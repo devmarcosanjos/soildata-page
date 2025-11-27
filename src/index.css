@@ -1,0 +1,484 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: tropical --default, dark --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "tropical";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: oklch(98% 0.01 120);
+  --color-base-200: oklch(95% 0.02 120);
+  --color-base-300: oklch(92% 0.03 120);
+  --color-base-content: oklch(25% 0.02 240);
+
+  --color-primary: oklch(60% 0.2 190);
+  --color-primary-content: oklch(98% 0.01 190);
+
+  --color-secondary: oklch(65% 0.25 150);
+  --color-secondary-content: oklch(98% 0.01 150);
+
+  --color-accent: oklch(70% 0.25 50);
+  --color-accent-content: oklch(20% 0.05 50);
+
+  --color-neutral: oklch(45% 0.03 240);
+  --color-neutral-content: oklch(98% 0.01 240);
+
+  --color-info: oklch(65% 0.2 200);
+  --color-info-content: oklch(98% 0.01 200);
+
+  --color-success: oklch(60% 0.25 140);
+  --color-success-content: oklch(98% 0.01 140);
+
+  --color-warning: oklch(75% 0.25 80);
+  --color-warning-content: oklch(25% 0.05 80);
+
+  --color-error: oklch(60% 0.3 15);
+  --color-error-content: oklch(98% 0.01 15);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+
+  --depth: 1;
+  --noise: 0;
+}
+
+:root {
+  --color-gray-500: rgb(128, 130, 132);
+  --color-gray-700: rgb(55, 65, 81);
+  --color-orange-600: rgb(234, 88, 12);
+  --color-orange-primary: #EA580C;
+  --color-orange-secondary: #C55B28;
+  --color-bg-light: #F5F5F5;
+  --color-bg-footer: #EBEBEB;
+  --color-white: #FFF;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0 !important;
+  font-family: 'Lato', sans-serif;
+}
+
+html {
+  ::-webkit-scrollbar {
+    background-color: transparent;
+    width: 15px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: oklch(70% 0.03 240);
+    border-radius: 0.5rem;
+    border: 4px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(60% 0.03 240);
+  }
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  margin: 1.5rem;
+}
+
+.menu.menu-horizontal summary.text-gray-500 {
+  color: rgb(128, 130, 132) !important;
+}
+
+.menu.menu-horizontal summary.text-gray-700 {
+  color: rgb(55, 65, 81) !important;
+}
+
+.menu.menu-horizontal summary.text-gray-500:hover {
+  background-color: transparent !important;
+  color: rgb(234 88 12) !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgb(234 88 12) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+}
+
+.menu.menu-horizontal a.text-gray-500 {
+  color: rgb(128, 130, 132) !important;
+}
+
+.menu.menu-horizontal a.text-gray-700 {
+  color: rgb(55, 65, 81) !important;
+}
+
+.menu.menu-horizontal a.text-gray-500:hover {
+  background-color: transparent !important;
+  color: rgb(234 88 12) !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgb(234 88 12) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+}
+
+.menu.menu-horizontal .dropdown.dropdown-hover:hover .dropdown-content,
+.menu.menu-horizontal .dropdown.dropdown-hover:focus .dropdown-content,
+.menu.menu-horizontal .dropdown.dropdown-hover:focus-within .dropdown-content {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+.menu.menu-horizontal .dropdown.dropdown-hover:hover .dropdown-content,
+.menu.menu-horizontal .dropdown.dropdown-hover .dropdown-content:hover {
+  display: block;
+}
+
+.menu.menu-horizontal li.dropdown-hover-menu {
+  position: relative;
+}
+
+.menu.menu-horizontal li.dropdown-hover-menu > ul.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: none;
+  z-index: 50;
+  margin-top: 0;
+  margin-left: 0;
+  padding-left: 0 !important;
+  transform: translateX(0);
+}
+
+.menu.menu-horizontal li.dropdown-hover-menu:hover > ul.dropdown-menu {
+  display: block;
+}
+
+.menu.menu-horizontal li.dropdown-hover-menu > ul.dropdown-menu:hover {
+  display: block;
+}
+
+.carousel-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.carousel-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.carousel-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(60% 0.03 240);
+  border-radius: 4px;
+}
+
+.carousel-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: oklch(50% 0.03 240);
+}
+
+/* Estilos para componentes de seleção com cor SoilData */
+.selecao-dados-soildata .checkbox .checkboxIconSquare {
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .checkbox[data-selected] .checkboxIconSquare {
+  border-color: #EA580C !important;
+  background-color: #C55B28 !important;
+}
+
+.selecao-dados-soildata .checkbox[data-hovered] .checkboxIconSquare,
+.selecao-dados-soildata .checkbox[data-pressed] .checkboxIconSquare {
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .checkbox[data-pressed] .checkboxIconSquare {
+  outline-color: #F97316 !important;
+}
+
+.selecao-dados-soildata .radio {
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .radio[data-selected='true'] {
+  border-color: #C55B28 !important;
+  background-color: rgba(234, 88, 12, 0.1) !important;
+}
+
+.selecao-dados-soildata .radio[data-selected='true'] .radioIcon {
+  background-color: #C55B28 !important;
+}
+
+.selecao-dados-soildata .radio[data-hovered='true'] {
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .radio[data-selected='true'][data-hovered='true'] {
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .radio[data-selected='true'][data-hovered='true'] .radioIcon {
+  background-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .react-aria-SliderThumb {
+  background: #C55B28 !important;
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .react-aria-SliderThumb[data-dragging] {
+  background: #EA580C !important;
+  outline-color: #F97316 !important;
+}
+
+.selecao-dados-soildata .react-aria-SliderThumb[data-focus-visible] {
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata .react-aria-SliderTrack::before {
+  background-color: #EA580C !important;
+}
+
+/* Estilos para Accordion com cor SoilData */
+.accordion[data-type='theme'][data-expanded='true'] {
+  border-color: #EA580C !important;
+}
+
+.accordion[data-type='theme'] .plusMinusIcon {
+  fill: #EA580C !important;
+  color: #EA580C !important;
+}
+
+.accordion[data-type='theme'] .plusMinusIcon svg {
+  fill: #EA580C !important;
+}
+
+.accordion[data-type='theme'] .plusMinusIcon path {
+  fill: #EA580C !important;
+}
+
+.accordion[data-type='theme'] .plusMinusIcon rect {
+  fill: #EA580C !important;
+}
+
+.accordion[data-type='theme'] .accordionBadge {
+  color: #C55B28 !important;
+  background-color: rgba(234, 88, 12, 0.1) !important;
+}
+
+/* Estilos para botões de download com cor SoilData - obrigatório #C55B28 */
+.download-button-soildata.button[data-hierarchy='secondary'] {
+  background-color: #C55B28 !important;
+  color: var(--color-neutral-1000) !important;
+  border-color: #C55B28 !important;
+}
+
+.download-button-soildata.button[data-hierarchy='secondary']:hover {
+  background-color: rgba(197, 91, 40, 0.8) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(197, 91, 40, 0.8) !important;
+}
+
+.download-button-soildata.button[data-hierarchy='secondary']:active {
+  background-color: rgba(197, 91, 40, 0.6) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(197, 91, 40, 0.6) !important;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-button {
+  background-color: var(--color-white);
+  border-color: var(--color-gray-500);
+  color: var(--color-gray-500);
+}
+
+.carousel-button:hover {
+  border-color: var(--color-orange-primary);
+  color: var(--color-orange-primary);
+}
+
+.dataset-card {
+  background-color: var(--color-white);
+  padding: 8px;
+  border-color: var(--color-gray-500);
+}
+
+.dataset-card:hover {
+  border-color: var(--color-orange-primary);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.dataset-card-content {
+  color: var(--color-gray-500);
+}
+
+.dataset-card:hover .dataset-card-content {
+  color: var(--color-orange-primary);
+}
+
+.navigation-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.dropdown-menu-custom {
+  padding-left: 0;
+  background-color: var(--color-orange-secondary);
+  width: auto;
+  min-width: fit-content;
+}
+
+.dropdown-link {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  color: white;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  display: block;
+  text-decoration: none;
+  text-decoration-color: white;
+  text-underline-offset: 4px;
+  transition: text-decoration 0.2s ease;
+}
+
+.dropdown-link:hover {
+  text-decoration: underline;
+  text-decoration-color: white;
+}
+
+.footer-gradient-section {
+  background: #F5F5F5;
+}
+
+.footer-gradient-main {
+  background: #E8E8E8;
+}
+
+.footer-gradient-bottom {
+  background: #363636;
+}
+
+/* Estilos para popup do mapa */
+.maplibregl-popup-content {
+  padding: 0 !important;
+  border-radius: var(--radius-box) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.maplibregl-popup-close-button {
+  color: #6b7280 !important;
+  font-size: 20px !important;
+  padding: 8px !important;
+  right: 8px !important;
+  top: 8px !important;
+}
+
+.maplibregl-popup-close-button:hover {
+  color: #C55B28 !important;
+  background-color: transparent !important;
+}
+
+.maplibregl-popup-content .card {
+  margin: 0 !important;
+}
+
+.maplibregl-popup-content .btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.maplibregl-popup-content .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.maplibregl-popup-content .soildata-popup-btn-primary:hover {
+  background-color: #A04A20 !important;
+  border-color: #A04A20 !important;
+}
+
+.maplibregl-popup-content .soildata-popup-btn-outline:hover {
+  background-color: #C55B28 !important;
+  color: white !important;
+  border-color: #C55B28 !important;
+}
+
+/* Background cinza claro para o painel lateral da plataforma (padrão MapBiomas) */
+[data-platform-leftbar] {
+  background-color: var(--color-base-200) !important;
+}
+
+/* Garantir fundo claro no painel lateral */
+[data-platform-leftbar] > * {
+  background-color: var(--color-base-200) !important;
+}
+
+/* Forçar fundo claro caso a variável não esteja definida */
+[data-platform-leftbar],
+[data-platform-leftbar] > div {
+  background-color: #F5F5F5 !important;
+}
+
+/* Estilos para Tabs da plataforma */
+[data-tabs-list] {
+  border-bottom: 1px solid var(--color-neutral-200) !important;
+}
+
+[data-tabs-trigger][data-state="active"] {
+  color: #EA580C !important;
+  border-bottom: 2px solid #EA580C !important;
+}
+
+[data-tabs-trigger]:hover {
+  color: #EA580C !important;
+}
+
+/* Estilos para RadioGroup no painel SOLO */
+.selecao-dados-soildata [data-radio-group] [data-radio-item][data-state="checked"] {
+  border-color: #EA580C !important;
+}
+
+.selecao-dados-soildata [data-radio-group] [data-radio-item][data-state="checked"]::before {
+  background-color: #EA580C !important;
+}
+
+/* Esconder botão de expandir (+) do componente Caption */
+.caption-no-expand button,
+.caption-no-expand [role="button"],
+.caption-no-expand [aria-label*="expand" i],
+.caption-no-expand [aria-label*="Expand" i] {
+  display: none !important;
+}
+
+/* Reduzir largura do painel direito da plataforma */
+[data-platform-rightbar],
+[data-platform-rightbar] > *,
+div[class*="rightbar"],
+div[class*="Rightbar"] {
+  max-width: 220px !important;
+  min-width: 220px !important;
+  width: 220px !important;
+}
+
+/* Forçar largura nos elementos internos do rightbar */
+[data-platform-rightbar] > div {
+  max-width: 220px !important;
+  width: 100% !important;
+}

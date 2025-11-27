@@ -1,0 +1,2 @@
+export { PublicationsSection } from './PublicationsSection';
+

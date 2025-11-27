@@ -1,0 +1,2 @@
+export { HeroPageLayout } from './HeroPageLayout';
+
