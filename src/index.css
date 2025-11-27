@@ -339,7 +339,7 @@ html {
   padding-left: 0;
   background-color: var(--color-orange-secondary);
   width: auto;
-  min-width: fit-content;
+  min-width: 14rem;
 }
 
 .dropdown-link {
@@ -353,6 +353,7 @@ html {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   display: block;
+  white-space: nowrap;
   text-decoration: none;
   text-decoration-color: white;
   text-underline-offset: 4px;

@@ -13,29 +13,28 @@ const menuItems: MenuItemType[] = [
     children: [
       { path: '/project', label: 'O Projeto' },
       { path: '/about', label: 'Quem Somos' },
-      { path: '/history', label: 'História' },
     ],
   },
   {
     path: '/data',
     label: 'Dados',
     children: [
-      { path: '/statistics', label: 'Estatísticas' },
-      { path: '/platform', label: 'Plataforma de Dados' },
       {
         path: '/dataverse',
         label: 'SoilData Repositório',
         external: true,
         href: 'https://soildata.mapbiomas.org/dataverse/soildata?q=',
       },
+      { path: '/platform', label: 'Plataforma de Dados' },
+      { path: '/statistics', label: 'Estatísticas' },
     ],
   },
   {
     path: '/methods',
     label: 'Métodos',
     children: [
-      { path: '/methods/integration', label: 'Integração dos dados' },
       { path: '/methods/curation', label: 'Curadoria de dados' },
+      { path: '/methods/integration', label: 'Integração dos dados' },
     ],
   },
   { path: '/faq', label: 'Perguntas Frequentes' },
