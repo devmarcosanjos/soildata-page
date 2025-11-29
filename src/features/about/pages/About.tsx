@@ -19,7 +19,7 @@ export function About() {
           {t('sections.coordination.title')}
         </h2>
         <ul className="list-none space-y-2">
-          {t('sections.coordination.members', { returnObjects: true }) as string[]).map((member, index) => (
+          {(t('sections.coordination.members', { returnObjects: true }) as string[]).map((member, index) => (
             <li key={index} className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
               {member}
             </li>
