@@ -33,5 +33,16 @@
       "legacy": "Legacy datasets"
     },
     "target": "You and your projects"
+  },
+  "collaborativeSection": {
+    "kicker": "COLLABORATIVE NETWORK",
+    "title": "Connect with the SoilData community",
+    "description": "Join the network that connects people, institutions and initiatives around Brazilian soil data.",
+    "items": {
+      "feedback": "Feedback and suggestions",
+      "shareTech": "Share technology",
+      "events": "Events and opportunities",
+      "contacts": "Contacts and partnerships"
+    }
   }
 }

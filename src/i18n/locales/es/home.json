@@ -33,5 +33,16 @@
       "legacy": "Bases históricas"
     },
     "target": "Tú y tus proyectos"
+  },
+  "collaborativeSection": {
+    "kicker": "RED COLABORATIVA",
+    "title": "Conéctate con la comunidad SoilData",
+    "description": "Participa en la red que conecta personas, instituciones e iniciativas en torno a los datos de suelos brasileños.",
+    "items": {
+      "feedback": "Comentarios y sugerencias",
+      "shareTech": "Compartir tecnología",
+      "events": "Eventos y oportunidades",
+      "contacts": "Contactos y colaboraciones"
+    }
   }
 }
