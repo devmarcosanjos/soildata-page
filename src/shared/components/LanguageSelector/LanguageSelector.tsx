@@ -33,9 +33,14 @@ export function LanguageSelector() {
               onClick={() => changeLanguage(lang)}
               className={`text-sm ${
                 currentLanguage === lang
-                  ? 'bg-primary text-primary-content font-semibold'
+                  ? 'font-semibold'
                   : 'hover:bg-base-200'
               }`}
+              style={
+                currentLanguage === lang
+                  ? { backgroundColor: '#C55B28', color: 'white' }
+                  : {}
+              }
             >
               {languageNames[lang]}
             </button>
