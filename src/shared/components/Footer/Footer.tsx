@@ -2,8 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Logo } from '../Logo';
 import { useI18n } from '@/shared/hooks/useI18n';
-import logoCNPq from '@/assets/cnpq.png';
-import logoDataCite from '@/assets/DataCite-Logo_stacked.svg';
 
 export function Footer() {
   const { t } = useTranslation('footer');
@@ -15,44 +13,6 @@ export function Footer() {
 
   return (
     <>
-      <section className="py-8 md:py-10 footer-gradient-section">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-6 lg:px-0">
-          <div className="max-w-[1200px] mx-auto w-full px-2 md:px-4 lg:px-0">
-            <div className="flex flex-col md:flex-row items-start justify-center md:justify-start gap-8 md:gap-12 lg:gap-16">
-              {/* Seção APOIO */}
-              <div className="flex flex-col items-center md:items-start">
-                <h3 className="text-sm font-semibold mb-6 text-center md:text-left text-gray-600">
-                  {t('support')}
-                </h3>
-                <div className="flex items-center justify-center" style={{ height: '95px' }}>
-                  <img
-                    src={logoCNPq}
-                    alt="CNPq"
-                    className="h-full w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                    style={{ maxHeight: '95px' }}
-                  />
-                </div>
-              </div>
-
-              {/* Seção INDEXADO */}
-              <div className="flex flex-col items-center md:items-start">
-                <h3 className="text-sm font-semibold mb-6 text-center md:text-left text-gray-600">
-                  {t('indexed')}
-                </h3>
-                <div className="flex items-center justify-center" style={{ height: '95px' }}>
-                  <img
-                    src={logoDataCite}
-                    alt="DataCite"
-                    className="h-full w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                    style={{ maxHeight: '95px' }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <footer className="footer sm:footer-horizontal text-base-content p-10 footer-gradient-main">
         <div className="max-w-[1920px] mx-auto w-full px-4 md:px-6 lg:px-0">
           <div className="max-w-[1200px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -60,9 +20,6 @@ export function Footer() {
               <div className="mb-4">
                 <Logo to={undefined} size="md" />
               </div>
-              <p className="text-sm text-gray-600">
-                {t('description')}
-              </p>
             </aside>
 
             <nav className="col-span-1">

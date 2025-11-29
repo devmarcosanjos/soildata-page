@@ -1,7 +1,7 @@
 {
+  "initiative": "INICIATIVA",
   "support": "APOYO",
-  "indexed": "INDEXADO",
-  "description": "Un repositorio integral de datos de suelo de MapBiomas, proporcionando a investigadores y formuladores de políticas información ambiental valiosa.",
+  "indexed": "INDEXADO POR",
   "quickLinks": {
     "title": "Enlaces Rápidos",
     "platform": "Plataforma de Datos",

@@ -1,7 +1,7 @@
 {
+  "initiative": "INITIATIVE",
   "support": "SUPPORT",
-  "indexed": "INDEXED",
-  "description": "A comprehensive repository of soil data from MapBiomas, providing researchers and policy makers with valuable environmental information.",
+  "indexed": "INDEXED BY",
   "quickLinks": {
     "title": "Quick Links",
     "platform": "Data Platform",
