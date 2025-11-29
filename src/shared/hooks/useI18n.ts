@@ -9,8 +9,9 @@ export function useI18n() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const changeLanguage = (lang: SupportedLanguage) => {
-    i18n.changeLanguage(lang);
+  const changeLanguage = async (lang: SupportedLanguage) => {
+    // Aguardar a atualização do i18n antes de navegar
+    await i18n.changeLanguage(lang);
     
     // Atualizar a URL mantendo o caminho atual
     const currentPath = location.pathname;
@@ -21,6 +22,15 @@ export function useI18n() {
   };
 
   const getCurrentLanguage = (): SupportedLanguage => {
+    // Priorizar o idioma da URL, que é a fonte da verdade
+    const pathSegments = location.pathname.split('/').filter(Boolean);
+    const firstSegment = pathSegments[0];
+    
+    if (SUPPORTED_LANGUAGES.includes(firstSegment as any)) {
+      return firstSegment as SupportedLanguage;
+    }
+    
+    // Fallback para i18n.language se não houver idioma na URL
     const lang = i18n.language.split('-')[0] as SupportedLanguage;
     return SUPPORTED_LANGUAGES.includes(lang) ? lang : 'pt';
   };

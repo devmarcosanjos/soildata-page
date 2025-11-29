@@ -1,7 +1,51 @@
 {
   "title": "Datos",
-  "repository": "Repositorio",
-  "statistics": "Estadísticas",
-  "tutorials": "Tutoriales"
+  "repository": {
+    "title": "Accede al Repositorio Dataverse",
+    "description": "Navega por los conjuntos de datos de SoilData alojados en la plataforma Dataverse."
+  },
+  "statistics": {
+    "title": "MÉTRICAS DE SOLIDDATA",
+    "description": "Estadísticas y métricas del repositorio SoilData en tiempo real. Acompaña el crecimiento del repositorio, descargas, conjuntos de datos y más.",
+    "sections": {
+      "overview": {
+        "title": "Resumen",
+        "totalDatasets": "Total de Conjuntos de Datos",
+        "totalDownloads": "Total de Descargas",
+        "totalFiles": "Total de Archivos",
+        "avgDownloadsPerDataset": "Promedio de Descargas por Conjunto de Datos",
+        "avgFilesPerDataset": "Promedio de Archivos por Conjunto de Datos"
+      },
+      "monthlyDownloads": {
+        "title": "Descargas a lo Largo del Tiempo",
+        "chart": {
+          "cumulative": "Acumulativo",
+          "monthly": "Mensual",
+          "period": "Período:",
+          "6months": "6 Meses",
+          "year": "Anual",
+          "all": "Todos",
+          "cumulativeDescription": "Valores acumulados a lo largo del tiempo",
+          "monthlyDescription": "Descargas por mes (diferencia entre meses consecutivos)",
+          "noData": "No hay datos disponibles",
+          "total": "Total:",
+          "monthlySum": "Suma de descargas mensuales:",
+          "accumulated": "acumulado",
+          "downloads": "descargas",
+          "tooltipCumulative": "{{date}}: {{count}} descargas acumuladas",
+          "tooltipMonthly": "{{date}}: {{monthly}} descargas (Total: {{total}})"
+        }
+      }
+    },
+    "error": "No se pudieron cargar las métricas. Por favor, inténtalo de nuevo más tarde."
+  },
+  "tutorials": {
+    "title": "Tutoriales",
+    "description": "Guías e instrucciones paso a paso para herramientas y conjuntos de datos de SoilData."
+  },
+  "methods": {
+    "title": "Métodos",
+    "description": "Notas metodológicas y reglas de curación de SoilData."
+  }
 }
 

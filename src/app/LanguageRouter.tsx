@@ -8,7 +8,7 @@ export function LanguageRouter() {
   const location = useLocation();
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-
+  
   useEffect(() => {
     const pathSegments = location.pathname.split('/').filter(Boolean);
     const firstSegment = pathSegments[0];
@@ -22,11 +22,18 @@ export function LanguageRouter() {
       return;
     }
 
-    // Se a rota começa com um idioma suportado, atualizar o i18n
+    // Se a rota começa com um idioma suportado, atualizar o i18n imediatamente
     const lang = firstSegment as typeof SUPPORTED_LANGUAGES[number];
     const currentLang = i18n.language.split('-')[0];
+    
+    // Sempre atualizar o idioma para garantir sincronização
     if (currentLang !== lang) {
-      i18n.changeLanguage(lang);
+      // Aguardar a atualização do i18n para garantir sincronização
+      i18n.changeLanguage(lang).catch((error) => {
+        console.error('Error changing language:', error);
+        // Se houver erro, tentar novamente
+        i18n.changeLanguage(lang);
+      });
     }
   }, [location.pathname, navigate, i18n]);
 

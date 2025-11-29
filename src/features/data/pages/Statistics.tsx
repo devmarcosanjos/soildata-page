@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { HeroPageLayout } from '@/shared/components/HeroPageLayout';
 import { MetricsChart } from '@/shared/components/Metrics';
 import {
@@ -11,6 +12,8 @@ import type { MonthlyMetric } from '@/types/metrics';
 import { Database, Download, FileText, TrendingUp } from 'lucide-react';
 
 export function Statistics() {
+  const { t, i18n } = useTranslation('data');
+  const locale = i18n.language.split('-')[0] || 'pt';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,7 +97,7 @@ export function Statistics() {
 
       } catch (err) {
         console.error('Erro ao buscar métricas:', err);
-        setError('Não foi possível carregar as métricas. Tente novamente mais tarde.');
+        setError(t('statistics.error'));
       } finally {
         setLoading(false);
       }
@@ -108,12 +111,11 @@ export function Statistics() {
   const avgFilesPerDataset = totalDatasets > 0 ? (totalFiles / totalDatasets).toFixed(1) : '0';
 
   return (
-    <HeroPageLayout title="MÉTRICAS DO SOLIDDATA">
+    <HeroPageLayout title={t('statistics.title')}>
       {/* Descrição */}
       <div className="mb-8 md:mb-12">
         <p className="text-base text-gray-500 leading-relaxed" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-          Estatísticas e métricas do repositório SoilData em tempo real. Acompanhe o crescimento do repositório, 
-          downloads, datasets e muito mais.
+          {t('statistics.description')}
         </p>
       </div>
 
@@ -126,7 +128,7 @@ export function Statistics() {
       {/* Seção: Visão Geral */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 md:mb-8 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          Visão Geral
+          {t('statistics.sections.overview.title')}
         </h2>
         
         {loading ? (
@@ -139,17 +141,17 @@ export function Statistics() {
               <div className="stat-figure" style={{ color: '#C55B28' }}>
                 <Database className="w-8 h-8" />
               </div>
-              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>Total de Datasets</div>
-              <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", color: '#C55B28', fontSize: '2.5rem' }}>{totalDatasets.toLocaleString('pt-BR')}</div>
+              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>{t('statistics.sections.overview.totalDatasets')}</div>
+              <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", color: '#C55B28', fontSize: '2.5rem' }}>{totalDatasets.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')}</div>
             </div>
             
             <div className="stat">
               <div className="stat-figure" style={{ color: '#C55B28' }}>
                 <Download className="w-8 h-8" />
               </div>
-              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>Total de Downloads</div>
+              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>{t('statistics.sections.overview.totalDownloads')}</div>
               <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", color: '#C55B28', fontSize: '2.5rem' }}>
-                {totalDownloads.toLocaleString('pt-BR')}
+                {totalDownloads.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')}
               </div>
             </div>
             
@@ -157,8 +159,8 @@ export function Statistics() {
               <div className="stat-figure" style={{ color: '#C55B28' }}>
                 <FileText className="w-8 h-8" />
               </div>
-              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>Total de Arquivos</div>
-              <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", color: '#C55B28', fontSize: '2.5rem' }}>{totalFiles.toLocaleString('pt-BR')}</div>
+              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>{t('statistics.sections.overview.totalFiles')}</div>
+              <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", color: '#C55B28', fontSize: '2.5rem' }}>{totalFiles.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')}</div>
             </div>
           </div>
         )}
@@ -170,14 +172,14 @@ export function Statistics() {
               <div className="stat-figure" style={{ color: '#C55B28' }}>
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>Média de Downloads por Dataset</div>
-              <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", fontSize: '2rem', color: '#374151' }}>{avgDownloadsPerDataset.toLocaleString('pt-BR')}</div>
+              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>{t('statistics.sections.overview.avgDownloadsPerDataset')}</div>
+              <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", fontSize: '2rem', color: '#374151' }}>{avgDownloadsPerDataset.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')}</div>
             </div>
             <div className="stat">
               <div className="stat-figure" style={{ color: '#C55B28' }}>
                 <FileText className="w-6 h-6" />
               </div>
-              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>Média de Arquivos por Dataset</div>
+              <div className="stat-title" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>{t('statistics.sections.overview.avgFilesPerDataset')}</div>
               <div className="stat-value" style={{ fontFamily: "'Lato', sans-serif", fontSize: '2rem', color: '#374151' }}>{avgFilesPerDataset}</div>
             </div>
           </div>
@@ -187,7 +189,7 @@ export function Statistics() {
       {/* Seção: Downloads Mensais */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 md:mb-8 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          Downloads ao Longo do Tempo
+          {t('statistics.sections.monthlyDownloads.title')}
         </h2>
         <div className="w-full overflow-x-auto">
           <MetricsChart

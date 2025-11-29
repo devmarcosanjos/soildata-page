@@ -80,11 +80,32 @@ const resources = {
   },
 };
 
+// Detectar idioma da URL na inicialização
+const getInitialLanguage = (): string => {
+  if (typeof window !== 'undefined') {
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const firstSegment = pathSegments[0];
+    if (['pt', 'en', 'es'].includes(firstSegment)) {
+      return firstSegment;
+    }
+    // Se não tem idioma na URL, verificar localStorage
+    const storedLang = localStorage.getItem('i18nextLng');
+    if (storedLang) {
+      const lang = storedLang.split('-')[0];
+      if (['pt', 'en', 'es'].includes(lang)) {
+        return lang;
+      }
+    }
+  }
+  return 'pt';
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
+    lng: getInitialLanguage(),
     fallbackLng: 'pt',
     defaultNS: 'common',
     ns: [
@@ -106,10 +127,11 @@ i18n
     detection: {
       order: ['path', 'localStorage', 'navigator'],
       lookupFromPathIndex: 0,
-      caches: ['localStorage'],
+      caches: [],
       checkWhitelist: true,
     },
     supportedLngs: ['pt', 'en', 'es'],
+    load: 'languageOnly',
   });
 
 export default i18n;

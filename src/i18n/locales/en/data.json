@@ -1,7 +1,51 @@
 {
   "title": "Data",
-  "repository": "Repository",
-  "statistics": "Statistics",
-  "tutorials": "Tutorials"
+  "repository": {
+    "title": "Access the Dataverse Repository",
+    "description": "Browse SoilData datasets hosted on the Dataverse platform."
+  },
+  "statistics": {
+    "title": "SOILDATA METRICS",
+    "description": "Real-time statistics and metrics from the SoilData repository. Track repository growth, downloads, datasets and more.",
+    "sections": {
+      "overview": {
+        "title": "Overview",
+        "totalDatasets": "Total Datasets",
+        "totalDownloads": "Total Downloads",
+        "totalFiles": "Total Files",
+        "avgDownloadsPerDataset": "Average Downloads per Dataset",
+        "avgFilesPerDataset": "Average Files per Dataset"
+      },
+      "monthlyDownloads": {
+        "title": "Downloads Over Time",
+        "chart": {
+          "cumulative": "Cumulative",
+          "monthly": "Monthly",
+          "period": "Period:",
+          "6months": "6 Months",
+          "year": "Annual",
+          "all": "All",
+          "cumulativeDescription": "Cumulative values over time",
+          "monthlyDescription": "Downloads per month (difference between consecutive months)",
+          "noData": "No data available",
+          "total": "Total:",
+          "monthlySum": "Sum of monthly downloads:",
+          "accumulated": "accumulated",
+          "downloads": "downloads",
+          "tooltipCumulative": "{{date}}: {{count}} accumulated downloads",
+          "tooltipMonthly": "{{date}}: {{monthly}} downloads (Total: {{total}})"
+        }
+      }
+    },
+    "error": "Could not load metrics. Please try again later."
+  },
+  "tutorials": {
+    "title": "Tutorials",
+    "description": "Guides and walkthroughs for SoilData tools and datasets."
+  },
+  "methods": {
+    "title": "Methods",
+    "description": "SoilData methodological notes and curation rules."
+  }
 }
 

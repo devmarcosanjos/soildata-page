@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { type MonthlyMetric } from '@/types/metrics';
 
 interface MetricsChartProps {
@@ -14,6 +15,8 @@ export function MetricsChart({
   loading = false,
   className = '',
 }: MetricsChartProps) {
+  const { t, i18n } = useTranslation('data');
+  const locale = i18n.language.split('-')[0] || 'pt';
   const [viewMode, setViewMode] = useState<'cumulative' | 'monthly'>('cumulative');
   const [periodFilter, setPeriodFilter] = useState<'6months' | 'year' | 'all'>('all');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -30,7 +33,7 @@ export function MetricsChart({
             {loading ? (
               <span className="loading loading-spinner loading-lg"></span>
             ) : (
-              <p className="text-base-content/70">Nenhum dado disponível</p>
+              <p className="text-base-content/70">{t('statistics.sections.monthlyDownloads.chart.noData')}</p>
             )}
           </div>
         </div>
@@ -115,7 +118,7 @@ export function MetricsChart({
                     : { color: '#6B7280' })
                 }}
               >
-                Acumulativo
+                {t('statistics.sections.monthlyDownloads.chart.cumulative')}
               </button>
               <button
                 className={`btn btn-sm join-item ${viewMode === 'monthly' ? 'btn-active' : 'btn-ghost'}`}
@@ -128,7 +131,7 @@ export function MetricsChart({
                     : { color: '#6B7280' })
                 }}
               >
-                Mensal
+                {t('statistics.sections.monthlyDownloads.chart.monthly')}
               </button>
             </div>
           </div>
@@ -136,7 +139,7 @@ export function MetricsChart({
           {/* Filtros de período */}
           <div className="flex flex-wrap gap-2">
             <span style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280', alignSelf: 'center' }}>
-              Período:
+              {t('statistics.sections.monthlyDownloads.chart.period')}
             </span>
             <div className="join">
               <button
@@ -150,7 +153,7 @@ export function MetricsChart({
                     : { color: '#6B7280' })
                 }}
               >
-                6 Meses
+                {t('statistics.sections.monthlyDownloads.chart.6months')}
               </button>
               <button
                 className={`btn btn-sm join-item ${periodFilter === 'year' ? 'btn-active' : 'btn-ghost'}`}
@@ -163,7 +166,7 @@ export function MetricsChart({
                     : { color: '#6B7280' })
                 }}
               >
-                Anual
+                {t('statistics.sections.monthlyDownloads.chart.year')}
               </button>
               <button
                 className={`btn btn-sm join-item ${periodFilter === 'all' ? 'btn-active' : 'btn-ghost'}`}
@@ -176,7 +179,7 @@ export function MetricsChart({
                     : { color: '#6B7280' })
                 }}
               >
-                Todos
+                {t('statistics.sections.monthlyDownloads.chart.all')}
               </button>
             </div>
           </div>
@@ -185,8 +188,8 @@ export function MetricsChart({
         <div className="mb-2" style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', color: '#6B7280' }}>
           <span className="badge badge-ghost" style={{ fontFamily: "'Lato', sans-serif", fontSize: '12px', color: '#6B7280', backgroundColor: '#F3F4F6' }}>
             {viewMode === 'cumulative' 
-              ? 'Valores acumulados ao longo do tempo' 
-              : 'Downloads por mês (diferença entre meses consecutivos)'}
+              ? t('statistics.sections.monthlyDownloads.chart.cumulativeDescription')
+              : t('statistics.sections.monthlyDownloads.chart.monthlyDescription')}
           </span>
         </div>
 
@@ -216,8 +219,15 @@ export function MetricsChart({
                   style={{ overflow: 'visible' }}
                   title={
                     viewMode === 'cumulative'
-                      ? `${formatDate(item.date)}: ${item.count.toLocaleString('pt-BR')} downloads acumulados`
-                      : `${formatDate(item.date)}: ${monthlyValue.toLocaleString('pt-BR')} downloads (Total: ${cumulativeValue.toLocaleString('pt-BR')})`
+                      ? t('statistics.sections.monthlyDownloads.chart.tooltipCumulative', { 
+                          date: formatDate(item.date), 
+                          count: item.count.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')
+                        })
+                      : t('statistics.sections.monthlyDownloads.chart.tooltipMonthly', {
+                          date: formatDate(item.date),
+                          monthly: monthlyValue.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR'),
+                          total: cumulativeValue.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')
+                        })
                   }
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
@@ -251,8 +261,8 @@ export function MetricsChart({
                       }}
                     >
                       {viewMode === 'cumulative' 
-                        ? `${item.count.toLocaleString('pt-BR')} acumulado`
-                        : `${monthlyValue.toLocaleString('pt-BR')} downloads`}
+                        ? `${item.count.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')} ${t('statistics.sections.monthlyDownloads.chart.accumulated')}`
+                        : `${monthlyValue.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')} ${t('statistics.sections.monthlyDownloads.chart.downloads')}`}
                     </div>
                   </div>
                   <div className="mt-4 w-full" style={{ 
@@ -290,14 +300,14 @@ export function MetricsChart({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-6 pt-4" style={{ borderTop: '1px solid #E5E7EB' }}>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', fontWeight: '600', color: '#374151' }}>Total:</span>
+              <span style={{ fontFamily: "'Lato', sans-serif", fontSize: '14px', fontWeight: '600', color: '#374151' }}>{t('statistics.sections.monthlyDownloads.chart.total')}</span>
               <span style={{ fontFamily: "'Lato', sans-serif", fontSize: '1.25rem', fontWeight: 'bold', color: '#C55B28' }}>
-                {totalCumulative.toLocaleString('pt-BR')}
+                {totalCumulative.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')}
               </span>
             </div>
             {viewMode === 'monthly' && (
               <div style={{ fontFamily: "'Lato', sans-serif", fontSize: '12px', color: '#9CA3AF' }}>
-                Soma dos downloads mensais: {monthlyData.reduce((sum, item) => sum + item.count, 0).toLocaleString('pt-BR')}
+                {t('statistics.sections.monthlyDownloads.chart.monthlySum')} {monthlyData.reduce((sum, item) => sum + item.count, 0).toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')}
               </div>
             )}
           </div>

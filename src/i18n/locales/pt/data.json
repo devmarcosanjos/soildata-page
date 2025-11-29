@@ -1,7 +1,51 @@
 {
   "title": "Dados",
-  "repository": "Repositório",
-  "statistics": "Estatísticas",
-  "tutorials": "Tutoriais"
+  "repository": {
+    "title": "Acesse o Repositório Dataverse",
+    "description": "Navegue pelos conjuntos de dados do SoilData hospedados na plataforma Dataverse."
+  },
+  "statistics": {
+    "title": "MÉTRICAS DO SOLIDDATA",
+    "description": "Estatísticas e métricas do repositório SoilData em tempo real. Acompanhe o crescimento do repositório, downloads, datasets e muito mais.",
+    "sections": {
+      "overview": {
+        "title": "Visão Geral",
+        "totalDatasets": "Total de Datasets",
+        "totalDownloads": "Total de Downloads",
+        "totalFiles": "Total de Arquivos",
+        "avgDownloadsPerDataset": "Média de Downloads por Dataset",
+        "avgFilesPerDataset": "Média de Arquivos por Dataset"
+      },
+      "monthlyDownloads": {
+        "title": "Downloads ao Longo do Tempo",
+        "chart": {
+          "cumulative": "Acumulativo",
+          "monthly": "Mensal",
+          "period": "Período:",
+          "6months": "6 Meses",
+          "year": "Anual",
+          "all": "Todos",
+          "cumulativeDescription": "Valores acumulados ao longo do tempo",
+          "monthlyDescription": "Downloads por mês (diferença entre meses consecutivos)",
+          "noData": "Nenhum dado disponível",
+          "total": "Total:",
+          "monthlySum": "Soma dos downloads mensais:",
+          "accumulated": "acumulado",
+          "downloads": "downloads",
+          "tooltipCumulative": "{{date}}: {{count}} downloads acumulados",
+          "tooltipMonthly": "{{date}}: {{monthly}} downloads (Total: {{total}})"
+        }
+      }
+    },
+    "error": "Não foi possível carregar as métricas. Tente novamente mais tarde."
+  },
+  "tutorials": {
+    "title": "Tutoriais",
+    "description": "Guias e instruções passo a passo para ferramentas e conjuntos de dados do SoilData."
+  },
+  "methods": {
+    "title": "Métodos",
+    "description": "Notas metodológicas e regras de curadoria do SoilData."
+  }
 }
 
