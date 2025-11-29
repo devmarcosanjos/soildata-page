@@ -21,7 +21,7 @@ const Circle = forwardRef<HTMLDivElement, CircleProps>(
       <div
         ref={ref}
         className={cn(
-          'z-10 flex items-center justify-center rounded-full border-2 border-[var(--color-orange-primary)] bg-white shadow-[0_0_20px_-12px_rgba(0,0,0,0.5)]',
+          'z-10 flex items-center justify-center rounded-full border-2 border-(--color-orange-primary) bg-white shadow-[0_0_20px_-12px_rgba(0,0,0,0.5)]',
           className,
         )}
       >
@@ -41,7 +41,7 @@ export function PlatformPreviewSection() {
   const userRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <section className="py-8 md:py-12 lg:py-16 bg-[var(--color-orange-background)]">
+    <section className="py-8 md:py-12 lg:py-16 bg-(--color-orange-background)">
       <div className="max-w-[1920px] mx-auto px-4 md:px-6 lg:px-0">
         <div className="max-w-[1200px] mx-auto w-full px-2 md:px-4 lg:px-0">
           <div className="rounded-2xl bg-white/90 shadow-sm border border-base-300 px-4 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
@@ -78,7 +78,7 @@ export function PlatformPreviewSection() {
                     <div className="flex flex-col justify-center">
                       <Circle
                         ref={soilDataRef}
-                        className="size-14 md:size-16 bg-white border-[var(--color-orange-primary)]"
+                        className="size-14 md:size-16 bg-white border-(--color-orange-primary)"
                       >
                         <img
                           src="/soildata-favicon.png"
@@ -105,7 +105,7 @@ export function PlatformPreviewSection() {
                         ref={userRef}
                         className="size-14 md:size-16"
                       >
-                        <User className="w-4 h-4 md:w-5 md:h-5 text-[var(--color-orange-primary)]" />
+                        <User className="w-4 h-4 md:w-5 md:h-5 text-(--color-orange-primary)" />
                       </Circle>
                     </div>
                   </div>

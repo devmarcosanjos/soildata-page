@@ -2,7 +2,7 @@ import type React from 'react';
 import { forwardRef, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Database, FileText, TextSearch } from 'lucide-react';
+import { Database, FileText, TextSearch, User } from 'lucide-react';
 import { AnimatedBeam } from '@/registry/magicui/animated-beam';
 import { cn } from '@/shared/utils/cn';
 
@@ -21,7 +21,7 @@ const Circle = forwardRef<HTMLDivElement, CircleProps>(
       <div
         ref={ref}
         className={cn(
-          'z-10 flex items-center justify-center rounded-full border-2 border-[var(--color-orange-primary)] bg-white shadow-[0_0_20px_-12px_rgba(0,0,0,0.5)]',
+          'z-10 flex items-center justify-center rounded-full border-2 border-(--color-orange-primary) bg-white shadow-[0_0_20px_-12px_rgba(0,0,0,0.5)]',
           className,
         )}
       >
@@ -43,7 +43,7 @@ export function RepositoryPreviewSection() {
   const userRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <section className="py-8 md:py-12 lg:py-16 bg-[var(--color-orange-background)]">
+    <section className="py-8 md:py-12 lg:py-16 bg-(--color-orange-background)">
       <div className="max-w-[1920px] mx-auto px-4 md:px-6 lg:px-0">
         <div className="max-w-[1200px] mx-auto w-full px-2 md:px-4 lg:px-0">
           <div className="rounded-2xl bg-white/90 shadow-sm border border-base-300 px-4 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
@@ -82,25 +82,25 @@ export function RepositoryPreviewSection() {
                         ref={source1Ref}
                         className="size-14 md:size-18"
                       >
-                        <FileText className="w-4 h-4 md:w-5 md:h-5 text-[var(--color-orange-primary)]" />
+                        <FileText className="w-4 h-4 md:w-5 md:h-5 text-(--color-orange-primary)" />
                       </Circle>
                       <Circle
                         ref={source2Ref}
                         className="size-14 md:size-18"
                       >
-                        <TextSearch className="w-4 h-4 md:w-5 md:h-5 text-[var(--color-orange-primary)]" />
+                        <TextSearch className="w-4 h-4 md:w-5 md:h-5 text-(--color-orange-primary)" />
                       </Circle>
                       <Circle
                         ref={source3Ref}
                         className="size-14 md:size-18"
                       >
-                        <Database className="w-4 h-4 md:w-5 md:h-5 text-[var(--color-orange-primary)]" />
+                        <Database className="w-4 h-4 md:w-5 md:h-5 text-(--color-orange-primary)" />
                       </Circle>
                     </div>
                     <div className="flex flex-col justify-center">
                       <Circle
                         ref={soilDataRef}
-                        className="size-18 md:size-22 flex items-center justify-center bg-white border-[var(--color-orange-primary)]"
+                        className="size-18 md:size-22 flex items-center justify-center bg-white border-(--color-orange-primary)"
                       >
                         <img
                           src="/soildata-favicon.png"
@@ -114,7 +114,7 @@ export function RepositoryPreviewSection() {
                         ref={userRef}
                         className="size-14 md:size-18"
                       >
-                        <Database className="w-4 h-4 md:w-5 md:h-5 text-[var(--color-orange-primary)]" />
+                        <User className="w-4 h-4 md:w-5 md:h-5 text-(--color-orange-primary)" />
                       </Circle>
                     </div>
                   </div>
@@ -136,8 +136,8 @@ export function RepositoryPreviewSection() {
                   />
                   <AnimatedBeam
                     containerRef={containerRef}
-                    fromRef={soilDataRef}
-                    toRef={userRef}
+                    fromRef={userRef}
+                    toRef={soilDataRef}
                   />
                 </div>
               </div>

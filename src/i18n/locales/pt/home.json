@@ -15,7 +15,7 @@
     "description": "Visualize e explore dados de solos brasileiros de forma interativa através da nossa plataforma de visualização geoespacial.",
     "ctaButton": "Acessar Plataforma",
     "imageAlt": "Visualização da plataforma SoilData",
-    "nodeLabel": "Plataforma"
+    "nodeLabel": "Plataforma de visualização de dados"
   },
   "repositorySection": {
     "title": "Conheça o Repositório SoilData",

@@ -23,7 +23,7 @@ export function AnimatedBeam({
   fromRef,
   toRef,
   className,
-  color = 'var(--color-orange-primary)',
+  color = 'var(--color-orange-secondary)',
   strokeWidth = 2,
 }: AnimatedBeamProps) {
   const [points, setPoints] = useState<BeamPoints | null>(null);
@@ -95,4 +95,3 @@ export function AnimatedBeam({
     </svg>
   );
 }
-

@@ -15,7 +15,7 @@
     "description": "Visualiza y explora datos de suelos brasileños de forma interactiva a través de nuestra plataforma de visualización geoespacial.",
     "ctaButton": "Acceder a la Plataforma",
     "imageAlt": "Visualización de la plataforma SoilData",
-    "nodeLabel": "Plataforma"
+    "nodeLabel": "Plataforma de visualización de datos"
   },
   "repositorySection": {
     "title": "Conoce el Repositorio SoilData",

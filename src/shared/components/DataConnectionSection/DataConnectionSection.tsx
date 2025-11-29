@@ -14,7 +14,7 @@ const Circle = forwardRef<HTMLDivElement, CircleProps>(
       <div
         ref={ref}
         className={cn(
-          'z-10 flex size-12 items-center justify-center rounded-full border-2 border-[var(--color-orange-primary)] bg-white p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.5)]',
+          'z-10 flex size-12 items-center justify-center rounded-full border-2 border-(--color-orange-primary) bg-white p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.5)]',
           className,
         )}
       >
@@ -36,7 +36,7 @@ export function DataConnectionSection() {
   const userRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <section className="py-8 md:py-12 lg:py-16 bg-[var(--color-bg-light)]">
+    <section className="py-8 md:py-12 lg:py-16 bg-(--color-bg-light)">
       <div className="max-w-[1920px] mx-auto px-4 md:px-6 lg:px-0">
         <div className="max-w-[1200px] mx-auto w-full px-2 md:px-4 lg:px-0">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
@@ -80,7 +80,7 @@ export function DataConnectionSection() {
                 <div className="flex flex-col justify-center">
                   <Circle
                     ref={soilDataRef}
-                    className="size-16 text-xs md:text-sm font-semibold bg-[var(--color-orange-primary)] text-white border-[var(--color-orange-primary)]"
+                    className="size-16 text-xs md:text-sm font-semibold bg-(--color-orange-primary) text-white border-(--color-orange-primary)"
                   >
                     SoilData
                   </Circle>
