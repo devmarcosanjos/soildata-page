@@ -31,8 +31,10 @@ export function LanguageRouter() {
       // Aguardar a atualização do i18n para garantir sincronização
       i18n.changeLanguage(lang).catch((error) => {
         console.error('Error changing language:', error);
-        // Se houver erro, tentar novamente
-        i18n.changeLanguage(lang);
+        // Se houver erro, tentar novamente com tratamento adequado
+        i18n.changeLanguage(lang).catch((retryError) => {
+          console.error('Error on retry changing language:', retryError);
+        });
       });
     }
   }, [location.pathname, navigate, i18n]);
@@ -50,16 +52,12 @@ export function LanguageRouter() {
     return path;
   };
 
-  // Se estamos na raiz com idioma, redirecionar para /{lang}/discover-soildata
-  if (pathSegments.length === 1 && SUPPORTED_LANGUAGES.includes(firstSegment as any)) {
-    return <Navigate to={`/${firstSegment}/discover-soildata`} replace />;
-  }
-
   return (
     <Routes>
       {SUPPORTED_LANGUAGES.map((lang) =>
         appRoutes.map((route) => {
-          const routePath = route.path === '/' ? '/discover-soildata' : route.path;
+          // A rota '/' deve mapear para /{lang}/, não para /{lang}/discover-soildata
+          const routePath = route.path === '/' ? '/' : route.path;
           const fullPath = `/${lang}${routePath}`;
           
           return (
@@ -71,6 +69,14 @@ export function LanguageRouter() {
           );
         })
       )}
+      {/* Se estamos na raiz com idioma, redirecionar para /{lang}/ (home) */}
+      {SUPPORTED_LANGUAGES.map((lang) => (
+        <Route
+          key={`${lang}-root-redirect`}
+          path={`/${lang}`}
+          element={<Navigate to={`/${lang}/`} replace />}
+        />
+      ))}
       {/* Redirecionar rotas antigas sem idioma */}
       <Route
         path="*"
@@ -78,8 +84,8 @@ export function LanguageRouter() {
           <Navigate
             to={`/${currentLang}${
               location.pathname === '/'
-                ? '/discover-soildata'
-                : removeLanguagePrefix(location.pathname) || '/discover-soildata'
+                ? '/'
+                : removeLanguagePrefix(location.pathname) || '/'
             }`}
             replace
           />

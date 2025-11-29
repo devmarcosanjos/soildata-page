@@ -22,7 +22,7 @@ export function Logo({ to = '/', className = '', size = 'lg', onClick }: LogoPro
   
   const getLocalizedPath = (path: string) => {
     if (path === '/' || path === '') {
-      return `/${currentLanguage}/discover-soildata`;
+      return `/${currentLanguage}/`;
     }
     return `/${currentLanguage}${path}`;
   };

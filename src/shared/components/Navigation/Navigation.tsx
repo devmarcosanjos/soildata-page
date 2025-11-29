@@ -10,7 +10,7 @@ interface MenuItemType {
 
 const menuItems: MenuItemType[] = [
   {
-    path: '/discover-soildata',
+    path: '/',
     labelKey: 'discoverSoildata',
     children: [
       { path: '/project', labelKey: 'menu.project' },
