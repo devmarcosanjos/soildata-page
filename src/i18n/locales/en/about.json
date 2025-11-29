@@ -1,0 +1,57 @@
+{
+  "title": "ABOUT US",
+  "intro": "The MapBiomas network is collaborative and brings together non-governmental organizations, universities and technology companies that analyze data on biomes and cross-cutting themes. We also have technical partners and a group of funders who support MapBiomas work.",
+  "sections": {
+    "coordination": {
+      "title": "COORDINATION",
+      "members": [
+        "Alessandro Samuel-Rosa | General Coordination",
+        "Taciara Zborowski Horst | XXXXXX",
+        "Marcos Alexandre dos Anjos | XXXXXX"
+      ]
+    },
+    "techPartners": {
+      "title": "TECHNOLOGY PARTNERS",
+      "members": [
+        "Google",
+        "EcoStage",
+        "Pedometrics Laboratory (LdP)",
+        "XXXXXX"
+      ]
+    },
+    "institutionalPartners": {
+      "title": "INSTITUTIONAL PARTNERS",
+      "members": [
+        "Instituto Arapyaú",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    },
+    "formerMembers": {
+      "title": "FORMER MEMBERS",
+      "members": [
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    },
+    "funding": {
+      "title": "FUNDING",
+      "members": [
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    },
+    "supportingUsers": {
+      "title": "SUPPORTING USERS",
+      "members": [
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    }
+  }
+}
+

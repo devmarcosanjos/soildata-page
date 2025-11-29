@@ -1,0 +1,28 @@
+{
+  "support": "SUPPORT",
+  "indexed": "INDEXED",
+  "description": "A comprehensive repository of soil data from MapBiomas, providing researchers and policy makers with valuable environmental information.",
+  "quickLinks": {
+    "title": "Quick Links",
+    "platform": "Data Platform",
+    "repository": "Data Repository",
+    "statistics": "Statistics",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "resources": {
+    "title": "Resources",
+    "dictionary": "Data Dictionary",
+    "spreadsheet": "Data Spreadsheet Template"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  },
+  "copyright": "© {{year}} MapBiomas. All rights reserved.",
+  "developed": "Developed by",
+  "lab": "Pedometrics Laboratory - UTFPR",
+  "ecostage": "EcoEstage"
+}
+

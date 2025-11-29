@@ -1,44 +1,46 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/shared/hooks/useI18n';
 
 interface MenuItemType {
   path: string;
-  label: string;
-  children?: { path: string; label: string; external?: boolean; href?: string }[];
+  labelKey: string;
+  children?: { path: string; labelKey: string; external?: boolean; href?: string }[];
 }
 
 const menuItems: MenuItemType[] = [
   {
     path: '/discover-soildata',
-    label: 'Conheça o SoilData',
+    labelKey: 'discoverSoildata',
     children: [
-      { path: '/project', label: 'O Projeto' },
-      { path: '/about', label: 'Quem Somos' },
+      { path: '/project', labelKey: 'menu.project' },
+      { path: '/about', labelKey: 'menu.about' },
     ],
   },
   {
     path: '/data',
-    label: 'Dados',
+    labelKey: 'data',
     children: [
       {
         path: '/dataverse',
-        label: 'SoilData Repositório',
+        labelKey: 'menu.repository',
         external: true,
         href: 'https://soildata.mapbiomas.org/dataverse/soildata?q=',
       },
-      { path: '/platform', label: 'Plataforma de Dados' },
-      { path: '/statistics', label: 'Estatísticas' },
+      { path: '/platform', labelKey: 'menu.platform' },
+      { path: '/statistics', labelKey: 'menu.statistics' },
     ],
   },
   {
     path: '/methods',
-    label: 'Métodos',
+    labelKey: 'methods',
     children: [
-      { path: '/methods/curation', label: 'Curadoria de dados' },
-      { path: '/methods/integration', label: 'Integração dos dados' },
+      { path: '/methods/curation', labelKey: 'menu.curation' },
+      { path: '/methods/integration', labelKey: 'menu.integration' },
     ],
   },
-  { path: '/faq', label: 'Perguntas Frequentes' },
-  { path: '/contact', label: 'Contato' },
+  { path: '/faq', labelKey: 'faq' },
+  { path: '/contact', labelKey: 'contact' },
 ];
 
 interface NavigationProps {
@@ -47,6 +49,17 @@ interface NavigationProps {
 
 export function Navigation({ mobile = false }: NavigationProps) {
   const location = useLocation();
+  const { t } = useTranslation('navigation');
+  const { currentLanguage } = useI18n();
+
+  const getLocalizedPath = (path: string) => {
+    return `/${currentLanguage}${path}`;
+  };
+
+  const isPathActive = (path: string) => {
+    const pathWithoutLang = location.pathname.replace(/^\/(pt|en|es)/, '');
+    return pathWithoutLang === path || pathWithoutLang.startsWith(path + '/');
+  };
 
   if (mobile) {
     return (
@@ -56,18 +69,18 @@ export function Navigation({ mobile = false }: NavigationProps) {
       >
         {menuItems.map((item) => {
           if (item.children) {
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive = isPathActive(item.path);
             return (
               <li key={item.path}>
                 <details open={isActive}>
                   <summary 
                     className={`navigation-text ${isActive ? 'text-primary font-semibold' : 'text-gray-500'}`}
                   >
-                    {item.label}
+                    {t(item.labelKey)}
                   </summary>
                   <ul className="p-2">
                     {item.children.map((child) => {
-                      const childIsActive = !child.external && location.pathname === child.path;
+                      const childIsActive = !child.external && isPathActive(child.path);
                       if (child.external && child.href) {
                         return (
                           <li key={child.path}>
@@ -77,7 +90,7 @@ export function Navigation({ mobile = false }: NavigationProps) {
                               rel="noopener noreferrer"
                               className={`navigation-text ${childIsActive ? 'active text-primary' : 'text-gray-500'}`}
                             >
-                              {child.label}
+                              {t(child.labelKey)}
                             </a>
                           </li>
                         );
@@ -85,10 +98,10 @@ export function Navigation({ mobile = false }: NavigationProps) {
                       return (
                         <li key={child.path}>
                           <Link
-                            to={child.path}
+                            to={getLocalizedPath(child.path)}
                             className={`navigation-text ${childIsActive ? 'active text-primary' : 'text-gray-500'}`}
                           >
-                            {child.label}
+                            {t(child.labelKey)}
                           </Link>
                         </li>
                       );
@@ -99,14 +112,14 @@ export function Navigation({ mobile = false }: NavigationProps) {
             );
           }
 
-          const isActive = location.pathname === item.path;
+          const isActive = isPathActive(item.path);
           return (
             <li key={item.path}>
               <Link 
-                to={item.path} 
+                to={getLocalizedPath(item.path)} 
                 className={`navigation-text ${isActive ? 'active text-primary' : 'text-gray-500'}`}
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             </li>
           );
@@ -119,8 +132,8 @@ export function Navigation({ mobile = false }: NavigationProps) {
     <ul className="menu menu-horizontal navigation-text text-gray-500 gap-5">
       {menuItems.map((item) => {
         if (item.children) {
-          const isActive = location.pathname === item.path || 
-            item.children.some(child => location.pathname === child.path);
+          const isActive = isPathActive(item.path) || 
+            item.children.some(child => isPathActive(child.path));
           return (
             <li key={item.path} className="dropdown-hover-menu">
               <div
@@ -130,11 +143,11 @@ export function Navigation({ mobile = false }: NavigationProps) {
                     : 'text-gray-500 hover:text-orange-600 hover:underline hover:decoration-orange-600 hover:decoration-2 hover:underline-offset-4 hover:bg-transparent'
                 }`}
               >
-                {item.label}
+                {t(item.labelKey)}
               </div>
               <ul className="dropdown-menu rounded-box py-2 z-50 mt-0 dropdown-menu-custom">
                 {item.children.map((child) => {
-                  const childIsActive = !child.external && location.pathname === child.path;
+                  const childIsActive = !child.external && isPathActive(child.path);
                   if (child.external && child.href) {
                     return (
                       <li key={child.path} className="pl-0">
@@ -144,7 +157,7 @@ export function Navigation({ mobile = false }: NavigationProps) {
                           rel="noopener noreferrer"
                           className={`dropdown-link ${childIsActive ? 'underline' : ''}`}
                         >
-                          {child.label}
+                          {t(child.labelKey)}
                         </a>
                       </li>
                     );
@@ -152,10 +165,10 @@ export function Navigation({ mobile = false }: NavigationProps) {
                   return (
                     <li key={child.path} className="pl-0">
                       <Link
-                        to={child.path}
+                        to={getLocalizedPath(child.path)}
                         className={`dropdown-link ${childIsActive ? 'underline' : ''}`}
                       >
-                        {child.label}
+                        {t(child.labelKey)}
                       </Link>
                     </li>
                   );
@@ -165,18 +178,18 @@ export function Navigation({ mobile = false }: NavigationProps) {
           );
         }
 
-        const isActive = location.pathname === item.path;
+        const isActive = isPathActive(item.path);
         return (
           <li key={item.path}>
             <Link
-              to={item.path}
+              to={getLocalizedPath(item.path)}
               className={`navigation-text py-5 ${
                 isActive
                   ? 'text-gray-700 font-semibold'
                   : 'text-gray-500 hover:text-orange-600 hover:underline hover:decoration-orange-600 hover:decoration-2 hover:underline-offset-4'
               }`}
             >
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           </li>
         );

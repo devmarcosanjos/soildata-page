@@ -1,0 +1,13 @@
+{
+  "hero": {
+    "description": "O repositório SoilData é a vitrine do trabalho de campo e laboratório de quem estuda o solo brasileiro! Nele, você pode publicar dados que tenha produzido em seus projetos. Você também pode encontrar dados para utilizar em suas atividades",
+    "activities": {
+      "teaching": "de ensino.",
+      "research": "de pesquisa.",
+      "commercial": "e inclusive comerciais."
+    },
+    "searchPlaceholder": "Pesquise em centenas de conjuntos de dados sobre solos brasileiros",
+    "doiNote": "Todos os conjuntos de dados contém"
+  }
+}
+

@@ -1,0 +1,13 @@
+{
+  "hero": {
+    "description": "¡El repositorio SoilData es la vitrina del trabajo de campo y laboratorio de quienes estudian el suelo brasileño! En él, puedes publicar datos que hayas producido en tus proyectos. También puedes encontrar datos para utilizar en tus actividades",
+    "activities": {
+      "teaching": "de enseñanza.",
+      "research": "de investigación.",
+      "commercial": "e incluso comerciales."
+    },
+    "searchPlaceholder": "Busca en cientos de conjuntos de datos sobre suelos brasileños",
+    "doiNote": "Todos los conjuntos de datos contienen"
+  }
+}
+

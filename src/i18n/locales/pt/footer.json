@@ -1,0 +1,28 @@
+{
+  "support": "APOIO",
+  "indexed": "INDEXADO",
+  "description": "Um repositório abrangente de dados de solo do MapBiomas, fornecendo a pesquisadores e formuladores de políticas informações ambientais valiosas.",
+  "quickLinks": {
+    "title": "Links Rápidos",
+    "platform": "Plataforma de Dados",
+    "repository": "Repositório de Dados",
+    "statistics": "Estatísticas",
+    "about": "Quem Somos",
+    "contact": "Contato"
+  },
+  "resources": {
+    "title": "Recursos",
+    "dictionary": "Dicionário de Dados",
+    "spreadsheet": "Modelo Planilha de Dados"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacy": "Política de Privacidade",
+    "terms": "Termos de Uso"
+  },
+  "copyright": "© {{year}} MapBiomas. All rights reserved.",
+  "developed": "Desenvolvido",
+  "lab": "Laboratório Pedometria - UTFPR",
+  "ecostage": "EcoEstage"
+}
+

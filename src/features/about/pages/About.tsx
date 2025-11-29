@@ -1,126 +1,99 @@
+import { useTranslation } from 'react-i18next';
 import { HeroPageLayout } from '@/shared/components/HeroPageLayout';
 
 export function About() {
+  const { t } = useTranslation('about');
+  
   return (
-    <HeroPageLayout title="QUEM SOMOS">
+    <HeroPageLayout title={t('title')}>
       {/* Texto introdutório */}
       <div className="mb-8 md:mb-12">
         <p className="text-base text-gray-500 leading-relaxed" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-          A rede MapBiomas é colaborativa e reúne organizações não governamentais, universidades e empresas de tecnologia que analisam dados sobre os biomas e temas transversais. Contamos também com parceiros técnicos e com um conjunto de financiadores que apoiam o trabalho do MapBiomas.
+          {t('intro')}
         </p>
       </div>
 
       {/* COORDENAÇÃO */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          COORDENAÇÃO
+          {t('sections.coordination.title')}
         </h2>
         <ul className="list-none space-y-2">
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            Alessandro Samuel-Rosa | Coordenação Geral
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            Taciara Zborowski Horst | XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            Marcos Alexandre dos Anjos | XXXXXX
-          </li>
+          {t('sections.coordination.members', { returnObjects: true }) as string[]).map((member, index) => (
+            <li key={index} className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
+              {member}
+            </li>
+          ))}
         </ul>
       </div>
 
       {/* PARCEIROS DE TECNOLOGIA */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          PARCEIROS DE TECNOLOGIA
+          {t('sections.techPartners.title')}
         </h2>
         <ul className="list-none space-y-2">
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            Google
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            EcoStage
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            Laboratório de Pedometria (LdP)
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
+          {(t('sections.techPartners.members', { returnObjects: true }) as string[]).map((member, index) => (
+            <li key={index} className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
+              {member}
+            </li>
+          ))}
         </ul>
       </div>
 
       {/* PARCEIROS INSTITUCIONAIS */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          PARCEIROS INSTITUCIONAIS
+          {t('sections.institutionalPartners.title')}
         </h2>
         <ul className="list-none space-y-2">
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            Instituto Arapyaú
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
+          {(t('sections.institutionalPartners.members', { returnObjects: true }) as string[]).map((member, index) => (
+            <li key={index} className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
+              {member}
+            </li>
+          ))}
         </ul>
       </div>
 
       {/* MEMBROS ANTERIORES */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          MEMBROS ANTERIORES
+          {t('sections.formerMembers.title')}
         </h2>
         <ul className="list-none space-y-2">
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
+          {(t('sections.formerMembers.members', { returnObjects: true }) as string[]).map((member, index) => (
+            <li key={index} className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
+              {member}
+            </li>
+          ))}
         </ul>
       </div>
 
       {/* FINANCIAMENTO */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          FINANCIAMENTO
+          {t('sections.funding.title')}
         </h2>
         <ul className="list-none space-y-2">
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
+          {(t('sections.funding.members', { returnObjects: true }) as string[]).map((member, index) => (
+            <li key={index} className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
+              {member}
+            </li>
+          ))}
         </ul>
       </div>
 
       {/* USUÁRIOS APOIADORES */}
       <div className="mb-8 md:mb-12">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-700" style={{ fontFamily: "'Lato', sans-serif" }}>
-          USUÁRIOS APOIADORES
+          {t('sections.supportingUsers.title')}
         </h2>
         <ul className="list-none space-y-2">
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
-          <li className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
-            XXXXXX
-          </li>
+          {(t('sections.supportingUsers.members', { returnObjects: true }) as string[]).map((member, index) => (
+            <li key={index} className="text-base text-gray-500" style={{ fontFamily: "'Lato', sans-serif", fontSize: '16px' }}>
+              {member}
+            </li>
+          ))}
         </ul>
       </div>
     </HeroPageLayout>

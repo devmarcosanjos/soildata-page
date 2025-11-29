@@ -1,0 +1,13 @@
+{
+  "hero": {
+    "description": "The SoilData repository is the showcase of field and laboratory work for those who study Brazilian soil! In it, you can publish data you have produced in your projects. You can also find data to use in your",
+    "activities": {
+      "teaching": "teaching activities.",
+      "research": "research activities.",
+      "commercial": "and even commercial activities."
+    },
+    "searchPlaceholder": "Search hundreds of datasets on Brazilian soils",
+    "doiNote": "All datasets contain"
+  }
+}
+

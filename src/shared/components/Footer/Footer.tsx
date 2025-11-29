@@ -1,8 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Logo } from '../Logo';
+import { useI18n } from '@/shared/hooks/useI18n';
 import logoCNPq from '@/assets/cnpq.png';
 import logoDataCite from '@/assets/DataCite-Logo_stacked.svg';
+
 export function Footer() {
+  const { t } = useTranslation('footer');
+  const { currentLanguage } = useI18n();
+
+  const getLocalizedPath = (path: string) => {
+    return `/${currentLanguage}${path}`;
+  };
+
   return (
     <>
       <section className="py-8 md:py-10 footer-gradient-section">
@@ -12,7 +22,7 @@ export function Footer() {
               {/* Seção APOIO */}
               <div className="flex flex-col items-center md:items-start">
                 <h3 className="text-sm font-semibold mb-6 text-center md:text-left text-gray-600">
-                  APOIO
+                  {t('support')}
                 </h3>
                 <div className="flex items-center justify-center" style={{ height: '95px' }}>
                   <img
@@ -27,7 +37,7 @@ export function Footer() {
               {/* Seção INDEXADO */}
               <div className="flex flex-col items-center md:items-start">
                 <h3 className="text-sm font-semibold mb-6 text-center md:text-left text-gray-600">
-                  INDEXADO
+                  {t('indexed')}
                 </h3>
                 <div className="flex items-center justify-center" style={{ height: '95px' }}>
                   <img
@@ -51,14 +61,14 @@ export function Footer() {
                 <Logo to={undefined} size="md" />
               </div>
               <p className="text-sm text-gray-600">
-                Um repositório abrangente de dados de solo do MapBiomas, fornecendo a pesquisadores e formuladores de políticas informações ambientais valiosas.
+                {t('description')}
               </p>
             </aside>
 
             <nav className="col-span-1">
-              <h6 className="footer-title text-gray-600">Links Rápidos</h6>
-              <Link to="/platform" className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
-                Plataforma de Dados
+              <h6 className="footer-title text-gray-600">{t('quickLinks.title')}</h6>
+              <Link to={getLocalizedPath('/platform')} className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
+                {t('quickLinks.platform')}
               </Link>
               <a
                 href="https://soildata.mapbiomas.org/dataverse/soildata?q="
@@ -66,28 +76,28 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors"
               >
-                Repositório de Dados
+                {t('quickLinks.repository')}
               </a>
-              <Link to="/statistics" className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
-                Estatísticas
+              <Link to={getLocalizedPath('/statistics')} className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
+                {t('quickLinks.statistics')}
               </Link>
-              <Link to="/about" className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
-                Quem Somos
+              <Link to={getLocalizedPath('/about')} className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
+                {t('quickLinks.about')}
               </Link>
-              <Link to="/contact" className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
-                Contato
+              <Link to={getLocalizedPath('/contact')} className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors">
+                {t('quickLinks.contact')}
               </Link>
             </nav>
 
             <nav className="col-span-1">
-              <h6 className="footer-title text-gray-600">Recursos</h6>
+              <h6 className="footer-title text-gray-600">{t('resources.title')}</h6>
               <a
                 href="https://soildata.mapbiomas.org/dicionario"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors"
               >
-                Dicionário de Dados
+                {t('resources.dictionary')}
               </a>
               <a
                 href="https://docs.google.com/spreadsheets/d/1bCRlrHx0HZLhzNoh5iCKNljSTZnoT4gGgyElfi-AY2o/edit?gid=0#gid=0"
@@ -95,23 +105,23 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors"
               >
-                Modelo Planilha de Dados
+                {t('resources.spreadsheet')}
               </a>
             </nav>
 
             <nav className="col-span-1">
-              <h6 className="footer-title text-gray-600">Legal</h6>
+              <h6 className="footer-title text-gray-600">{t('legal.title')}</h6>
               <Link
-                to="/privacy-policy"
+                to={getLocalizedPath('/privacy-policy')}
                 className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors"
               >
-                Política de Privacidade
+                {t('legal.privacy')}
               </Link>
               <Link
-                to="/termos-uso"
+                to={getLocalizedPath('/termos-uso')}
                 className="link link-hover block text-gray-500 hover:text-orange-600 transition-colors"
               >
-                Termos de Uso
+                {t('legal.terms')}
               </Link>
             </nav>
           </div>
@@ -121,10 +131,10 @@ export function Footer() {
       <footer className="footer sm:footer-horizontal footer-center footer-gradient-bottom text-base-content p-4">
         <aside>
           <p className="text-sm mb-2 text-white">
-            © {new Date().getFullYear()} MapBiomas. All rights reserved.
+            {t('copyright', { year: new Date().getFullYear() })}
           </p>
           <p className="text-sm text-white/80">
-            Desenvolvido
+            {t('developed')}
             <br />
             <a
               href="https://www.pedometria.org/"
@@ -132,7 +142,7 @@ export function Footer() {
               rel="noopener noreferrer"
               className="link link-hover text-white/80 hover:text-orange-600 transition-colors"
             >
-              Laboratório Pedometria - UTFPR
+              {t('lab')}
             </a>
             {' | '}
             <a
@@ -141,7 +151,7 @@ export function Footer() {
               rel="noopener noreferrer"
               className="link link-hover text-white/80 hover:text-orange-600 transition-colors"
             >
-              EcoEstage
+              {t('ecostage')}
             </a>
           </p>
         </aside>

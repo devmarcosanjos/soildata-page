@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useI18n } from '@/shared/hooks/useI18n';
 
 const logoSoilData = '/soildata-logo.png';
 
@@ -16,7 +17,16 @@ const sizeClasses = {
 };
 
 export function Logo({ to = '/', className = '', size = 'lg', onClick }: LogoProps) {
+  const { currentLanguage } = useI18n();
   const imageClasses = sizeClasses[size];
+  
+  const getLocalizedPath = (path: string) => {
+    if (path === '/' || path === '') {
+      return `/${currentLanguage}/discover-soildata`;
+    }
+    return `/${currentLanguage}${path}`;
+  };
+
   const content = (
     <div className={`flex items-center ${className}`}>
       <img
@@ -29,7 +39,7 @@ export function Logo({ to = '/', className = '', size = 'lg', onClick }: LogoPro
 
   if (to) {
     return (
-      <Link to={to} className="shrink-0" onClick={onClick}>
+      <Link to={getLocalizedPath(to)} className="shrink-0" onClick={onClick}>
         {content}
       </Link>
     );

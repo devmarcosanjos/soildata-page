@@ -1,0 +1,57 @@
+{
+  "title": "QUEM SOMOS",
+  "intro": "A rede MapBiomas é colaborativa e reúne organizações não governamentais, universidades e empresas de tecnologia que analisam dados sobre os biomas e temas transversais. Contamos também com parceiros técnicos e com um conjunto de financiadores que apoiam o trabalho do MapBiomas.",
+  "sections": {
+    "coordination": {
+      "title": "COORDENAÇÃO",
+      "members": [
+        "Alessandro Samuel-Rosa | Coordenação Geral",
+        "Taciara Zborowski Horst | XXXXXX",
+        "Marcos Alexandre dos Anjos | XXXXXX"
+      ]
+    },
+    "techPartners": {
+      "title": "PARCEIROS DE TECNOLOGIA",
+      "members": [
+        "Google",
+        "EcoStage",
+        "Laboratório de Pedometria (LdP)",
+        "XXXXXX"
+      ]
+    },
+    "institutionalPartners": {
+      "title": "PARCEIROS INSTITUCIONAIS",
+      "members": [
+        "Instituto Arapyaú",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    },
+    "formerMembers": {
+      "title": "MEMBROS ANTERIORES",
+      "members": [
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    },
+    "funding": {
+      "title": "FINANCIAMENTO",
+      "members": [
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    },
+    "supportingUsers": {
+      "title": "USUÁRIOS APOIADORES",
+      "members": [
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX",
+        "XXXXXX"
+      ]
+    }
+  }
+}
+

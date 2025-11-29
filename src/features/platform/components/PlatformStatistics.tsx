@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { SummaryCard } from '@mapbiomas/ui';
 import { Database, Layers, MapPin, FlaskConical } from 'lucide-react';
 import type { MapStatistics } from './PlatformMap';
@@ -7,25 +8,28 @@ interface PlatformStatisticsProps {
 }
 
 export function PlatformStatistics({ statistics }: PlatformStatisticsProps) {
+  const { t, i18n } = useTranslation('platform');
+  const locale = i18n.language.split('-')[0] || 'pt';
+  
   const summaryData = [
     { 
       icon: <Database size={20} />, 
-      label: 'Conjuntos de Dados de Solo', 
+      label: t('datasets'), 
       value: statistics?.totalDatasets ? `${statistics.totalDatasets}` : '0'
     },
     { 
       icon: <Layers size={20} />, 
-      label: 'Amostras de Solo', 
-      value: statistics?.totalSamples ? statistics.totalSamples.toLocaleString('pt-BR') : '0'
+      label: t('samples'), 
+      value: statistics?.totalSamples ? statistics.totalSamples.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR') : '0'
     },
     { 
       icon: <MapPin size={20} />, 
-      label: 'Locais de Coleta', 
-      value: statistics?.totalLocations ? statistics.totalLocations.toLocaleString('pt-BR') : '0'
+      label: t('locations'), 
+      value: statistics?.totalLocations ? statistics.totalLocations.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR') : '0'
     },
     { 
       icon: <FlaskConical size={20} />, 
-      label: 'Propriedades Analisadas', 
+      label: t('properties'), 
       value: statistics?.totalProperties ? `${statistics.totalProperties}` : '0'
     },
   ];
@@ -50,7 +54,7 @@ export function PlatformStatistics({ statistics }: PlatformStatisticsProps) {
         }}
       >
         <div style={{ font: 'var(--heading-medium)', color: '#1E293B' }}>
-          Estatísticas
+          {t('statistics')}
         </div>
       </div>
 

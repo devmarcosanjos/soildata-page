@@ -1,0 +1,33 @@
+{
+  "title": "FAQ",
+  "sections": {
+    "aboutSoildata": {
+      "title": "About SoilData",
+      "questions": {
+        "difference": {
+          "question": "What is the difference between SoilData and MapBiomas Solo?",
+          "answer": "SoilData is the repository where point data from profiles and samples are stored and preserved. MapBiomas Solo is an initiative that uses this data as training to generate continuous spatial (geospatial) maps of soil attributes for all of Brazil."
+        }
+      }
+    },
+    "accessData": {
+      "title": "Data Access and Tools (For Users)",
+      "questions": {
+        "febrPackage": {
+          "question": "The febr package for R stopped working. How do I access the data now?",
+          "answer": "With the migration to the Dataverse infrastructure, the old febr package lost compatibility. We now recommend using the dataverse package (official R client) to access data via API, or direct download of .csv or .txt files through the SoilData portal web interface. We are working to update the easy access tools."
+        }
+      }
+    },
+    "submission": {
+      "title": "Submission and Intellectual Property (For Authors)",
+      "questions": {
+        "intellectualProperty": {
+          "question": "Who maintains intellectual property and which license should I choose?",
+          "answer": "Original authors maintain ownership and moral authorship of the data. Unlike repositories that require a single license, SoilData offers flexibility: at the time of deposit, you can select the use license you deem most appropriate for your dataset. It is even possible to choose to keep data access restricted (for example, during the period of article preparation). In all cases, we strongly recommend that you read the repository's Terms of Use to understand the implications of each choice."
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,16 @@
+{
+  "title": "CONTATO",
+  "contactInfo": {
+    "title": "Informações de Contato",
+    "description": "Entre em contato conosco para dúvidas sobre o repositório SoilData, acesso e contas, entre outras.",
+    "email": {
+      "label": "E-mail de contato",
+      "value": "contato@mapbiomas.org"
+    }
+  },
+  "suggestions": {
+    "title": "Sugestões e reportar problemas",
+    "survey": "Survey de sugestões e melhorias"
+  }
+}
+

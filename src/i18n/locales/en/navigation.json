@@ -1,0 +1,17 @@
+{
+  "discoverSoildata": "Discover SoilData",
+  "data": "Data",
+  "methods": "Methods",
+  "faq": "Frequently Asked Questions",
+  "contact": "Contact",
+  "menu": {
+    "project": "The Project",
+    "about": "About Us",
+    "repository": "SoilData Repository",
+    "platform": "Data Platform",
+    "statistics": "Statistics",
+    "curation": "Data curation",
+    "integration": "Data integration"
+  }
+}
+

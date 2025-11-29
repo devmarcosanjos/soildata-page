@@ -1,0 +1,33 @@
+{
+  "title": "PREGUNTAS FRECUENTES",
+  "sections": {
+    "aboutSoildata": {
+      "title": "Acerca de SoilData",
+      "questions": {
+        "difference": {
+          "question": "¿Cuál es la diferencia entre SoilData y MapBiomas Solo?",
+          "answer": "SoilData es el repositorio donde se almacenan y preservan los datos puntuales de perfiles y muestras. MapBiomas Solo es una iniciativa que utiliza estos datos como entrenamiento para generar mapas espaciales continuos (geoespaciales) de atributos del suelo para todo Brasil."
+        }
+      }
+    },
+    "accessData": {
+      "title": "Acceso a Datos y Herramientas (Para Usuarios)",
+      "questions": {
+        "febrPackage": {
+          "question": "El paquete febr para R dejó de funcionar. ¿Cómo accedo a los datos ahora?",
+          "answer": "Con la migración a la infraestructura Dataverse, el paquete febr antiguo perdió compatibilidad. Ahora recomendamos usar el paquete dataverse (cliente oficial para R) para acceder a los datos vía API, o la descarga directa de archivos .csv o .txt a través de la interfaz web del portal SoilData. Estamos trabajando para actualizar las herramientas de acceso facilitado."
+        }
+      }
+    },
+    "submission": {
+      "title": "Envío y Propiedad Intelectual (Para Autores)",
+      "questions": {
+        "intellectualProperty": {
+          "question": "¿Quién mantiene la propiedad intelectual y qué licencia debo elegir?",
+          "answer": "Los autores originales mantienen la titularidad y la autoría moral de los datos. A diferencia de repositorios que exigen una licencia única, SoilData ofrece flexibilidad: en el momento del depósito, puedes seleccionar la licencia de uso que consideres más apropiada para tu conjunto de datos. Incluso es posible optar por mantener el acceso a los datos restringido (por ejemplo, durante el período de elaboración de un artículo). En todos los casos, recomendamos encarecidamente que leas los Términos de Uso del repositorio para entender las implicaciones de cada elección."
+        }
+      }
+    }
+  }
+}
+
