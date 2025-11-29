@@ -14,13 +14,24 @@
     "title": "Discover the Platform",
     "description": "Visualize and explore Brazilian soil data interactively through our geospatial visualization platform.",
     "ctaButton": "Access Platform",
-    "imageAlt": "SoilData platform visualization"
+    "imageAlt": "SoilData platform visualization",
+    "nodeLabel": "Platform"
   },
   "repositorySection": {
     "title": "Discover the SoilData Repository",
     "description": "Explore and access hundreds of datasets on Brazilian soils available in our Dataverse repository.",
     "ctaButton": "Access Repository",
     "imageAlt": "SoilData repository visualization"
+  },
+  "dataConnectionSection": {
+    "title": "Connecting data to decisions",
+    "description": "Field observations, laboratory analyses and legacy databases come together in SoilData to support analysis, teaching and decision-making on Brazilian soils.",
+    "helper": "Illustrative representation of how different sources feed the platform and reach the end user.",
+    "sources": {
+      "field": "Field data",
+      "laboratory": "Laboratory data",
+      "legacy": "Legacy datasets"
+    },
+    "target": "You and your projects"
   }
 }
-

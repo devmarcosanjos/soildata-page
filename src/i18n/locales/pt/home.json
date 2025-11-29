@@ -14,13 +14,24 @@
     "title": "Conheça a Plataforma",
     "description": "Visualize e explore dados de solos brasileiros de forma interativa através da nossa plataforma de visualização geoespacial.",
     "ctaButton": "Acessar Plataforma",
-    "imageAlt": "Visualização da plataforma SoilData"
+    "imageAlt": "Visualização da plataforma SoilData",
+    "nodeLabel": "Plataforma"
   },
   "repositorySection": {
     "title": "Conheça o Repositório SoilData",
     "description": "Explore e acesse centenas de conjuntos de dados sobre solos brasileiros disponíveis no nosso repositório Dataverse.",
     "ctaButton": "Acessar Repositório",
     "imageAlt": "Visualização do repositório SoilData"
+  },
+  "dataConnectionSection": {
+    "title": "Conexão com os dados",
+    "description": "Dados de campo, laboratório e bases históricas se encontram no SoilData para apoiar análises, ensino e tomada de decisão sobre solos brasileiros.",
+    "helper": "Representação ilustrativa do fluxo de dados até a plataforma e o usuário final.",
+    "sources": {
+      "field": "Dados de campo",
+      "laboratory": "Dados de laboratório",
+      "legacy": "Bases históricas"
+    },
+    "target": "Você e seus projetos"
   }
 }
-

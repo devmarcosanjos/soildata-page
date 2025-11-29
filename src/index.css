@@ -347,6 +347,18 @@ html {
   color: var(--color-orange-primary);
 }
 
+.animated-beam {
+  stroke-linecap: round;
+  stroke-dasharray: 6 10;
+  animation: animated-beam-dash 2.4s linear infinite;
+}
+
+@keyframes animated-beam-dash {
+  to {
+    stroke-dashoffset: -48;
+  }
+}
+
 .navigation-text {
   font-family: 'Lato', sans-serif;
   font-size: 14px;

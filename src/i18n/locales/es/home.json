@@ -14,13 +14,24 @@
     "title": "Conoce la Plataforma",
     "description": "Visualiza y explora datos de suelos brasileños de forma interactiva a través de nuestra plataforma de visualización geoespacial.",
     "ctaButton": "Acceder a la Plataforma",
-    "imageAlt": "Visualización de la plataforma SoilData"
+    "imageAlt": "Visualización de la plataforma SoilData",
+    "nodeLabel": "Plataforma"
   },
   "repositorySection": {
     "title": "Conoce el Repositorio SoilData",
     "description": "Explora y accede a cientos de conjuntos de datos sobre suelos brasileños disponibles en nuestro repositorio Dataverse.",
     "ctaButton": "Acceder al Repositorio",
     "imageAlt": "Visualización del repositorio SoilData"
+  },
+  "dataConnectionSection": {
+    "title": "Conexión con los datos",
+    "description": "Datos de campo, análisis de laboratorio y bases históricas se integran en SoilData para apoyar análisis, enseñanza y toma de decisiones sobre suelos brasileños.",
+    "helper": "Representación ilustrativa del flujo de datos hacia la plataforma y el usuario final.",
+    "sources": {
+      "field": "Datos de campo",
+      "laboratory": "Datos de laboratorio",
+      "legacy": "Bases históricas"
+    },
+    "target": "Tú y tus proyectos"
   }
 }
-
