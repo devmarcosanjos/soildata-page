@@ -9,6 +9,12 @@
     "searchPlaceholder": "Pesquise em centenas de conjuntos de dados sobre solos brasileiros",
     "doiNote": "Todos os conjuntos de dados contém"
   },
-  "latestPublications": "ÚLTIMAS PUBLICAÇÕES"
+  "latestPublications": "ÚLTIMAS PUBLICAÇÕES",
+  "platformSection": {
+    "title": "Conheça a Plataforma",
+    "description": "Visualize e explore dados de solos brasileiros de forma interativa através da nossa plataforma de visualização geoespacial.",
+    "ctaButton": "Acessar Plataforma",
+    "imageAlt": "Visualização da plataforma SoilData"
+  }
 }
 

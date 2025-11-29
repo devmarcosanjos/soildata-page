@@ -9,6 +9,12 @@
     "searchPlaceholder": "Busca en cientos de conjuntos de datos sobre suelos brasileños",
     "doiNote": "Todos los conjuntos de datos contienen"
   },
-  "latestPublications": "ÚLTIMAS PUBLICACIONES"
+  "latestPublications": "ÚLTIMAS PUBLICACIONES",
+  "platformSection": {
+    "title": "Conoce la Plataforma",
+    "description": "Visualiza y explora datos de suelos brasileños de forma interactiva a través de nuestra plataforma de visualización geoespacial.",
+    "ctaButton": "Acceder a la Plataforma",
+    "imageAlt": "Visualización de la plataforma SoilData"
+  }
 }
 

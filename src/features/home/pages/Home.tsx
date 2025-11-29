@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import soloImage from '@/assets/solo.png';
 import logoDOI from '@/assets/doi.png';
 import { PublicationsSection } from '@/shared/components/PublicationsSection';
+import { PlatformPreviewSection } from '@/shared/components/PlatformPreviewSection';
 import { SearchBar } from '@/shared/components/SearchBar';
 import { mockPublications } from '@/data/mockPublications';
 import type { Dataset } from '@/types/dataset';
@@ -89,6 +90,7 @@ export function Home() {
     
 
       {!isLoading && <PublicationsSection datasets={datasets} />}
+      <PlatformPreviewSection />
     </>
   );
 }

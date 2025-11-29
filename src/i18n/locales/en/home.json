@@ -9,6 +9,12 @@
     "searchPlaceholder": "Search hundreds of datasets on Brazilian soils",
     "doiNote": "All datasets contain"
   },
-  "latestPublications": "LATEST PUBLICATIONS"
+  "latestPublications": "LATEST PUBLICATIONS",
+  "platformSection": {
+    "title": "Discover the Platform",
+    "description": "Visualize and explore Brazilian soil data interactively through our geospatial visualization platform.",
+    "ctaButton": "Access Platform",
+    "imageAlt": "SoilData platform visualization"
+  }
 }
 
