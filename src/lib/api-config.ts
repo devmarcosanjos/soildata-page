@@ -22,17 +22,27 @@ const getApiBaseUrl = (): string => {
         const parsedUrl = new URL(url);
         const isHttps = window.location.protocol === 'https:';
         const isApiHttp = parsedUrl.protocol === 'http:';
+        const isIpAddress = /^\d+\.\d+\.\d+\.\d+/.test(parsedUrl.hostname);
         
         if (isHttps && isApiHttp) {
           console.error('❌ [API Config] ERRO CRÍTICO: Site em HTTPS mas API em HTTP!');
           console.error('   URL configurada:', url);
           console.error('   Isso causará erro de Mixed Content e será bloqueado pelo navegador.');
-          console.error('   Use HTTPS para a API em produção: https://api.soildata.cmob.online');
           
-          // Força o uso de HTTPS mesmo se configurado HTTP
+          // Se for IP, não converte automaticamente (IPs geralmente não têm SSL)
+          if (isIpAddress) {
+            console.error('   ⚠️ IP detectado - não é possível usar HTTPS automaticamente');
+            console.error('   SOLUÇÃO: Configure VITE_API_BASE_URL=https://api.soildata.cmob.online');
+            console.error('   Ou configure um reverse proxy (Nginx) com SSL para o IP');
+            // Retorna a URL original mas mostra o erro
+            return url;
+          }
+          
+          // Se for domínio, tenta converter para HTTPS
+          console.error('   Use HTTPS para a API em produção: https://api.soildata.cmob.online');
           parsedUrl.protocol = 'https:';
           const correctedUrl = parsedUrl.toString();
-          console.warn('⚠️ [API Config] Corrigindo automaticamente para HTTPS:', correctedUrl);
+          console.warn('⚠️ [API Config] Tentando converter para HTTPS:', correctedUrl);
           return correctedUrl;
         }
       } catch {
@@ -143,11 +153,20 @@ export function apiUrl(path: string): string {
     ? cleanPath 
     : `api/${cleanPath}`;
   
-  const fullUrl = `${API_BASE_URL}/${normalizedPath}`;
+  // Remove trailing slash da API_BASE_URL se existir para evitar duplo slash
+  const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+  
+  const fullUrl = `${baseUrl}/${normalizedPath}`;
   
   // Validação da URL final
   try {
-    new URL(fullUrl);
+    const parsedUrl = new URL(fullUrl);
+    // Verifica se há duplo slash (não deveria acontecer, mas valida)
+    if (parsedUrl.pathname.includes('//')) {
+      console.warn('⚠️ [API Config] Duplo slash detectado na URL, corrigindo...');
+      parsedUrl.pathname = parsedUrl.pathname.replace(/\/+/g, '/');
+      return parsedUrl.toString();
+    }
   } catch (error) {
     console.error('❌ [API Config] Erro ao construir URL:', fullUrl, error);
     throw new Error(`URL da API inválida: ${fullUrl}`);
