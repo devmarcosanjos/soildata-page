@@ -221,12 +221,12 @@ export function MetricsChart({
                     viewMode === 'cumulative'
                       ? t('statistics.sections.monthlyDownloads.chart.tooltipCumulative', { 
                           date: formatDate(item.date), 
-                          count: item.count.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')
+                          count: item.count
                         })
                       : t('statistics.sections.monthlyDownloads.chart.tooltipMonthly', {
                           date: formatDate(item.date),
-                          monthly: monthlyValue.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR'),
-                          total: cumulativeValue.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'pt-BR')
+                          monthly: monthlyValue,
+                          total: cumulativeValue
                         })
                   }
                   onMouseEnter={() => setHoveredIndex(index)}

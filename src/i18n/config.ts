@@ -142,7 +142,6 @@ i18n
       order: ['path', 'localStorage', 'navigator'],
       lookupFromPathIndex: 0,
       caches: [],
-      checkWhitelist: true,
     },
     supportedLngs: ['pt', 'en', 'es'],
     load: 'languageOnly',
