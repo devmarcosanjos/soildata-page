@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { HeroPageLayout } from '@/shared/components/HeroPageLayout';
 import { FileSearch, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export function Contact() {
   const { t } = useTranslation('contact');
@@ -29,7 +28,14 @@ export function Contact() {
           <h2 className="text-lg font-semibold text-gray-900 mb-3">{t('suggestions.title')}</h2>
           <div className="flex gap-4">
             <FileSearch size={24} className="text-[#EA580C]" />
-            <Link to="https://forms.gle/VnQxYsayNXqcL9ix8" target="_blank" className='hover:underline hover:text-[#EA580C]/80 transition-all'>{t('suggestions.survey')}</Link>
+            <a
+              href="https://forms.gle/VnQxYsayNXqcL9ix8"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline hover:text-[#EA580C]/80 transition-all"
+            >
+              {t('suggestions.survey')}
+            </a>
           </div>
           
         </section>
