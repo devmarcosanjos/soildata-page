@@ -1,7 +1,6 @@
 import type React from 'react';
 import { forwardRef, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { Database, FileText, TextSearch, User } from 'lucide-react';
 import { AnimatedBeam } from '@/registry/magicui/animated-beam';
 import { cn } from '@/shared/utils/cn';
@@ -60,12 +59,14 @@ export function RepositoryPreviewSection() {
                 </p>
 
                 <div className="flex justify-center lg:justify-start">
-                  <Link 
-                    to="/repository" 
+                  <a 
+                    href="https://soildata.mapbiomas.org/dataverse/soildata?q="
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="btn btn-lg soildata-primary-btn"
                   >
                     {t('repositorySection.ctaButton')}
-                  </Link>
+                  </a>
                 </div>
 
                 <div
