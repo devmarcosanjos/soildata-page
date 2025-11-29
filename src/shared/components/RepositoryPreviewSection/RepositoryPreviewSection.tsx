@@ -6,10 +6,6 @@ import { Database, FileText, TextSearch, User } from 'lucide-react';
 import { AnimatedBeam } from '@/registry/magicui/animated-beam';
 import { cn } from '@/shared/utils/cn';
 
-// Placeholder temporário - substitua pela imagem real quando disponível
-// Para adicionar a imagem: coloque repository-screenshot.png em src/assets/
-const repositoryScreenshot = 'https://picsum.photos/1200/800';
-
 interface CircleProps {
   className?: string;
   children?: React.ReactNode;
@@ -151,7 +147,7 @@ export function RepositoryPreviewSection() {
                   </div>
                   <div className="flex justify-center bg-white overflow-hidden">
                     <img 
-                      src={repositoryScreenshot} 
+                      src="/soildata-home.png" 
                       alt={t('repositorySection.imageAlt')}
                       className="w-full h-auto object-contain max-h-[260px] sm:max-h-[320px] md:max-h-[380px] lg:max-h-[420px]"
                     />
