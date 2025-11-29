@@ -1,0 +1,90 @@
+{
+  "title": "TERMS OF USE",
+  "sections": {
+    "introduction": {
+      "paragraph1": "Welcome to SoilData, the Brazilian repository of soil science research data (hereinafter referred to as 'Repository'). By accessing or using the Repository, you agree to be bound by these Terms and Conditions of Use (hereinafter referred to as 'Terms'). Please read these Terms carefully before using the Repository."
+    },
+    "acceptance": {
+      "title": "Acceptance of Terms",
+      "sectionNumber": "1",
+      "items": [
+        "By depositing research data in the Repository, you acknowledge that you have read and fully agree to these Terms.",
+        "You declare that you are the creator/author of the research data or have obtained permission from the creator/author to deposit any research data in the Repository."
+      ]
+    },
+    "copyright": {
+      "title": "Copyright and License",
+      "sectionNumber": "2",
+      "item2_1": "To properly administer and preserve content for future use, the Repository requires certain permissions and warranties regarding the copyright of deposited research data. If copyright law applies to the submission of research data and you are the copyright owner, by accepting these Terms, you still retain the copyright to your work and the right to submit research data to publishers or other repositories.",
+      "item2_2": "If copyright applies and you are not the copyright owner, you declare that the copyright owner has given you unrestricted permission to make the research data publicly available.",
+      "item2_3": "By depositing research data in the Repository, you grant MapBiomas the non-exclusive right to reproduce, translate and distribute the data in any format or medium worldwide and royalty-free, including, but not limited to, publication on the Internet."
+    },
+    "standardization": {
+      "title": "Standardization and Metadata",
+      "sectionNumber": "3",
+      "item3_1": "Research data to be published in the Repository must comply with the instructions described in the Data Deposit Guide."
+    },
+    "compliance": {
+      "title": "Compliance with the Guide",
+      "sectionNumber": "4",
+      "item4_1": "Deposited research data is subject to curation review and approval before being published."
+    },
+    "conversion": {
+      "title": "Conversion and Copies",
+      "sectionNumber": "5",
+      "item5_1": "The Repository reserves the right to convert deposited data files and/or metadata files to any medium or format and make copies of research data for security, backup, preservation and distribution purposes."
+    },
+    "metadataChanges": {
+      "title": "Metadata Changes",
+      "sectionNumber": "6",
+      "item6_1": "The Repository team may, if necessary, make changes to descriptive metadata, including enhancements and corrections. Any descriptive metadata changes will be tracked through the Repository's automated version control. Your research data will not be changed without your permission."
+    },
+    "display": {
+      "title": "Information Display",
+      "sectionNumber": "7",
+      "item7_1": "The depositor's name is displayed alongside published research data, as well as the terms of use selected by the depositor."
+    },
+    "preservation": {
+      "title": "Preservation Policy and Public Access",
+      "sectionNumber": "8",
+      "item8_1": "The Repository commits to preserving published research data in accordance with the Data Preservation Policy."
+    },
+    "publicAccess": {
+      "title": "Public Access",
+      "sectionNumber": "9",
+      "item9_1": "The Repository commits to providing public access to research data through the maintenance of persistent web pages, descriptive metadata records and identifiers, and to providing access metrics, which may include page views, downloads and citations."
+    },
+    "userResponsibilities": {
+      "title": "User Responsibilities",
+      "sectionNumber": "10",
+      "paragraph1": "You understand that you are responsible for:",
+      "items": [
+        "Ensuring that you have the right to grant the rights contained in these Terms;",
+        "Ensuring that, to the best of your knowledge, nothing in the research data infringes third-party copyrights or other intellectual property rights;",
+        "Obtaining unrestricted permission from the copyright owner to deposit third-party material in the Repository, clearly identifying such material in the research data content;",
+        "Ensuring that nothing in the research data violates any terms, such as confidentiality agreements or terms of use;",
+        "Not including private, confidential, third-party proprietary information, controlled export information, protected data or information that should not be shared publicly;",
+        "Ensuring that nothing in the research data contains software viruses, computer codes, files or programs capable of allowing unauthorized access or disrupting, damaging, limiting or interfering with the proper functioning of the Repository or the software, hardware or telecommunications equipment of other users;",
+        "Notifying the Repository of any changes to copyright or ownership terms of the research data;",
+        "Complying with all obligations required by contract or agreement with an agency or organization if the data is based on work sponsored or supported by that entity."
+      ]
+    },
+    "agreement": {
+      "title": "Agreement with Terms",
+      "sectionNumber": "11",
+      "item11_1": "By using the Repository, you fully agree to these Terms of Use."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "sectionNumber": "12",
+      "item12_1": "The Repository reserves the right to modify these Terms at any time. Any changes to the Terms will take effect immediately after being published in the Repository. Your continued use of the Repository after publication of changes to the Terms means that you agree to the changes."
+    },
+    "contact": {
+      "title": "Contact",
+      "sectionNumber": "13",
+      "item13_1": "If you do not agree with the above items or have questions, please contact the Repository team at contato@mapbiomas.org before depositing data in the Repository.",
+      "lastUpdate": "Last update date: 2025-09-18"
+    }
+  }
+}
+

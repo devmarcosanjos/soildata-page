@@ -1,0 +1,90 @@
+{
+  "title": "TÉRMINOS DE USO",
+  "sections": {
+    "introduction": {
+      "paragraph1": "Bienvenido a SoilData, el repositorio brasileño de datos de investigación en ciencia del suelo (en adelante denominado 'Repositorio'). Al acceder o utilizar el Repositorio, usted acepta estar vinculado a estos Términos y Condiciones de Uso (en adelante denominados 'Términos'). Lea atentamente estos Términos antes de utilizar el Repositorio."
+    },
+    "acceptance": {
+      "title": "Aceptación de los Términos",
+      "sectionNumber": "1",
+      "items": [
+        "Al depositar datos de investigación en el Repositorio, usted reconoce que ha leído y está de acuerdo completamente con estos Términos.",
+        "Usted declara ser el creador/autor de los datos de investigación o haber obtenido permiso del creador/autor para depositar cualquier dato de investigación en el Repositorio."
+      ]
+    },
+    "copyright": {
+      "title": "Derechos de Autor y Licencia",
+      "sectionNumber": "2",
+      "item2_1": "Para administrar adecuadamente y preservar el contenido para uso futuro, el Repositorio requiere ciertos permisos y garantías con respecto a los derechos de autor de los datos de investigación depositados. Si la ley de derechos de autor es aplicable al envío de los datos de investigación y usted es el propietario de los derechos de autor, al aceptar estos Términos, usted aún mantiene los derechos de autor de su trabajo y el derecho de enviar los datos de investigación a editores u otros repositorios.",
+      "item2_2": "Si los derechos de autor son aplicables y usted no es el propietario de los derechos de autor, usted declara que el propietario de los derechos de autor le ha dado permiso sin restricciones para hacer que los datos de investigación estén disponibles públicamente.",
+      "item2_3": "Al depositar datos de investigación en el Repositorio, usted otorga a MapBiomas el derecho no exclusivo de reproducir, traducir y distribuir los datos en cualquier formato o medio en todo el mundo y libre de regalías, incluyendo, pero no limitado a, la publicación en Internet."
+    },
+    "standardization": {
+      "title": "Estandarización y Metadatos",
+      "sectionNumber": "3",
+      "item3_1": "Los datos de investigación que se publiquen en el Repositorio deben estar en conformidad con las instrucciones descritas en la Guía de Depósito de Datos."
+    },
+    "compliance": {
+      "title": "Cumplimiento con la Guía",
+      "sectionNumber": "4",
+      "item4_1": "Los datos de investigación depositados están sujetos a revisión y aprobación de la curación antes de ser publicados."
+    },
+    "conversion": {
+      "title": "Conversión y Copias",
+      "sectionNumber": "5",
+      "item5_1": "El Repositorio se reserva el derecho de convertir archivos de datos y/o archivos de metadatos depositados a cualquier medio o formato y hacer copias de los datos de investigación para fines de seguridad, respaldo, preservación y distribución."
+    },
+    "metadataChanges": {
+      "title": "Cambios en los Metadatos",
+      "sectionNumber": "6",
+      "item6_1": "El equipo del Repositorio puede, si es necesario, hacer cambios en los metadatos descriptivos, incluyendo mejoras y correcciones. Cualquier cambio en los metadatos descriptivos será rastreado mediante el control de versiones automatizado del Repositorio. Sus datos de investigación no serán alterados sin su permiso."
+    },
+    "display": {
+      "title": "Visualización de Información",
+      "sectionNumber": "7",
+      "item7_1": "El nombre del depositante se muestra junto con los datos de investigación publicados, así como los términos de uso seleccionados por el depositante."
+    },
+    "preservation": {
+      "title": "Política de Preservación y Acceso Público",
+      "sectionNumber": "8",
+      "item8_1": "El Repositorio se compromete a preservar los datos de investigación publicados de acuerdo con la Política de Preservación de Datos."
+    },
+    "publicAccess": {
+      "title": "Acceso Público",
+      "sectionNumber": "9",
+      "item9_1": "El Repositorio se compromete a proporcionar acceso público a los datos de investigación mediante el mantenimiento de páginas web persistentes, registros de metadatos descriptivos e identificadores, y a proporcionar métricas de acceso, que pueden incluir visualizaciones de páginas, descargas y citas."
+    },
+    "userResponsibilities": {
+      "title": "Responsabilidades del Usuario",
+      "sectionNumber": "10",
+      "paragraph1": "Usted entiende que es responsable de:",
+      "items": [
+        "Garantizar que tiene el derecho de otorgar los derechos contenidos en estos Términos;",
+        "Garantizar que, hasta donde usted sabe, nada en los datos de investigación infringe los derechos de autor de terceros u otros derechos de propiedad intelectual;",
+        "Obtener permiso sin restricciones del propietario de los derechos de autor para depositar material de terceros en el Repositorio, identificando claramente tal material en el contenido de los datos de investigación;",
+        "Garantizar que nada en los datos de investigación viole ningún término, como acuerdos de confidencialidad o términos de uso;",
+        "No incluir información privada, confidencial, propietaria de terceros, información de exportación controlada, datos protegidos o información que no deba ser compartida públicamente;",
+        "Garantizar que nada en los datos de investigación contenga virus de software, códigos de computadora, archivos o programas capaces de permitir acceso no autorizado o interrumpir, dañar, limitar o interferir con el funcionamiento adecuado del Repositorio o del software, hardware o equipo de telecomunicaciones de otros usuarios;",
+        "Notificar al Repositorio sobre cualquier cambio en los términos de derechos de autor o propiedad de los datos de investigación;",
+        "Cumplir con todas las obligaciones requeridas por el contrato o acuerdo con una agencia u organización si los datos se basan en trabajo patrocinado o apoyado por esa entidad."
+      ]
+    },
+    "agreement": {
+      "title": "Acuerdo con los Términos",
+      "sectionNumber": "11",
+      "item11_1": "Al utilizar el Repositorio, usted está completamente de acuerdo con estos Términos de Uso."
+    },
+    "changes": {
+      "title": "Cambios en los Términos",
+      "sectionNumber": "12",
+      "item12_1": "El Repositorio se reserva el derecho de modificar estos Términos en cualquier momento. Cualquier cambio en los Términos entrará en vigor inmediatamente después de ser publicado en el Repositorio. Su uso continuo del Repositorio después de la publicación de cambios en los Términos significa que usted está de acuerdo con los cambios."
+    },
+    "contact": {
+      "title": "Contacto",
+      "sectionNumber": "13",
+      "item13_1": "Si no está de acuerdo con los elementos anteriores o tiene preguntas, contacte al equipo del Repositorio por correo electrónico a contato@mapbiomas.org antes de depositar datos en el Repositorio.",
+      "lastUpdate": "Fecha de última actualización: 2025-09-18"
+    }
+  }
+}
+

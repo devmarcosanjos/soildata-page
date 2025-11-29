@@ -16,7 +16,8 @@ export function useI18n() {
     // Atualizar a URL mantendo o caminho atual
     const currentPath = location.pathname;
     const pathWithoutLang = currentPath.replace(/^\/(pt|en|es)/, '') || '/';
-    const newPath = `/${lang}${pathWithoutLang === '/' ? '' : pathWithoutLang}`;
+    // Garantir que a rota raiz sempre tenha trailing slash para evitar redirecionamentos
+    const newPath = `/${lang}${pathWithoutLang === '/' ? '/' : pathWithoutLang}`;
     
     navigate(newPath, { replace: true });
   };

@@ -1,0 +1,226 @@
+{
+  "title": "POLÍTICA DE PRIVACIDAD",
+  "sections": {
+    "introduction": {
+      "paragraph1": "Este Aviso de Privacidad describe cómo SoilData, repositorio de datos de investigación operado por MapBiomas ('nosotros', 'nuestro' o 'organización'), recopila, utiliza y protege la información personal de los usuarios. Los usuarios de SoilData incluyen usuarios administrativos, depositantes, usuarios finales, personas vinculadas a los datos de investigación y personas identificadas en los datos de investigación.",
+      "paragraph2": "Los datos personales son información que puede estar vinculada a usted como persona. Pueden incluir datos que pueden estar directamente relacionados con una persona específica y datos que, por sí solos, no identifican a un individuo, pero se vuelven personales cuando se combinan con otra información.",
+      "paragraph3": "Los datos personales son información que puede estar vinculada a usted como persona. Pueden incluir:",
+      "items": [
+        "Datos que pueden estar directamente relacionados con una persona específica.",
+        "Datos que, por sí solos, no identifican a un individuo, pero se vuelven personales cuando se combinan con otra información"
+      ]
+    },
+    "dataCollection": {
+      "title": "Recopilación de Datos",
+      "paragraph1": "Recopilamos datos sobre usted de cuatro maneras distintas: voluntariamente, automáticamente, a través de terceros y mediante recuperación histórica.",
+      "voluntary": {
+        "subtitle": "Provisión voluntaria",
+        "paragraph1": "Usted elige proporcionar datos personales voluntariamente en las siguientes circunstancias:",
+        "items1": [
+          "Al crear una cuenta.",
+          "Al depositar datos de investigación (registrando metadatos y cargando archivos)."
+        ],
+        "paragraph2": "En estos casos, usted proporciona los siguientes datos personales:",
+        "items2": [
+          "Nombre completo (legal o social)",
+          "Contraseña",
+          "Dirección de correo electrónico",
+          "Afiliación laboral",
+          "Posición/profesión (opcional)",
+          "Identificador en base de datos públicas (ORCID o similar)"
+        ]
+      },
+      "automatic": {
+        "subtitle": "Recopilación automática",
+        "paragraph1": "Mientras navega por SoilData, recopilamos automáticamente datos de tráfico e interacción con las páginas usando Google Analytics. Estos datos, generados por su dispositivo o navegador, pueden incluir:",
+        "items": [
+          "Un identificador único (secuencia de caracteres)",
+          "El dispositivo que está usando",
+          "Su dirección IP (con fecha y hora)",
+          "El navegador que está utilizando",
+          "Su sistema operativo",
+          "Su ubicación geográfica",
+          "Cómo llegó al sitio",
+          "Las páginas que visita",
+          "Las páginas que comparte",
+          "La cantidad de tiempo que pasa en cada página"
+        ],
+        "paragraph2": "Para evitar que Google Analytics recopile sus datos, puede instalar un complemento de bloqueo de seguimiento en su navegador, como el 'Google Analytics Opt-out Browser Add-on' o el 'Privacy Badger' de la Electronic Frontier Foundation (EFF)."
+      },
+      "thirdParty": {
+        "subtitle": "Provisión por terceros",
+        "paragraph1": "Cuando un representante o colaborador deposita datos de investigación en nombre de un grupo o equipo, algunos datos personales pueden ser proporcionados, tanto en los metadatos de citación como en el cuerpo de los archivos de datos cargados. Estos datos personales pueden incluir:",
+        "items": [
+          "Nombre legal o social completo",
+          "Información de contacto, como dirección de correo electrónico y postal",
+          "Afiliación laboral",
+          "Identificador en base de datos públicas (ORCID o similar)"
+        ],
+        "paragraph2": "Es responsabilidad del representante o colaborador obtener el consentimiento apropiado de las partes involucradas para compartir sus datos personales, como direcciones de correo electrónico y postales, si es necesario."
+      },
+      "historical": {
+        "subtitle": "Recuperación histórica",
+        "paragraph1": "El equipo del Repositorio realiza la recuperación de datos históricos de investigación (datos heredados) disponibles en fuentes públicas, como bibliotecas, bases de datos y repositorios institucionales. Después de la digitalización, estos datos se depositan en el Repositorio, acompañados de los respectivos metadatos de citación. En estas circunstancias, los siguientes datos personales públicos, que hayan sido previamente hechos públicos por usted o su representante o colaborador, pueden ser registrados:",
+        "items": [
+          "Nombre completo (legal o social)",
+          "Afiliación laboral",
+          "Dirección de correo electrónico"
+        ],
+        "paragraph2": "Se le informará siempre que sus datos personales de acceso público sean registrados en el Repositorio, siempre que su dirección de correo electrónico también sea pública."
+      }
+    },
+    "dataUsage": {
+      "title": "Uso de Datos",
+      "paragraph1": "Utilizamos la información personal recopilada para tres propósitos:",
+      "items": [
+        "proporcionar y mejorar el servicio de SoilData",
+        "contacto y comunicación",
+        "compartir con terceros."
+      ],
+      "service": {
+        "subtitle": "Proporcionar y mejorar el servicio",
+        "items": [
+          {
+            "bold": "Visualización de datos: ",
+            "text": "Mostrar el nombre del depositante, autores, coautores, recolectores de datos y otros colaboradores vinculados a los datos de investigación publicados, permitiendo la identificación y reconocimiento de los responsables de los datos."
+          },
+          {
+            "bold": "Catalogación: ",
+            "text": "Usar datos personales recopilados para catalogar información y metadatos relacionados con los datos de investigación recuperados, facilitando la organización y búsqueda por parte de los usuarios."
+          },
+          {
+            "bold": "Atribución de créditos: ",
+            "text": "Utilizar datos personales para atribuir créditos apropiados a los individuos involucrados en la producción de los datos de investigación, reconociendo su contribución."
+          },
+          {
+            "bold": "Responsabilidad: ",
+            "text": "Permitir la responsabilidad de las personas detrás de los datos de investigación, garantizando transparencia y responsabilidad en la divulgación de datos científicos."
+          },
+          {
+            "bold": "Generar estadísticas sobre el uso del sitio: ",
+            "text": "Recopilar datos de tráfico e interacción con las páginas a través de Google Analytics, sin identificación personal, para generar estadísticas de uso."
+          },
+          {
+            "bold": "Mejora continua: ",
+            "text": "Realizar investigaciones y análisis para entender las necesidades de los usuarios y dirigir mejoras continuas en los servicios para hacer la experiencia del usuario más efectiva y agradable."
+          }
+        ]
+      },
+      "contact": {
+        "subtitle": "Contacto y comunicación",
+        "items": [
+          {
+            "bold": "Notificaciones relacionadas con el Repositorio: ",
+            "text": "Enviar notificaciones relacionadas con el Repositorio, como actualizaciones de depósitos de datos de investigación, modificaciones en los Términos y Condiciones de Uso, Política de Preservación de Datos y este Aviso de Privacidad."
+          },
+          {
+            "bold": "Facilitar el contacto entre usuarios: ",
+            "text": "Facilitar el contacto de otros usuarios que deseen comunicarse o colaborar con usted en asuntos relacionados con los datos de investigación de los cuales es autor o colaborador."
+          }
+        ]
+      },
+      "sharing": {
+        "subtitle": "Compartir con terceros",
+        "items": [
+          {
+            "bold": "Soporte técnico, mantenimiento y gestión: ",
+            "text": "Compartimos sus datos personales con la Universidad Tecnológica Federal de Paraná (que actúa como nuestro operador de datos del Repositorio), y con proveedores contratados que pueden necesitar estos datos para realizar mantenimiento, brindar soporte técnico y corregir cualquier problema en el servicio."
+          },
+          {
+            "bold": "Almacenamiento. ",
+            "text": "Los datos depositados en el Repositorio se almacenan en servidores de Google, que pueden estar ubicados en los EE. UU. Esto implica que los términos de uso y política de privacidad de Google también se aplican a sus datos personales."
+          },
+          {
+            "bold": "Indexación por motores de búsqueda: ",
+            "text": "Compartimos los datos personales abiertos vinculados a los datos de investigación con servicios externos especializados (DataCite Search, Google Dataset Search etc) y motores de búsqueda genéricos (Google, Bing etc)."
+          }
+        ]
+      }
+    },
+    "dataSecurity": {
+      "title": "Seguridad de Datos",
+      "paragraph1": "Tomamos medidas de seguridad para proteger sus datos contra acceso no autorizado, uso, divulgación, alteración o destrucción. Estas medidas incluyen:",
+      "items": [
+        "Acceso restringido a sus datos personales",
+        "Uso de tecnologías de seguridad",
+        "Implementación de políticas de seguridad"
+      ]
+    },
+    "yourRights": {
+      "title": "Sus Derechos",
+      "paragraph1": "Usted tiene los siguientes derechos con respecto a sus datos personales:",
+      "items": [
+        "derecho de acceso, información y portabilidad,",
+        "derecho de rectificación,",
+        "derecho de eliminación,",
+        "derecho a la restricción del procesamiento,",
+        "derecho a oponerse al procesamiento, y",
+        "derecho a presentar quejas sobre el procesamiento."
+      ],
+      "paragraph2": "Para ejercer cualquiera de estos derechos, por favor contáctenos.",
+      "access": {
+        "subtitle": "Acceso e información",
+        "paragraph1": "Usted tiene derecho a recibir información detallada sobre cómo se procesan sus datos personales en el Repositorio, y esta declaración de privacidad ha sido elaborada para proporcionar la información que tiene derecho a obtener. Además, usted tiene derecho a acceder y visualizar sus datos personales registrados en el Repositorio, así como otros datos personales recopilados. Si lo desea, también tiene derecho a recibir una copia de estos datos en un formato estructurado, comúnmente utilizado y legible por máquina, facilitando la portabilidad de sus datos personales.",
+        "paragraph2": "Para ejercer su derecho de acceso y portabilidad de datos personales, los usuarios registrados pueden iniciar sesión en el Repositorio y navegar hasta la página 'Información de la Cuenta' y 'Mis Datos' en el menú de la cuenta de usuario en la esquina superior derecha de la página. Si esta información no ofrece una vista completa de sus datos personales, puede contactarnos para solicitar acceso a información más detallada."
+      },
+      "rectification": {
+        "subtitle": "Rectificación",
+        "paragraph1": "Usted tiene derecho a rectificar datos personales inexactos sobre usted. Además, también tiene derecho a complementar información personal que esté incompleta. Si nota que el Repositorio presenta datos personales inexactos o incompletos, por favor contáctenos y explique por qué cree que estos datos son incorrectos o incompletos."
+      },
+      "deletion": {
+        "subtitle": "Eliminación de sus datos",
+        "paragraph1": "Usted tiene derecho a solicitar la eliminación de sus datos personales. Si desea que sus datos personales sean eliminados, por favor contáctenos. Es importante que, en su solicitud, explique por qué desea que sus datos personales sean eliminados y, si es posible, indique qué datos personales específicos le gustaría eliminar.",
+        "paragraph2": "La legislación prevé excepciones al derecho de eliminación de sus datos personales en ciertos casos. Esto puede ocurrir cuando procesamos datos personales para cumplir con obligaciones legales o para atender intereses sociales importantes, como archivo, investigación y estadísticas.",
+        "paragraph3": "En los casos en que los propios usuarios han registrado contenido en el Repositorio, no tenemos la capacidad de eliminar la información del usuario sin también eliminar el contenido registrado."
+      },
+      "restriction": {
+        "subtitle": "Restricción del procesamiento",
+        "paragraph1": "En ciertas circunstancias, usted puede tener derecho a solicitar restricciones en el procesamiento de sus datos personales. El procesamiento restringido significa que los datos personales aún se almacenarán, pero que otros procesamientos en el Repositorio serán limitados. Para solicitar el procesamiento restringido de datos personales, es necesario cumplir con las condiciones establecidas en la Ley General de Protección de Datos Personales. Puede solicitar el procesamiento restringido en los siguientes casos:",
+        "items": [
+          "Cuando sus datos personales inexactos o incompletos estén siendo rectificados.",
+          "Si ha presentado una objeción al procesamiento (consulte a continuación para más detalles).",
+          "Cuando los datos personales sean necesarios para establecer o defender una reclamación legal."
+        ],
+        "paragraph2": "Si se otorga el procesamiento restringido, recibirá una notificación antes de que se levante la restricción."
+      },
+      "objection": {
+        "subtitle": "Objeción al procesamiento",
+        "paragraph1": "Usted tiene derecho a oponerse al procesamiento de sus datos personales, incluso cuando los fundamentos legales para dicho procesamiento se basan en intereses legítimos, razones de interés público o en el ejercicio de autoridad pública, siempre que tenga motivos válidos para hacerlo.",
+        "paragraph2": "Otra situación en la que puede ejercer su derecho de oposición es cuando los datos personales se procesan para fines de investigación científica o histórica, así como para fines estadísticos. En estas situaciones, los datos se anonimizan para proteger su privacidad.",
+        "paragraph3": "Generalmente, el Repositorio no cumple con estas condiciones, excepto para el procesamiento de información del autor y en casos en que los datos personales se usan para fines estadísticos.",
+        "items": [
+          "Si tiene una necesidad especial para detener el procesamiento (ej: protección de datos personales o mantenimiento de dirección confidencial), estamos disponibles para ayudar.",
+          "Si ha consentido con el procesamiento de sus datos personales, usted tiene derecho a retirar ese consentimiento en cualquier momento."
+        ]
+      },
+      "complaints": {
+        "subtitle": "Quejas sobre el procesamiento",
+        "paragraph1": "Si cree que el Repositorio no ha manejado sus datos personales de manera correcta o legal, o si siente que no ha tenido la oportunidad de ejercer plenamente sus derechos con el Repositorio, sepa que tiene derecho a presentar una queja sobre el procesamiento. Nuestros detalles de contacto están disponibles a continuación."
+      }
+    },
+    "contact": {
+      "title": "Contacto",
+      "paragraph1": "Si tiene alguna pregunta sobre este Aviso de Privacidad o sobre el uso de sus datos personales en SoilData, contáctenos en ",
+      "email": "contato@mapbiomas.org",
+      "paragraph2": "Nos esforzaremos por responder sus preguntas y solicitudes lo más rápido posible.",
+      "controller": {
+        "subtitle": "Controlador de datos",
+        "paragraph1": "MapBiomas es el controlador de datos personales en el Repositorio SoilData. Para obtener una visión general de las ONG, universidades y empresas de tecnología que constituyen MapBiomas, consulte ",
+        "link": "nuestra página",
+        "linkHref": "https://mapbiomas.org/quem-somos"
+      },
+      "operator": {
+        "subtitle": "Operador de datos",
+        "paragraph1": "La Universidad Tecnológica Federal de Paraná (UTFPR) procesa datos personales en nombre del controlador de datos y desempeña el papel de operador de datos personales."
+      }
+    },
+    "changes": {
+      "title": "Cambios a este Aviso de Privacidad",
+      "paragraph1": "Nos reservamos el derecho de actualizar o modificar este Aviso de Privacidad periódicamente. Cualquier cambio se reflejará en esta página, y la fecha de la última actualización se indicará al principio del aviso.",
+      "lastUpdate": "Fecha de última actualización: ",
+      "date": "2025-09-17",
+      "paragraph2": "Al usar SoilData, usted acepta los términos de este Aviso de Privacidad."
+    }
+  }
+}
+

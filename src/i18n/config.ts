@@ -13,6 +13,8 @@ import ptPlatform from './locales/pt/platform.json';
 import ptFaq from './locales/pt/faq.json';
 import ptContact from './locales/pt/contact.json';
 import ptFooter from './locales/pt/footer.json';
+import ptPrivacy from './locales/pt/privacy.json';
+import ptTerms from './locales/pt/terms.json';
 
 import enCommon from './locales/en/common.json';
 import enNavigation from './locales/en/navigation.json';
@@ -25,6 +27,8 @@ import enPlatform from './locales/en/platform.json';
 import enFaq from './locales/en/faq.json';
 import enContact from './locales/en/contact.json';
 import enFooter from './locales/en/footer.json';
+import enPrivacy from './locales/en/privacy.json';
+import enTerms from './locales/en/terms.json';
 
 import esCommon from './locales/es/common.json';
 import esNavigation from './locales/es/navigation.json';
@@ -37,6 +41,8 @@ import esPlatform from './locales/es/platform.json';
 import esFaq from './locales/es/faq.json';
 import esContact from './locales/es/contact.json';
 import esFooter from './locales/es/footer.json';
+import esPrivacy from './locales/es/privacy.json';
+import esTerms from './locales/es/terms.json';
 
 const resources = {
   pt: {
@@ -51,6 +57,8 @@ const resources = {
     faq: ptFaq,
     contact: ptContact,
     footer: ptFooter,
+    privacy: ptPrivacy,
+    terms: ptTerms,
   },
   en: {
     common: enCommon,
@@ -64,6 +72,8 @@ const resources = {
     faq: enFaq,
     contact: enContact,
     footer: enFooter,
+    privacy: enPrivacy,
+    terms: enTerms,
   },
   es: {
     common: esCommon,
@@ -77,6 +87,8 @@ const resources = {
     faq: esFaq,
     contact: esContact,
     footer: esFooter,
+    privacy: esPrivacy,
+    terms: esTerms,
   },
 };
 
@@ -120,6 +132,8 @@ i18n
       'faq',
       'contact',
       'footer',
+      'privacy',
+      'terms',
     ],
     interpolation: {
       escapeValue: false,
