@@ -86,7 +86,8 @@ const soloDatasetDefinitions: SoloDatasetDefinition[] = [
   },
 ];
 
-export const soloDatasetOptions = soloDatasetDefinitions.map(({ id, label }) => ({
+export const soloDatasetOptions = soloDatasetDefinitions.map(({ id, label }, index) => ({
+  id: id || `option-${index}`, // Garantir ID único
   label,
   value: id,
 }));

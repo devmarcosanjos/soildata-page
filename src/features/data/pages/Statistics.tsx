@@ -1,110 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HeroPageLayout } from '@/shared/components/HeroPageLayout';
 import { MetricsChart } from '@/shared/components/Metrics';
 import {
-  getTotalDatasets,
-  getTotalFiles,
-  getMonthlyDownloads,
-  clearMetricsCache,
-} from '@/services/metricsApi';
-import type { MonthlyMetric } from '@/types/metrics';
+  useTotalDatasets,
+  useTotalFiles,
+  useMonthlyDownloads,
+} from '@/hooks/queries/useMetrics';
 import { Database, Download, FileText, TrendingUp } from 'lucide-react';
 
 export function Statistics() {
   const { t, i18n } = useTranslation('data');
   const locale = i18n.language.split('-')[0] || 'pt';
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Métricas totais
-  const [totalDatasets, setTotalDatasets] = useState<number>(0);
-  const [totalDownloads, setTotalDownloads] = useState<number>(0);
-  const [totalFiles, setTotalFiles] = useState<number>(0);
+  // Buscar métricas usando React Query
+  const { data: datasetsData, isLoading: datasetsLoading, isError: datasetsError } = useTotalDatasets();
+  const { data: filesData, isLoading: filesLoading, isError: filesError } = useTotalFiles();
+  const { data: monthlyDownloadsData = [], isLoading: monthlyLoading, isError: monthlyError } = useMonthlyDownloads();
 
-  // Métricas mensais
-  const [monthlyDownloads, setMonthlyDownloads] = useState<MonthlyMetric[]>([]);
+  // Estados derivados
+  const loading = datasetsLoading || filesLoading || monthlyLoading;
+  const error = (datasetsError || filesError || monthlyError) ? t('statistics.error') : null;
 
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      setLoading(true);
-      setError(null);
-      
-      // Limpar cache para garantir dados atualizados
-      clearMetricsCache();
-
-      try {
-        // Buscar todas as métricas em paralelo
-        // Removido getTotalDownloads() pois vamos usar o valor acumulativo dos dados mensais
-        // Removido getFileDownloads() pois o endpoint retorna erro 500
-        const [
-          datasetsResult,
-          filesResult,
-          monthlyDownloadsResult,
-        ] = await Promise.allSettled([
-          getTotalDatasets(),
-          getTotalFiles(),
-          getMonthlyDownloads(),
-        ]);
-
-        // Processar resultados com validação
-        if (datasetsResult.status === 'fulfilled') {
-          const value = datasetsResult.value;
-          if (value && typeof value.count === 'number') {
-            setTotalDatasets(value.count);
-          }
-        } else {
-          console.warn('Erro ao buscar total de datasets:', datasetsResult.status === 'rejected' ? datasetsResult.reason : 'unknown');
-        }
-
-        // Não usar mais o valor da API /downloads
-        // O total de downloads será definido pelo último valor acumulativo dos dados mensais
-        // if (downloadsResult.status === 'fulfilled') {
-        //   const value = downloadsResult.value;
-        //   if (value && typeof value.count === 'number') {
-        //     setTotalDownloads(value.count);
-        //   } else {
-        //     console.warn('Valor de downloads inválido:', value);
-        //   }
-        // } else {
-        //   console.warn('Erro ao buscar total de downloads:', downloadsResult.status === 'rejected' ? downloadsResult.reason : 'unknown');
-        // }
-
-        if (filesResult.status === 'fulfilled') {
-          const value = filesResult.value;
-          if (value && typeof value.count === 'number') {
-            setTotalFiles(value.count);
-          }
-        } else {
-          console.warn('Erro ao buscar total de arquivos:', filesResult.status === 'rejected' ? filesResult.reason : 'unknown');
-        }
-
-        if (monthlyDownloadsResult.status === 'fulfilled') {
-          const value = monthlyDownloadsResult.value;
-          // Verificar se é um array
-          if (Array.isArray(value)) {
-            setMonthlyDownloads(value);
-            // Usar o último valor acumulativo dos dados mensais como total de downloads
-            if (value.length > 0) {
-              const lastMonthValue = value[value.length - 1].count;
-              setTotalDownloads(lastMonthValue);
-            }
-          } else {
-            console.warn('monthlyDownloads não é um array:', value);
-            setMonthlyDownloads([]);
-          }
-        }
-
-      } catch (err) {
-        console.error('Erro ao buscar métricas:', err);
-        setError(t('statistics.error'));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMetrics();
-  }, []);
+  // Processar dados
+  const totalDatasets = datasetsData?.count ?? 0;
+  const totalFiles = filesData?.count ?? 0;
+  
+  // Calcular total de downloads do último valor acumulativo dos dados mensais
+  const totalDownloads = useMemo(() => {
+    if (Array.isArray(monthlyDownloadsData) && monthlyDownloadsData.length > 0) {
+      return monthlyDownloadsData[monthlyDownloadsData.length - 1].count;
+    }
+    return 0;
+  }, [monthlyDownloadsData]);
 
   // Calcular métricas derivadas
   const avgDownloadsPerDataset = totalDatasets > 0 ? Math.round(totalDownloads / totalDatasets) : 0;
@@ -193,7 +121,7 @@ export function Statistics() {
         </h2>
         <div className="w-full overflow-x-auto">
           <MetricsChart
-            data={monthlyDownloads}
+            data={Array.isArray(monthlyDownloadsData) ? monthlyDownloadsData : []}
             loading={loading}
             className="w-full"
           />

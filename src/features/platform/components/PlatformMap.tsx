@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
@@ -8,6 +8,7 @@ import { soloDatasetLoaders } from '@/features/platform/data/soloDatasets';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
 import { TerritorySearchBar } from './TerritorySearchBar';
 import type { TerritoryResult } from './TerritorySelector';
+import { usePlatformStore } from '@/stores/platformStore';
 import bbox from '@turf/bbox';
 
 
@@ -58,18 +59,10 @@ interface PlatformMapProps {
   onStatisticsChange?: (stats: MapStatistics) => void;
 }
 
-const groupingOptions = [
-  { id: 'pais', name: 'Brasil' },
-  { id: 'estados', name: 'Agrupar por Estados' },
-  { id: 'municipios', name: 'Agrupar por Municípios' },
-  { id: 'biomas', name: 'Agrupar por Biomas' },
-];
-
-
-
 // Component to expose the map instance to the parent
-function MapController({ setMap }: { setMap: (map: L.Map) => void }) {
+function MapController() {
   const map = useMap();
+  const { setMap } = usePlatformStore();
   useEffect(() => {
     setMap(map);
   }, [map, setMap]);
@@ -77,17 +70,26 @@ function MapController({ setMap }: { setMap: (map: L.Map) => void }) {
 }
 
 export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformMapProps) {
-  const [map, setMap] = useState<L.Map | null>(null);
-  const [datasetPoints, setDatasetPoints] = useState<SoloDatasetPoint[]>([]);
-  const [isDatasetLoading, setIsDatasetLoading] = useState(false);
-  const [datasetError, setDatasetError] = useState<string | null>(null);
-
-  const [groupingValue] = useState(groupingOptions[0].id);
-  const [countryGeoJson, setCountryGeoJson] = useState<GeoJSONData | null>(null);
-  const [brazilGeoJson, setBrazilGeoJson] = useState<GeoJSONData | null>(null);
-  const [biomesGeoJson, setBiomesGeoJson] = useState<GeoJSONData | null>(null);
-  const [municipalitiesGeoJson, setMunicipalitiesGeoJson] = useState<GeoJSONData | null>(null);
-  const [selectedTerritory, setSelectedTerritory] = useState<TerritoryResult | null>(null);
+  const {
+    map,
+    datasetPoints,
+    setDatasetPoints,
+    isDatasetLoading,
+    setIsDatasetLoading,
+    datasetError,
+    setDatasetError,
+    groupingValue,
+    countryGeoJson,
+    setCountryGeoJson,
+    brazilGeoJson,
+    setBrazilGeoJson,
+    biomesGeoJson,
+    setBiomesGeoJson,
+    municipalitiesGeoJson,
+    setMunicipalitiesGeoJson,
+    selectedTerritory,
+    setSelectedTerritory,
+  } = usePlatformStore();
 
 
   // Use filtered points if filters are active, otherwise use grouping filter
@@ -109,6 +111,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
       setBrazilGeoJson(getStatesGeoJson() as GeoJSONData);
       setBiomesGeoJson(getBiomesGeoJson() as GeoJSONData);
     }).catch(err => console.error('Failed to load GeoJSON:', err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lazy load municipalities only when needed
@@ -120,6 +123,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
           .catch(err => console.error('Failed to load Municipalities GeoJSON:', err));
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupingValue, municipalitiesGeoJson]);
 
   useEffect(() => {
@@ -128,14 +132,16 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     if (!selectedDatasetId) {
       setDatasetPoints([]);
       setDatasetError(null);
-      return () => { isCancelled = true; };
+      setIsDatasetLoading(false);
+      return;
     }
 
     const loader = soloDatasetLoaders[selectedDatasetId];
     if (!loader) {
       setDatasetPoints([]);
       setDatasetError('Dataset não configurado.');
-      return () => { isCancelled = true; };
+      setIsDatasetLoading(false);
+      return;
     }
 
     setIsDatasetLoading(true);
@@ -157,7 +163,10 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         setIsDatasetLoading(false);
       });
 
-    return () => { isCancelled = true; };
+    return () => { 
+      isCancelled = true; 
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDatasetId]);
 
   // Handle territory selection and zoom to bounds
@@ -193,7 +202,8 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     };
 
     onStatisticsChange(stats);
-  }, [datasetPoints, selectedTerritory, selectedDatasetId, onStatisticsChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [datasetPoints, selectedTerritory, selectedDatasetId]);
 
 
   const showEmptyState =
@@ -203,7 +213,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     <div className="h-full w-full relative z-0">
       {/* Enhanced Loading Overlay */}
       {isDatasetLoading && (
-        <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-[2000]">
+        <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-2000">
           <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white shadow-2xl border border-orange-100">
             <div className="relative">
               <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-200 border-t-orange-600" />
@@ -227,7 +237,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
 
       {/* Error and Empty States */}
       {(datasetError || showEmptyState) && (
-        <div className="absolute left-4 top-4 z-[1000] max-w-xs">
+        <div className="absolute left-4 top-4 z-1000 max-w-xs">
           <div
             className="rounded-xl bg-white/95 p-3 text-sm text-neutral-900 shadow-lg border"
             style={{ borderColor: 'rgba(197,91,40,0.3)' }}
@@ -245,7 +255,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         zoomControl={false}
         attributionControl={false}
       >
-        <MapController setMap={setMap} />
+        <MapController />
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -256,7 +266,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         {/* 1. States */}
         {groupingValue === 'estados' && brazilGeoJson && (
           <GeoJSON
-            data={brazilGeoJson as any}
+            data={brazilGeoJson as unknown as GeoJSON.FeatureCollection}
             style={{
               color: '#D97706', // Amber-600
               weight: 1,
@@ -269,7 +279,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         {/* 2. Biomes */}
         {groupingValue === 'biomas' && biomesGeoJson && (
           <GeoJSON
-            data={biomesGeoJson as any}
+            data={biomesGeoJson as unknown as GeoJSON.FeatureCollection}
             style={{
               color: '#059669', // Emerald-600
               weight: 1,
@@ -282,7 +292,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         {/* 3. Municipalities */}
         {groupingValue === 'municipios' && municipalitiesGeoJson && (
           <GeoJSON
-            data={municipalitiesGeoJson as any}
+            data={municipalitiesGeoJson as unknown as GeoJSON.FeatureCollection}
             style={{
               color: '#2563EB', // Blue-600
               weight: 0.5,
@@ -302,7 +312,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         >
           {displayPoints.map((point: SoloDatasetPoint) => (
             <Marker 
-              key={point.id} 
+              key={`${point.id}-${point.latitude}-${point.longitude}-${point.depth ?? 'no-depth'}`} 
               position={[point.latitude, point.longitude]}
             >
               <Popup maxWidth={360} minWidth={260}>
@@ -359,7 +369,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         {selectedTerritory?.feature && (
           <GeoJSON
             key={selectedTerritory.id}
-            data={selectedTerritory.feature as any}
+            data={selectedTerritory.feature as unknown as GeoJSON.FeatureCollection}
             style={{
               color: '#C55B28',
               weight: 2,
@@ -372,7 +382,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
       </MapContainer>
 
       {/* Territory Search Bar - Positioned absolutely over the map */}
-      <div className="absolute top-4 left-4 z-[400]">
+      <div className="absolute top-4 left-4 z-400">
         <TerritorySearchBar
           countryGeoJson={countryGeoJson}
           statesGeoJson={brazilGeoJson}

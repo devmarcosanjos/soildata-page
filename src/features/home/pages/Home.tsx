@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import soloImage from '@/assets/solo.png';
 import logoDOI from '@/assets/doi.png';
@@ -8,31 +7,11 @@ import { RepositoryPreviewSection } from '@/shared/components/RepositoryPreviewS
 import { CollaborativeNetworkSection } from '@/shared/components/CollaborativeNetworkSection';
 import { SearchBar } from '@/shared/components/SearchBar';
 import { mockPublications } from '@/data/mockPublications';
-import type { Dataset } from '@/types/dataset';
-import { getLatestDatasets } from '@/services/latestDatasetsApi';
+import { useLatestDatasets } from '@/hooks/queries/useDatasets';
 
 export function Home() {
   const { t } = useTranslation('home');
-  const [datasets, setDatasets] = useState<Dataset[]>(mockPublications);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchDatasets() {
-      setIsLoading(true);
-      try {
-        const latestDatasets = await getLatestDatasets(6);
-        if (latestDatasets.length > 0) {
-          setDatasets(latestDatasets);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar datasets:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchDatasets();
-  }, []);
+  const { data: datasets = mockPublications, isLoading } = useLatestDatasets(6);
 
   const handleSearch = (query: string) => {
     if (query.trim()) {

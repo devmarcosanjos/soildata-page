@@ -12,10 +12,6 @@ import type {
 
 const API_BASE_URL = 'https://soildata.mapbiomas.org/api/info/metrics';
 
-// Cache simples em memória
-const cache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_DURATION = 0; // Cache desabilitado para garantir dados sempre atualizados
-
 function buildUrl(endpoint: string, params?: MetricsApiParams): string {
   const url = new URL(`${API_BASE_URL}${endpoint}`);
   
@@ -38,13 +34,6 @@ async function fetchWithCache<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const cacheKey = url;
-  const cached = cache.get(cacheKey);
-  
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data as T;
-  }
-  
   try {
     const response = await fetch(url, {
       ...options,
@@ -69,7 +58,6 @@ async function fetchWithCache<T>(
     // Extrair apenas o campo 'data' se existir
     const data = (responseData as ApiResponse<T>).data ?? responseData;
     
-    cache.set(cacheKey, { data, timestamp: Date.now() });
     return data as T;
   } catch (error) {
     // Não logar erros 500 (erro do servidor)
@@ -169,7 +157,3 @@ export async function getDataverseTree(params?: MetricsApiParams): Promise<TreeD
   return fetchWithCache<TreeDataverse[]>(url);
 }
 
-// Limpar cache (útil para forçar atualização)
-export function clearMetricsCache(): void {
-  cache.clear();
-}

@@ -15,6 +15,7 @@
     "@appletosolutions/reactbits": "^1.0.3",
     "@fontsource/open-sans": "^5.2.7",
     "@mapbiomas/ui": "0.0.0-alpha.200",
+    "@tanstack/react-query": "^5.90.11",
     "@turf/bbox": "^7.3.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/helpers": "^6.5.0",
@@ -34,7 +35,8 @@
     "react-leaflet": "^4.2.1",
     "react-leaflet-cluster": "^2.1.0",
     "react-router-dom": "^7.9.5",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

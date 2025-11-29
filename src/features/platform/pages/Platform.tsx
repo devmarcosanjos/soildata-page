@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Platform, ThemeProvider, BaseColorsKeys } from '@mapbiomas/ui';
 import { Header } from '@/shared/components/Header';
 import {
@@ -7,13 +7,17 @@ import {
   PlatformStatistics,
   PlatformLeftbar,
 } from '@/features/platform/components';
-import { BRAZILIAN_SOIL_DATASET_ID } from '@/features/platform/data/soloDatasets';
-import type { MapStatistics } from '@/features/platform/components/PlatformMap';
+import { usePlatformStore } from '@/stores/platformStore';
 
 export function PlatformPage() {
-  const [headerHeight, setHeaderHeight] = useState(65);
-  const [selectedSoloDataset, setSelectedSoloDataset] = useState<string>(BRAZILIAN_SOIL_DATASET_ID);
-  const [mapStatistics, setMapStatistics] = useState<MapStatistics | undefined>(undefined);
+  const {
+    headerHeight,
+    setHeaderHeight,
+    selectedSoloDataset,
+    setSelectedSoloDataset,
+    mapStatistics,
+    setMapStatistics,
+  } = usePlatformStore();
 
   useEffect(() => {
     const updateHeaderHeight = () => {
@@ -35,6 +39,7 @@ export function PlatformPage() {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', updateHeaderHeight);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

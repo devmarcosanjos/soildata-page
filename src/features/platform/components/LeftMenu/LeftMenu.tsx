@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Accordion, RadioGroup, Tabs } from '@mapbiomas/ui';
 import { EarthIcon, Settings2Icon } from 'lucide-react';
 import { soloDatasetOptions } from '@/features/platform/data/soloDatasets';
+import { useUIStore } from '@/stores/uiStore';
 
 interface LeftMenuProps {
   selectedSoloDataset: string;
@@ -10,7 +10,7 @@ interface LeftMenuProps {
 }
 
 export function LeftMenu({ selectedSoloDataset, onSoloDatasetChange, isMinimized = false }: LeftMenuProps) {
-  const [activeTab, setActiveTab] = useState<string | number>('themes');
+  const { activeTab, setActiveTab } = useUIStore();
 
   const handleOpenPanel = () => {
     // Encontrar o botão padrão de toggle do MapBiomas UI
@@ -184,6 +184,7 @@ export function LeftMenu({ selectedSoloDataset, onSoloDatasetChange, isMinimized
             color="#EA580C"
           >
             <div 
+              id="solo-dataset-selection"
               style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
@@ -198,6 +199,8 @@ export function LeftMenu({ selectedSoloDataset, onSoloDatasetChange, isMinimized
                 onChange={onSoloDatasetChange}
                 orientation="vertical"
                 size="large"
+                aria-label="Seleção de dataset de solo"
+                aria-labelledby="solo-dataset-selection"
               />
             </div>
           </Accordion>

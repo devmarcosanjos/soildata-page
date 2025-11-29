@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Download } from 'lucide-react';
 import { LeftMenu } from './LeftMenu';
+import { useUIStore } from '@/stores/uiStore';
 
 interface PlatformLeftbarProps {
   selectedSoloDataset: string;
@@ -9,7 +10,7 @@ interface PlatformLeftbarProps {
 
 export function PlatformLeftbar({ selectedSoloDataset, onSoloDatasetChange }: PlatformLeftbarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const { isMinimized, setIsMinimized } = useUIStore();
 
   useEffect(() => {
     const checkMinimized = () => {
@@ -29,7 +30,7 @@ export function PlatformLeftbar({ selectedSoloDataset, onSoloDatasetChange }: Pl
     return () => {
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [setIsMinimized]);
 
   return (
     <div
