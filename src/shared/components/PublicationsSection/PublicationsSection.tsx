@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { Dataset } from '@/types/dataset';
 import { Carousel } from '../Carousel';
 import { DatasetCard } from '../DatasetCard';
@@ -9,14 +10,16 @@ interface PublicationsSectionProps {
 
 export function PublicationsSection({ 
   datasets, 
-  title = 'ÚLTIMAS PUBLICAÇÕES' 
+  title 
 }: PublicationsSectionProps) {
+  const { t } = useTranslation('home');
+  const sectionTitle = title || t('latestPublications');
   return (
     <section className="py-8 md:py-12 lg:py-16 bg-white">
       <div className="max-w-[1920px] mx-auto px-4 md:px-6 lg:px-0">
         <div className="max-w-[1200px] mx-auto w-full px-2 md:px-4 lg:px-0">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 md:mb-8 text-center text-gray-700">
-            {title}
+            {sectionTitle}
           </h2>
 
           <div className="relative -mx-1 px-1">
