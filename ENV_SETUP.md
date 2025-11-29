@@ -16,7 +16,7 @@ Este projeto usa variáveis de ambiente para configurar diferentes ambientes (de
 
 - `VITE_API_BASE_URL` - URL base da API SoilData
   - Desenvolvimento: `http://localhost:3000`
-  - Produção: `https://api.soildata.mapbiomas.org`
+  - Produção: `https://api.soildata.cmob.online`
 
 - `VITE_NODE_ENV` - Ambiente atual
   - `development` ou `production`
@@ -39,7 +39,7 @@ VITE_API_BASE_URL=http://localhost:3001
 
 1. Crie ou edite `.env.production`:
 ```bash
-VITE_API_BASE_URL=https://api.soildata.mapbiomas.org
+VITE_API_BASE_URL=https://api.soildata.cmob.online
 VITE_NODE_ENV=production
 ```
 
@@ -118,7 +118,7 @@ SOIL_DATA_PATH=../ladingpage-soildata/src/data/enriched-soil-data.json
 **Frontend:**
 ```bash
 # .env.production
-VITE_API_BASE_URL=https://api.soildata.mapbiomas.org
+VITE_API_BASE_URL=https://api.soildata.cmob.online
 VITE_NODE_ENV=production
 ```
 

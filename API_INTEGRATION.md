@@ -20,7 +20,7 @@ cp .env.example .env.local
 **Produção:**
 ```bash
 # Edite ou crie .env.production
-VITE_API_BASE_URL=https://api.soildata.mapbiomas.org
+VITE_API_BASE_URL=https://api.soildata.cmob.online
 VITE_NODE_ENV=production
 ```
 
@@ -58,7 +58,9 @@ O frontend automaticamente usará a API local em `http://localhost:3000`
 ## Endpoints Utilizados
 
 ### Datasets
+- `GET /api/datasets` - Lista datasets com paginação (padrão: 10 por página)
 - `GET /api/datasets/latest?limit=6` - Últimos datasets
+- `GET /api/datasets/search?q=query` - Busca datasets
 
 ### Métricas
 - `GET /api/metrics/datasets` - Total de datasets
