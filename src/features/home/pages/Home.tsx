@@ -4,6 +4,7 @@ import soloImage from '@/assets/solo.png';
 import logoDOI from '@/assets/doi.png';
 import { PublicationsSection } from '@/shared/components/PublicationsSection';
 import { PlatformPreviewSection } from '@/shared/components/PlatformPreviewSection';
+import { RepositoryPreviewSection } from '@/shared/components/RepositoryPreviewSection';
 import { SearchBar } from '@/shared/components/SearchBar';
 import { mockPublications } from '@/data/mockPublications';
 import type { Dataset } from '@/types/dataset';
@@ -91,6 +92,7 @@ export function Home() {
 
       {!isLoading && <PublicationsSection datasets={datasets} />}
       <PlatformPreviewSection />
+      <RepositoryPreviewSection />
     </>
   );
 }

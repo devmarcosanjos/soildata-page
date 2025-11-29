@@ -15,6 +15,12 @@
     "description": "Visualiza y explora datos de suelos brasileños de forma interactiva a través de nuestra plataforma de visualización geoespacial.",
     "ctaButton": "Acceder a la Plataforma",
     "imageAlt": "Visualización de la plataforma SoilData"
+  },
+  "repositorySection": {
+    "title": "Conoce el Repositorio SoilData",
+    "description": "Explora y accede a cientos de conjuntos de datos sobre suelos brasileños disponibles en nuestro repositorio Dataverse.",
+    "ctaButton": "Acceder al Repositorio",
+    "imageAlt": "Visualización del repositorio SoilData"
   }
 }
 

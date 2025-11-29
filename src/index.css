@@ -57,6 +57,7 @@
   --color-orange-600: rgb(234, 88, 12);
   --color-orange-primary: #EA580C;
   --color-orange-secondary: #C55B28;
+  --color-orange-background: rgba(104, 37, 2, 0.1);
   --color-bg-light: #F5F5F5;
   --color-bg-footer: #EBEBEB;
   --color-white: #FFF;
@@ -287,6 +288,24 @@ html {
   background-color: rgba(197, 91, 40, 0.6) !important;
   color: #FFFFFF !important;
   border-color: rgba(197, 91, 40, 0.6) !important;
+}
+
+.soildata-primary-btn {
+  background-color: var(--color-orange-primary) !important;
+  border-color: var(--color-orange-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.soildata-primary-btn:hover {
+  background-color: var(--color-orange-secondary) !important;
+  border-color: var(--color-orange-secondary) !important;
+  color: #FFFFFF !important;
+}
+
+.soildata-primary-btn:active {
+  background-color: #A04A20 !important;
+  border-color: #A04A20 !important;
+  color: #FFFFFF !important;
 }
 
 .scrollbar-hide {
