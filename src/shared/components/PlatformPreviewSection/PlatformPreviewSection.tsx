@@ -6,10 +6,6 @@ import { User } from 'lucide-react';
 import { AnimatedBeam } from '@/registry/magicui/animated-beam';
 import { cn } from '@/shared/utils/cn';
 
-// Placeholder temporário - substitua pela imagem real quando disponível
-// Para adicionar a imagem: coloque platform-screenshot.png em src/assets/
-const platformScreenshot = 'https://picsum.photos/1200/800';
-
 interface CircleProps {
   className?: string;
   children?: React.ReactNode;
@@ -132,7 +128,7 @@ export function PlatformPreviewSection() {
                   </div>
                   <div className="flex justify-center bg-white overflow-hidden">
                     <img 
-                      src={platformScreenshot} 
+                      src="/plataforma-home.png" 
                       alt={t('platformSection.imageAlt')}
                       className="w-full h-auto object-contain max-h-[260px] sm:max-h-[320px] md:max-h-[380px] lg:max-h-[420px]"
                     />
