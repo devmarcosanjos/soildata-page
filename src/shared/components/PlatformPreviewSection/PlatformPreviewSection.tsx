@@ -124,13 +124,13 @@ export function PlatformPreviewSection() {
               </div>
 
               <div className="flex justify-center">
-                <div className="mockup-browser border border-gray-300 bg-base-100 w-full max-w-2xl lg:max-w-3xl">
+                <div className="mockup-browser border border-gray-300 bg-white w-full max-w-2xl lg:max-w-3xl">
                   <div className="mockup-browser-toolbar">
                     <div className="input text-xs sm:text-sm md:text-base lg:text-lg bg-white break-all">
                       https://soildata.mapbiomas.org/platform
                     </div>
                   </div>
-                  <div className="flex justify-center bg-base-100 overflow-hidden">
+                  <div className="flex justify-center bg-white overflow-hidden">
                     <img 
                       src={platformScreenshot} 
                       alt={t('platformSection.imageAlt')}
