@@ -15,8 +15,48 @@ const getApiBaseUrl = (): string => {
   // Se a variável de ambiente estiver definida, usa ela
   if (import.meta.env.VITE_API_BASE_URL) {
     const url = import.meta.env.VITE_API_BASE_URL;
+    
+    // Validação crítica: em produção, se o site está em HTTPS, a API também deve ser HTTPS
+    if (import.meta.env.PROD && typeof window !== 'undefined') {
+      try {
+        const parsedUrl = new URL(url);
+        const isHttps = window.location.protocol === 'https:';
+        const isApiHttp = parsedUrl.protocol === 'http:';
+        
+        if (isHttps && isApiHttp) {
+          console.error('❌ [API Config] ERRO CRÍTICO: Site em HTTPS mas API em HTTP!');
+          console.error('   URL configurada:', url);
+          console.error('   Isso causará erro de Mixed Content e será bloqueado pelo navegador.');
+          console.error('   Use HTTPS para a API em produção: https://api.soildata.cmob.online');
+          
+          // Força o uso de HTTPS mesmo se configurado HTTP
+          parsedUrl.protocol = 'https:';
+          const correctedUrl = parsedUrl.toString();
+          console.warn('⚠️ [API Config] Corrigindo automaticamente para HTTPS:', correctedUrl);
+          return correctedUrl;
+        }
+      } catch {
+        // Ignora erros de parsing de URL
+      }
+    }
+    
+    // Validação adicional: em produção, sempre preferir HTTPS
+    if (import.meta.env.PROD) {
+      try {
+        const parsedUrl = new URL(url);
+        if (parsedUrl.protocol === 'http:') {
+          console.warn('⚠️ [API Config] URL HTTP detectada em produção:', url);
+          console.warn('   Recomendado usar HTTPS: https://api.soildata.cmob.online');
+        }
+      } catch {
+        // Ignora erros de parsing
+      }
+    }
+    
     if (import.meta.env.DEV) {
       console.log('🔧 [API Config] Usando VITE_API_BASE_URL:', url);
+    } else if (import.meta.env.PROD) {
+      console.log('🌐 [API Config] Ambiente: PRODUÇÃO | Usando VITE_API_BASE_URL:', url);
     }
     return url;
   }
@@ -24,7 +64,7 @@ const getApiBaseUrl = (): string => {
   // Em produção (build), usa a URL de produção
   if (import.meta.env.PROD) {
     const url = 'https://api.soildata.cmob.online';
-    console.log('🌐 [API Config] Ambiente: PRODUÇÃO | URL da API:', url);
+    console.log('🌐 [API Config] Ambiente: PRODUÇÃO | URL da API (padrão):', url);
     return url;
   }
   
@@ -59,9 +99,28 @@ if (!validateApiUrl(API_BASE_URL)) {
   console.warn('⚠️ [API Config] URL da API pode estar incorreta:', API_BASE_URL);
 }
 
-// Log da URL final em desenvolvimento
+// Log da URL final
 if (import.meta.env.DEV) {
   console.log('✅ [API Config] API_BASE_URL configurada:', API_BASE_URL);
+} else if (import.meta.env.PROD && typeof window !== 'undefined') {
+  // Log em produção também para facilitar diagnóstico
+  console.log('✅ [API Config] API_BASE_URL configurada (PRODUÇÃO):', API_BASE_URL);
+  
+  // Verificação adicional de Mixed Content
+  try {
+    const parsedUrl = new URL(API_BASE_URL);
+    const isHttps = window.location.protocol === 'https:';
+    const isApiHttp = parsedUrl.protocol === 'http:';
+    
+    if (isHttps && isApiHttp) {
+      console.error('❌ [API Config] AVISO: Mixed Content detectado!');
+      console.error('   Site:', window.location.href);
+      console.error('   API:', API_BASE_URL);
+      console.error('   O navegador bloqueará requisições HTTP de um site HTTPS.');
+    }
+      } catch {
+        // Ignora erros de validação aqui
+      }
 }
 
 /**
