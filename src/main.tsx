@@ -11,7 +11,11 @@ import './index.css'
 
 import './i18n/config'
 import { queryClient } from './lib/react-query'
+import { initGoogleAnalytics } from './lib/googleAnalytics'
 import App from './App.tsx'
+
+// Inicializa o Google Analytics
+initGoogleAnalytics()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
