@@ -39,7 +39,14 @@ const loadBrazilianSoilDatasetPoints: SoloDatasetLoader = async () => {
     });
 
     if (!response.ok) {
-      console.warn('Falha ao buscar dados de solo da API, tentando fallback local', response.status);
+      const errorMessage = `Falha ao buscar dados de solo da API: ${response.status} ${response.statusText}`;
+      console.warn('⚠️ [Solo Datasets]', errorMessage);
+      console.warn('   Tentando fallback local...');
+      
+      if (response.status === 0 || response.status === 500) {
+        console.warn('   Possível problema de CORS ou servidor indisponível');
+      }
+      
       // Fallback para import local se a API não estiver disponível
       const enrichedData = await import('@/data/enriched-soil-data.json');
       const compactPoints = (enrichedData.default as any).points;
@@ -85,7 +92,12 @@ const loadBrazilianSoilDatasetPoints: SoloDatasetLoader = async () => {
 
     return [];
   } catch (error) {
-    console.error('Erro ao buscar dados de solo:', error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error('❌ [Solo Datasets] Erro de rede - API pode estar indisponível ou bloqueada por CORS');
+      console.error('   Usando fallback local...');
+    } else {
+      console.error('❌ [Solo Datasets] Erro ao buscar dados de solo:', error);
+    }
     // Fallback para import local em caso de erro
     try {
       const enrichedData = await import('@/data/enriched-soil-data.json');

@@ -42,10 +42,16 @@ async function fetchWithCache<T>(
     });
     
     if (!response.ok) {
-      if (response.status !== 500) {
-        console.warn(`HTTP error fetching ${url}: status ${response.status}`);
+      const errorMessage = `HTTP error fetching ${url}: ${response.status} ${response.statusText}`;
+      
+      if (response.status === 0 || response.status === 500) {
+        console.error('❌ [Metrics API]', errorMessage);
+        console.error('   Possível problema de CORS ou servidor indisponível');
+      } else if (response.status !== 500) {
+        console.warn('⚠️ [Metrics API]', errorMessage);
       }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      
+      throw new Error(errorMessage);
     }
     
     const responseData = await response.json();
@@ -58,11 +64,12 @@ async function fetchWithCache<T>(
     // Fallback para formato antigo se necessário
     return responseData as T;
   } catch (error) {
-    if (error instanceof Error && error.message.includes('status: 500')) {
-      throw error;
-    }
-    if (!(error instanceof Error && error.message.includes('status: 500'))) {
-      console.error(`Error fetching ${url}:`, error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error(`❌ [Metrics API] Erro de rede ao buscar ${url}`);
+      console.error('   API pode estar indisponível ou bloqueada por CORS');
+      console.error('   Verifique se a API está rodando e acessível');
+    } else if (error instanceof Error && !error.message.includes('status: 500')) {
+      console.error(`❌ [Metrics API] Erro ao buscar ${url}:`, error);
     }
     throw error;
   }

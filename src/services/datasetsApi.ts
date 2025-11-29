@@ -42,8 +42,18 @@ export async function getDatasets(params: DatasetsQuery = {}): Promise<DatasetsR
     });
 
     if (!response.ok) {
-      console.warn('Falha ao buscar datasets', response.status);
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorMessage = `Falha ao buscar datasets: ${response.status} ${response.statusText}`;
+      console.error('❌ [Datasets API]', errorMessage);
+      console.error('   URL:', url.toString());
+      
+      // Mensagens específicas para erros comuns
+      if (response.status === 0 || response.status === 500) {
+        console.error('   Possível problema de CORS ou servidor indisponível');
+      } else if (response.status === 404) {
+        console.error('   Endpoint não encontrado - verifique a URL da API');
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const payload = await response.json();
@@ -54,7 +64,12 @@ export async function getDatasets(params: DatasetsQuery = {}): Promise<DatasetsR
 
     throw new Error('Resposta inválida da API');
   } catch (error) {
-    console.error('Erro ao buscar datasets:', error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error('❌ [Datasets API] Erro de rede - API pode estar indisponível ou bloqueada por CORS');
+      console.error('   Verifique se a API está rodando e acessível em:', url.toString());
+    } else {
+      console.error('❌ [Datasets API] Erro ao buscar datasets:', error);
+    }
     throw error;
   }
 }
@@ -83,8 +98,10 @@ export async function searchDatasets(
     });
 
     if (!response.ok) {
-      console.warn('Falha ao buscar datasets', response.status);
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorMessage = `Falha ao buscar datasets: ${response.status} ${response.statusText}`;
+      console.error('❌ [Datasets API - Search]', errorMessage);
+      console.error('   URL:', url.toString());
+      throw new Error(errorMessage);
     }
 
     const payload = await response.json();
@@ -95,7 +112,12 @@ export async function searchDatasets(
 
     throw new Error('Resposta inválida da API');
   } catch (error) {
-    console.error('Erro ao buscar datasets:', error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error('❌ [Datasets API - Search] Erro de rede - API pode estar indisponível ou bloqueada por CORS');
+      console.error('   Verifique se a API está rodando e acessível');
+    } else {
+      console.error('❌ [Datasets API - Search] Erro ao buscar datasets:', error);
+    }
     throw error;
   }
 }
@@ -113,7 +135,14 @@ export async function getLatestDatasets(limit: number = 6): Promise<Dataset[]> {
     });
 
     if (!response.ok) {
-      console.warn('Falha ao buscar datasets mais recentes', response.status);
+      const errorMessage = `Falha ao buscar datasets mais recentes: ${response.status} ${response.statusText}`;
+      console.error('❌ [Datasets API - Latest]', errorMessage);
+      console.error('   URL:', url);
+      
+      if (response.status === 0 || response.status === 500) {
+        console.error('   Possível problema de CORS ou servidor indisponível');
+      }
+      
       return [];
     }
 
@@ -126,7 +155,12 @@ export async function getLatestDatasets(limit: number = 6): Promise<Dataset[]> {
 
     return [];
   } catch (error) {
-    console.error('Erro ao buscar datasets mais recentes:', error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error('❌ [Datasets API - Latest] Erro de rede - API pode estar indisponível ou bloqueada por CORS');
+      console.error('   Verifique se a API está rodando e acessível');
+    } else {
+      console.error('❌ [Datasets API - Latest] Erro ao buscar datasets mais recentes:', error);
+    }
     return [];
   }
 }
