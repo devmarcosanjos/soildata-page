@@ -25,4 +25,7 @@ dist-ssr
 
 
 .cursor
-.env 
+.env
+.env.local
+.env.*.local 
+.env.production

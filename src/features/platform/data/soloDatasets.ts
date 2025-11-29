@@ -29,26 +29,87 @@ export interface SoloDatasetDefinition {
 export const BRAZILIAN_SOIL_DATASET_ID = 'brazilian-soil-dataset';
 
 const loadBrazilianSoilDatasetPoints: SoloDatasetLoader = async () => {
-  const enrichedData = await import('@/data/enriched-soil-data.json');
-  const compactPoints = (enrichedData.default as any).points;
-  
-  // Map compact field names to descriptive names
-  return compactPoints.map((p: any) => ({
-    id: p.id,
-    latitude: p.lat,
-    longitude: p.lon,
-    depth: p.d,
-    logClaySand: p.lcs,
-    logSiltSand: p.lss,
-    datasetCode: p.dc,
-    state: p.st,
-    municipality: p.mu,
-    biome: p.bi,
-    title: p.ti,
-    doi: p.doi,
-    datasetUrl: p.url,
-    csvDataUri: p.csv,
-  })) as SoloDatasetPoint[];
+  try {
+    // Buscar dados da API local
+    const { apiUrl } = await import('@/lib/api-config');
+    const response = await fetch(apiUrl('api/soil-data'), {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.warn('Falha ao buscar dados de solo da API, tentando fallback local', response.status);
+      // Fallback para import local se a API não estiver disponível
+      const enrichedData = await import('@/data/enriched-soil-data.json');
+      const compactPoints = (enrichedData.default as any).points;
+      return compactPoints.map((p: any) => ({
+        id: p.id,
+        latitude: p.lat,
+        longitude: p.lon,
+        depth: p.d,
+        logClaySand: p.lcs,
+        logSiltSand: p.lss,
+        datasetCode: p.dc,
+        state: p.st,
+        municipality: p.mu,
+        biome: p.bi,
+        title: p.ti,
+        doi: p.doi,
+        datasetUrl: p.url,
+        csvDataUri: p.csv,
+      })) as SoloDatasetPoint[];
+    }
+
+    const payload = await response.json();
+    
+    if (payload.success && Array.isArray(payload.data)) {
+      // Map compact field names to descriptive names
+      return payload.data.map((p: any) => ({
+        id: p.id,
+        latitude: p.lat,
+        longitude: p.lon,
+        depth: p.d,
+        logClaySand: p.lcs,
+        logSiltSand: p.lss,
+        datasetCode: p.dc,
+        state: p.st,
+        municipality: p.mu,
+        biome: p.bi,
+        title: p.ti,
+        doi: p.doi,
+        datasetUrl: p.url,
+        csvDataUri: p.csv,
+      })) as SoloDatasetPoint[];
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Erro ao buscar dados de solo:', error);
+    // Fallback para import local em caso de erro
+    try {
+      const enrichedData = await import('@/data/enriched-soil-data.json');
+      const compactPoints = (enrichedData.default as any).points;
+      return compactPoints.map((p: any) => ({
+        id: p.id,
+        latitude: p.lat,
+        longitude: p.lon,
+        depth: p.d,
+        logClaySand: p.lcs,
+        logSiltSand: p.lss,
+        datasetCode: p.dc,
+        state: p.st,
+        municipality: p.mu,
+        biome: p.bi,
+        title: p.ti,
+        doi: p.doi,
+        datasetUrl: p.url,
+        csvDataUri: p.csv,
+      })) as SoloDatasetPoint[];
+    } catch {
+      return [];
+    }
+  }
 };
 
 const emptyLoader: SoloDatasetLoader = async () => [];

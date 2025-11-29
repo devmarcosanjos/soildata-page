@@ -7,13 +7,11 @@ import type {
   MonthlyFileDownload,
   TreeDataverse,
   MetricsApiParams,
-  ApiResponse,
 } from '@/types/metrics';
-
-const API_BASE_URL = 'https://soildata.mapbiomas.org/api/info/metrics';
+import { apiUrl } from '@/lib/api-config';
 
 function buildUrl(endpoint: string, params?: MetricsApiParams): string {
-  const url = new URL(`${API_BASE_URL}${endpoint}`);
+  const url = new URL(apiUrl(`api/metrics${endpoint}`));
   
   if (params) {
     if (params.parentAlias) {
@@ -44,8 +42,6 @@ async function fetchWithCache<T>(
     });
     
     if (!response.ok) {
-      // Para erros 4xx e 5xx, logar apenas se não for 500 (erro do servidor)
-      // Erros 500 são esperados em alguns endpoints e não precisam poluir o console
       if (response.status !== 500) {
         console.warn(`HTTP error fetching ${url}: status ${response.status}`);
       }
@@ -54,19 +50,17 @@ async function fetchWithCache<T>(
     
     const responseData = await response.json();
     
-    // A API retorna {status: "OK", data: {...}}
-    // Extrair apenas o campo 'data' se existir
-    const data = (responseData as ApiResponse<T>).data ?? responseData;
+    // A API local retorna { success: true, data: {...} }
+    if (responseData.success && responseData.data !== undefined) {
+      return responseData.data as T;
+    }
     
-    return data as T;
+    // Fallback para formato antigo se necessário
+    return responseData as T;
   } catch (error) {
-    // Não logar erros 500 (erro do servidor)
-    // Erros 500 são esperados em alguns endpoints e não precisam poluir o console
     if (error instanceof Error && error.message.includes('status: 500')) {
-      // Silenciosamente ignorar erros 500 - não logar nada
       throw error;
     }
-    // Logar apenas outros erros (não 500)
     if (!(error instanceof Error && error.message.includes('status: 500'))) {
       console.error(`Error fetching ${url}:`, error);
     }
@@ -97,57 +91,54 @@ export async function getTotalDataverses(params?: MetricsApiParams): Promise<Met
 
 // Métricas mensais
 export async function getMonthlyDownloads(params?: MetricsApiParams): Promise<MonthlyMetric[]> {
-  const url = buildUrl('/downloads/monthly', params);
+  const url = buildUrl('/monthly/downloads', params);
   return fetchWithCache<MonthlyMetric[]>(url);
 }
 
 export async function getMonthlyDatasets(params?: MetricsApiParams): Promise<MonthlyMetric[]> {
-  const url = buildUrl('/datasets/monthly', params);
+  const url = buildUrl('/monthly/datasets', params);
   return fetchWithCache<MonthlyMetric[]>(url);
 }
 
 export async function getMonthlyFiles(params?: MetricsApiParams): Promise<MonthlyMetric[]> {
-  const url = buildUrl('/files/monthly', params);
+  const url = buildUrl('/monthly/files', params);
   return fetchWithCache<MonthlyMetric[]>(url);
 }
 
 // Métricas por período
 export async function getDownloadsPastDays(days: number, params?: MetricsApiParams): Promise<MetricCount> {
-  const url = buildUrl(`/downloads/pastDays/${days}`, params);
+  const url = buildUrl(`/downloads/past-days/${days}`, params);
   return fetchWithCache<MetricCount>(url);
 }
 
 export async function getDatasetsPastDays(days: number, params?: MetricsApiParams): Promise<MetricCount> {
-  const url = buildUrl(`/datasets/pastDays/${days}`, params);
+  const url = buildUrl(`/datasets/past-days/${days}`, params);
   return fetchWithCache<MetricCount>(url);
 }
 
 // Distribuições
 export async function getDatasetsBySubject(params?: MetricsApiParams): Promise<DatasetBySubject[]> {
-  const url = buildUrl('/datasets/bySubject', params);
+  const url = buildUrl('/datasets/by-subject', params);
   return fetchWithCache<DatasetBySubject[]>(url);
 }
 
 export async function getDataversesByCategory(params?: MetricsApiParams): Promise<DatasetByCategory[]> {
-  const url = buildUrl('/dataverses/byCategory', params);
+  const url = buildUrl('/dataverses/by-category', params);
   return fetchWithCache<DatasetByCategory[]>(url);
 }
 
 // Downloads por arquivo
-// Nota: Este endpoint retorna erro 500 do servidor, então silenciosamente retornamos array vazio
 export async function getFileDownloads(params?: MetricsApiParams): Promise<FileDownload[]> {
   try {
-    const url = buildUrl('/filedownloads', params);
+    const url = buildUrl('/file-downloads', params);
     return await fetchWithCache<FileDownload[]>(url);
   } catch {
-    // Silenciosamente retornar array vazio se houver erro (especialmente 500)
-    // Não logar nada para não poluir o console
     return [];
   }
 }
 
 export async function getMonthlyFileDownloads(params?: MetricsApiParams): Promise<MonthlyFileDownload[]> {
-  const url = buildUrl('/filedownloads/monthly', params);
+  const url = buildUrl('/monthly/file-downloads', params);
   return fetchWithCache<MonthlyFileDownload[]>(url);
 }
 
