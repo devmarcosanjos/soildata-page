@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, Rectangle } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +10,8 @@ import { TerritorySearchBar } from './TerritorySearchBar';
 import type { TerritoryResult } from './TerritorySelector';
 import { usePlatformStore } from '@/stores/platformStore';
 import { VectorTileLayer } from './VectorTileLayer';
+// import { LayerControls } from './LayerControls'; // Oculto - camada controlada automaticamente
+import { getTerritoryGeoJSON } from '@/services/psdPlatformApi';
 import bbox from '@turf/bbox';
 import { points } from '@turf/helpers';
 
@@ -68,12 +70,13 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     datasetError,
     setDatasetError,
     groupingValue,
+    setGroupingValue,
     selectedTerritory,
     setSelectedTerritory,
   } = usePlatformStore();
 
-  // State para armazenar bounds do território selecionado (usa state para forçar re-render)
-  const [territoryBounds, setTerritoryBounds] = useState<[[number, number], [number, number]] | null>(null);
+  // State para armazenar GeoJSON do território selecionado
+  const [territoryGeoJSON, setTerritoryGeoJSON] = useState<any | null>(null);
 
 
   // Os pontos já vêm filtrados da API quando selectedTerritory está definido
@@ -81,11 +84,14 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
   const displayPoints = useMemo(() => {
     // Quando há um território selecionado, os dados já vêm filtrados da API
     // Não precisamos filtrar novamente aqui
+    console.log(`📍 [PlatformMap] Exibindo ${datasetPoints.length} pontos${selectedTerritory ? ` filtrados por ${selectedTerritory.type}: ${selectedTerritory.name}` : ' (todos os dados)'}`);
     return datasetPoints;
-  }, [datasetPoints]);
+  }, [datasetPoints, selectedTerritory]);
 
   // Determina qual divisionCategoryId usar baseado no groupingValue
+  // Se groupingValue for 'pais', não mostra nenhuma camada
   const divisionCategoryId = useMemo(() => {
+    if (groupingValue === 'pais') return null;
     return GROUPING_TO_DIVISION_CATEGORY[groupingValue] || null;
   }, [groupingValue]);
 
@@ -152,44 +158,116 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDatasetId, selectedTerritory]);
 
-  // Calculate bounding box and zoom to area when territory is selected and data is loaded
+  // Buscar GeoJSON do território selecionado e fazer zoom
   useEffect(() => {
-    if (!map || !selectedTerritory || datasetPoints.length === 0 || isDatasetLoading) {
-      setTerritoryBounds(null);
+    if (!selectedTerritory) {
+      setTerritoryGeoJSON(null);
       return;
     }
 
-    // Calculate bounding box from filtered points
-    try {
-      const pointsCollection = points(
-        datasetPoints.map(p => [p.longitude, p.latitude])
-      );
-      const bounds = bbox(pointsCollection);
-      
-      // bbox returns [minX, minY, maxX, maxY]
-      const boundsArray: [[number, number], [number, number]] = [
-        [bounds[1], bounds[0]], // Southwest [lat, lng]
-        [bounds[3], bounds[2]], // Northeast [lat, lng]
-      ];
-      
-      setTerritoryBounds(boundsArray);
-      
-      // Zoom to bounds with padding
-      map.fitBounds(boundsArray, {
-        padding: [50, 50],
-        maxZoom: 12,
-      });
-    } catch (error) {
-      console.error('Failed to calculate bounds:', error);
-      setTerritoryBounds(null);
+    // Buscar GeoJSON apenas para State, Biome ou Municipality
+    if (selectedTerritory.type === 'State' || selectedTerritory.type === 'Biome' || selectedTerritory.type === 'Municipality') {
+      getTerritoryGeoJSON(selectedTerritory.type, selectedTerritory.name)
+        .then((geoJSON) => {
+          if (geoJSON && map) {
+            setTerritoryGeoJSON(geoJSON);
+            
+            // Fazer zoom para o território usando o GeoJSON
+            try {
+              const geoJsonLayer = (L as any).geoJSON(geoJSON as any);
+              const bounds = geoJsonLayer.getBounds();
+              map.fitBounds(bounds, {
+                padding: [50, 50],
+                maxZoom: 12,
+              });
+            } catch (error) {
+              console.error('Failed to fit bounds from GeoJSON:', error);
+              // Fallback: usar bounding box dos pontos se GeoJSON não funcionar
+              if (datasetPoints.length > 0) {
+                try {
+                  const pointsCollection = points(
+                    datasetPoints.map(p => [p.longitude, p.latitude])
+                  );
+                  const bounds = bbox(pointsCollection);
+                  const boundsArray: [[number, number], [number, number]] = [
+                    [bounds[1], bounds[0]],
+                    [bounds[3], bounds[2]],
+                  ];
+                  map.fitBounds(boundsArray, {
+                    padding: [50, 50],
+                    maxZoom: 12,
+                  });
+                } catch (err) {
+                  console.error('Failed to calculate bounds from points:', err);
+                }
+              }
+            }
+          } else {
+            setTerritoryGeoJSON(null);
+            // Fallback: usar bounding box dos pontos
+            if (map && datasetPoints.length > 0 && !isDatasetLoading) {
+              try {
+                const pointsCollection = points(
+                  datasetPoints.map(p => [p.longitude, p.latitude])
+                );
+                const bounds = bbox(pointsCollection);
+                const boundsArray: [[number, number], [number, number]] = [
+                  [bounds[1], bounds[0]],
+                  [bounds[3], bounds[2]],
+                ];
+                map.fitBounds(boundsArray, {
+                  padding: [50, 50],
+                  maxZoom: 12,
+                });
+              } catch (err) {
+                console.error('Failed to calculate bounds from points:', err);
+              }
+            }
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to fetch territory GeoJSON:', error);
+          setTerritoryGeoJSON(null);
+        });
+    } else {
+      setTerritoryGeoJSON(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, selectedTerritory, datasetPoints, isDatasetLoading]);
+  }, [selectedTerritory, map]);
 
   // Handle territory selection
   const handleTerritorySelect = (territory: TerritoryResult | null) => {
     setSelectedTerritory(territory);
-    setTerritoryBounds(null); // Reset bounds when territory changes
+    setTerritoryGeoJSON(null); // Reset GeoJSON when territory changes
+    
+    // Atualiza a camada de vector tiles baseado no tipo de território selecionado
+    if (territory) {
+      switch (territory.type) {
+        case 'State':
+          setGroupingValue('estados');
+          break;
+        case 'Biome':
+          setGroupingValue('biomas');
+          break;
+        case 'Municipality':
+          setGroupingValue('municipios');
+          break;
+        case 'Country':
+        case 'Region':
+        default:
+          // Para País e Região, manter a camada atual ou usar biomas como padrão
+          if (groupingValue === 'pais') {
+            setGroupingValue('biomas');
+          }
+          break;
+      }
+    } else {
+      // Quando nenhum território está selecionado, manter a camada atual
+      // ou voltar para biomas se estiver em 'pais'
+      if (groupingValue === 'pais') {
+        setGroupingValue('biomas');
+      }
+    }
     
     // Quando um território é selecionado, os dados serão recarregados automaticamente
     // via useEffect que depende de selectedTerritory
@@ -381,16 +459,16 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
           ))}
         </MarkerClusterGroup>
         
-        {/* Highlight selected territory - Rectangle baseado no bounding box dos pontos */}
-        {selectedTerritory && territoryBounds && (
-          <Rectangle
-            bounds={territoryBounds}
+        {/* Highlight selected territory - GeoJSON do território real */}
+        {selectedTerritory && territoryGeoJSON && (
+          <GeoJSON
+            key={selectedTerritory.id}
+            data={territoryGeoJSON as any}
             pathOptions={{
               color: '#C55B28',
               weight: 2,
               fillColor: '#FED7AA',
               fillOpacity: 0.2,
-              dashArray: '5, 5',
             }}
           />
         )}
@@ -398,12 +476,15 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
       </MapContainer>
 
       {/* Territory Search Bar - Positioned absolutely over the map */}
-      <div className="absolute top-4 left-4 z-400">
+      <div className="absolute top-4 left-4 z-[500]">
         <TerritorySearchBar
           onSelectTerritory={handleTerritorySelect}
           selectedTerritory={selectedTerritory}
         />
       </div>
+
+      {/* Layer Controls - Oculto pois a camada é controlada automaticamente pelo tipo de território selecionado */}
+      {/* A camada de vector tiles é atualizada automaticamente quando um território é selecionado */}
 
       <MapLayout>
         <MapLayout.TopLeft />

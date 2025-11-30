@@ -81,7 +81,9 @@ export async function loadPSDPlatformWithFilters(territory: TerritoryResult | nu
           break;
         case 'State':
           // A API aceita tanto nome completo quanto sigla
+          console.log(`🔍 [PSD Platform] Filtrando por estado: "${territory.name}"`);
           response = await getPSDByEstado(territory.name);
+          console.log(`✅ [PSD Platform] Resposta recebida: ${response.success ? 'sucesso' : 'erro'}, ${response.data?.length || 0} registros`);
           break;
         case 'Municipality':
           response = await getPSDByMunicipio(territory.name);

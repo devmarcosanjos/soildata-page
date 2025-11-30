@@ -118,7 +118,11 @@ export async function getPSDByEstado(
     ? `${apiUrl(`api/psd-platform/estado/${encodedEstado}`)}?${queryString}`
     : apiUrl(`api/psd-platform/estado/${encodedEstado}`);
   
-  return fetchPSDPlatform<PSDPlatformResponse>(url);
+  console.log(`🌐 [PSD Platform API] Buscando estado: "${estado}" -> URL: ${url}`);
+  const response = await fetchPSDPlatform<PSDPlatformResponse>(url);
+  console.log(`📊 [PSD Platform API] Resposta: success=${response.success}, total=${response.data?.length || 0} registros`);
+  
+  return response;
 }
 
 export async function getPSDByEstadoPaginated(
@@ -208,5 +212,49 @@ export async function getAvailableRegioes(): Promise<string[]> {
   const url = apiUrl('api/psd-platform/regioes');
   const response = await fetchPSDPlatform<PSDListResponse>(url);
   return response.regioes || [];
+}
+
+/**
+ * Busca GeoJSON do território selecionado da API MapBiomas
+ */
+export async function getTerritoryGeoJSON(
+  type: 'State' | 'Biome' | 'Municipality',
+  name: string
+): Promise<any | null> {
+  try {
+    const mapbiomasApiUrl = 'https://prd.plataforma.mapbiomas.org/api/v1/brazil/territories';
+    let url = '';
+    
+    switch (type) {
+      case 'State':
+        url = `${mapbiomasApiUrl}/estado/${encodeURIComponent(name)}`;
+        break;
+      case 'Biome':
+        url = `${mapbiomasApiUrl}/bioma/${encodeURIComponent(name)}`;
+        break;
+      case 'Municipality':
+        url = `${mapbiomasApiUrl}/municipio/${encodeURIComponent(name)}`;
+        break;
+      default:
+        return null;
+    }
+    
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      console.warn(`⚠️ [MapBiomas API] Não foi possível buscar GeoJSON para ${type}: ${name}`);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`❌ [MapBiomas API] Erro ao buscar GeoJSON para ${type}: ${name}`, error);
+    return null;
+  }
 }
 

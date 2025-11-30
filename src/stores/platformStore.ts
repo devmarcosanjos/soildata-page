@@ -51,7 +51,7 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   datasetPoints: [],
   isDatasetLoading: false,
   datasetError: null,
-  groupingValue: 'pais',
+  groupingValue: 'biomas',
   selectedTerritory: null,
 
   // Actions - usando função estável para evitar re-renders
