@@ -41,7 +41,7 @@ export const PSD_PLATFORM_DATASET_ID = 'psd-platform-dataset';
 
 const loadBrazilianSoilDatasetPoints: SoloDatasetLoader = async () => {
   try {
-    // Buscar dados da API local
+    // Buscar dados da API
     const { apiUrl } = await import('@/lib/api-config');
     const response = await fetch(apiUrl('api/soil-data'), {
       headers: {
@@ -51,32 +51,13 @@ const loadBrazilianSoilDatasetPoints: SoloDatasetLoader = async () => {
 
     if (!response.ok) {
       const errorMessage = `Falha ao buscar dados de solo da API: ${response.status} ${response.statusText}`;
-      console.warn('⚠️ [Solo Datasets]', errorMessage);
-      console.warn('   Tentando fallback local...');
+      console.error('❌ [Solo Datasets]', errorMessage);
       
       if (response.status === 0 || response.status === 500) {
-        console.warn('   Possível problema de CORS ou servidor indisponível');
+        console.error('   Possível problema de CORS ou servidor indisponível');
       }
       
-      // Fallback para import local se a API não estiver disponível
-      const enrichedData = await import('@/data/enriched-soil-data.json');
-      const compactPoints = (enrichedData.default as any).points;
-      return compactPoints.map((p: any) => ({
-        id: p.id,
-        latitude: p.lat,
-        longitude: p.lon,
-        depth: p.d,
-        logClaySand: p.lcs,
-        logSiltSand: p.lss,
-        datasetCode: p.dc,
-        state: p.st,
-        municipality: p.mu,
-        biome: p.bi,
-        title: p.ti,
-        doi: p.doi,
-        datasetUrl: p.url,
-        csvDataUri: p.csv,
-      })) as SoloDatasetPoint[];
+      return [];
     }
 
     const payload = await response.json();
@@ -103,35 +84,11 @@ const loadBrazilianSoilDatasetPoints: SoloDatasetLoader = async () => {
 
     return [];
   } catch (error) {
+    console.error('❌ [Solo Datasets] Erro ao buscar dados de solo:', error);
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      console.error('❌ [Solo Datasets] Erro de rede - API pode estar indisponível ou bloqueada por CORS');
-      console.error('   Usando fallback local...');
-    } else {
-      console.error('❌ [Solo Datasets] Erro ao buscar dados de solo:', error);
+      console.error('   Erro de rede - API pode estar indisponível ou bloqueada por CORS');
     }
-    // Fallback para import local em caso de erro
-    try {
-      const enrichedData = await import('@/data/enriched-soil-data.json');
-      const compactPoints = (enrichedData.default as any).points;
-      return compactPoints.map((p: any) => ({
-        id: p.id,
-        latitude: p.lat,
-        longitude: p.lon,
-        depth: p.d,
-        logClaySand: p.lcs,
-        logSiltSand: p.lss,
-        datasetCode: p.dc,
-        state: p.st,
-        municipality: p.mu,
-        biome: p.bi,
-        title: p.ti,
-        doi: p.doi,
-        datasetUrl: p.url,
-        csvDataUri: p.csv,
-      })) as SoloDatasetPoint[];
-    } catch {
-      return [];
-    }
+    return [];
   }
 };
 

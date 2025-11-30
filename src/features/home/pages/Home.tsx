@@ -9,13 +9,12 @@ import { PlatformPreviewSection } from '@/shared/components/PlatformPreviewSecti
 import { RepositoryPreviewSection } from '@/shared/components/RepositoryPreviewSection';
 import { CollaborativeNetworkSection } from '@/shared/components/CollaborativeNetworkSection';
 import { SearchBar } from '@/shared/components/SearchBar';
-import { mockPublications } from '@/data/mockPublications';
 import { useLatestDatasets } from '@/hooks/queries/useDatasets';
 
 export function Home() {
   const { t } = useTranslation('home');
   const { t: tFooter } = useTranslation('footer');
-  const { data: datasets = mockPublications, isLoading } = useLatestDatasets(6);
+  const { data: datasets = [], isLoading } = useLatestDatasets(6);
 
   const handleSearch = (query: string) => {
     if (query.trim()) {
@@ -74,7 +73,7 @@ export function Home() {
 
     
 
-      {!isLoading && <PublicationsSection datasets={datasets} />}
+      {!isLoading && datasets.length > 0 && <PublicationsSection datasets={datasets} />}
       <PlatformPreviewSection />
       <RepositoryPreviewSection />
       <CollaborativeNetworkSection />
