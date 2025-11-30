@@ -4,7 +4,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapLayout, CompassControl, ZoomControl } from '@mapbiomas/ui';
-import { soloDatasetLoaders } from '@/features/platform/data/soloDatasets';
+import { soloDatasetLoaders, PSD_PLATFORM_DATASET_ID, loadPSDPlatformWithFilters } from '@/features/platform/data/soloDatasets';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
 import { TerritorySearchBar } from './TerritorySearchBar';
 import type { TerritoryResult } from './TerritorySelector';
@@ -136,38 +136,58 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
       return;
     }
 
-    const loader = soloDatasetLoaders[selectedDatasetId];
-    if (!loader) {
-      setDatasetPoints([]);
-      setDatasetError('Dataset não configurado.');
-      setIsDatasetLoading(false);
-      return;
-    }
-
     setIsDatasetLoading(true);
     setDatasetError(null);
 
-    loader()
-      .then((points) => {
-        if (isCancelled) return;
-        setDatasetPoints(points);
-      })
-      .catch((error) => {
-        console.error('Falha ao carregar pontos do dataset', error);
-        if (isCancelled) return;
+    // Se for PSD Platform, usar loader com filtros baseado em selectedTerritory
+    if (selectedDatasetId === PSD_PLATFORM_DATASET_ID) {
+      loadPSDPlatformWithFilters(selectedTerritory)
+        .then((points) => {
+          if (isCancelled) return;
+          setDatasetPoints(points);
+        })
+        .catch((error) => {
+          console.error('Falha ao carregar pontos do PSD Platform', error);
+          if (isCancelled) return;
+          setDatasetPoints([]);
+          setDatasetError('Não foi possível carregar os pontos deste conjunto de dados.');
+        })
+        .finally(() => {
+          if (isCancelled) return;
+          setIsDatasetLoading(false);
+        });
+    } else {
+      // Para outros datasets, usar loader padrão
+      const loader = soloDatasetLoaders[selectedDatasetId];
+      if (!loader) {
         setDatasetPoints([]);
-        setDatasetError('Não foi possível carregar os pontos deste conjunto de dados.');
-      })
-      .finally(() => {
-        if (isCancelled) return;
+        setDatasetError('Dataset não configurado.');
         setIsDatasetLoading(false);
-      });
+        return;
+      }
+
+      loader()
+        .then((points) => {
+          if (isCancelled) return;
+          setDatasetPoints(points);
+        })
+        .catch((error) => {
+          console.error('Falha ao carregar pontos do dataset', error);
+          if (isCancelled) return;
+          setDatasetPoints([]);
+          setDatasetError('Não foi possível carregar os pontos deste conjunto de dados.');
+        })
+        .finally(() => {
+          if (isCancelled) return;
+          setIsDatasetLoading(false);
+        });
+    }
 
     return () => { 
       isCancelled = true; 
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDatasetId]);
+  }, [selectedDatasetId, selectedTerritory]);
 
   // Handle territory selection and zoom to bounds
   const handleTerritorySelect = (territory: TerritoryResult | null) => {
