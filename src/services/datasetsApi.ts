@@ -34,7 +34,7 @@ export async function getDatasets(params: DatasetsQuery = {}): Promise<DatasetsR
     url.searchParams.set('sort', sort);
     url.searchParams.set('order', order);
     url.searchParams.set('q', q);
-    
+
     const urlString = url.toString();
 
     const response = await fetch(urlString, {
@@ -91,7 +91,7 @@ export async function searchDatasets(
     url.searchParams.set('offset', offset.toString());
     url.searchParams.set('sort', sort);
     url.searchParams.set('order', order);
-    
+
     const urlString = url.toString();
 
     const response = await fetch(urlString, {

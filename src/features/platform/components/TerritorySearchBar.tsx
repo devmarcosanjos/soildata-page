@@ -2,19 +2,17 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { SearchInput, Checkbox } from '@mapbiomas/ui';
 import { ChevronRight } from 'lucide-react';
 import type { TerritoryResult } from './TerritorySelector';
+import {
+  getAvailableBiomes,
+  getAvailableEstados,
+  getAvailableMunicipios,
+  getAvailableRegioes,
+} from '@/services/psdPlatformApi';
 
 interface TerritorySearchBarProps {
   onSelectTerritory: (territory: TerritoryResult | null) => void;
   selectedTerritory: TerritoryResult | null;
 }
-
-const BRAZIL_REGIONS = {
-  'Norte': ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
-  'Nordeste': ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE'],
-  'Centro-Oeste': ['DF', 'GO', 'MT', 'MS'],
-  'Sudeste': ['ES', 'MG', 'RJ', 'SP'],
-  'Sul': ['PR', 'RS', 'SC']
-};
 
 export function TerritorySearchBar({
   onSelectTerritory,
@@ -24,12 +22,13 @@ export function TerritorySearchBar({
   const [isOpen, setIsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('General result');
   const [tempSelected, setTempSelected] = useState<TerritoryResult | null>(selectedTerritory);
-  const [geoJsonData, setGeoJsonData] = useState<{
-    country?: any;
-    states?: any;
-    biomes?: any;
-    municipalities?: any;
-  }>({});
+  const [territoriesData, setTerritoriesData] = useState<{
+    biomes?: string[];
+    estados?: string[];
+    municipios?: string[];
+    regioes?: string[];
+    loading: boolean;
+  }>({ loading: false });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Sync temp selection when prop changes
@@ -48,106 +47,112 @@ export function TerritorySearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Carregar GeoJSON apenas quando necessário (para busca de territórios)
+  // Carregar territórios da API quando necessário
   useEffect(() => {
-    if (isOpen && Object.keys(geoJsonData).length === 0) {
-      import('@/features/platform/data/geoJsonData').then(({ 
-        getCountryGeoJson, 
-        getStatesGeoJson, 
-        getBiomesGeoJson 
-      }) => {
-        setGeoJsonData({
-          country: getCountryGeoJson(),
-          states: getStatesGeoJson(),
-          biomes: getBiomesGeoJson(),
+    if (isOpen && !territoriesData.loading && !territoriesData.biomes) {
+      setTerritoriesData(prev => ({ ...prev, loading: true }));
+      
+      Promise.all([
+        getAvailableBiomes().catch(() => []),
+        getAvailableEstados().catch(() => []),
+        getAvailableRegioes().catch(() => []),
+      ])
+        .then(([biomes, estados, regioes]) => {
+          setTerritoriesData({
+            biomes,
+            estados,
+            regioes,
+            loading: false,
+          });
+        })
+        .catch(err => {
+          console.error('Failed to load territories from API:', err);
+          setTerritoriesData(prev => ({ ...prev, loading: false }));
         });
-      }).catch(err => console.error('Failed to load GeoJSON:', err));
     }
-  }, [isOpen, geoJsonData]);
+  }, [isOpen, territoriesData.loading, territoriesData.biomes]);
 
   // Lazy load municipalities only when needed
   useEffect(() => {
-    if (isOpen && activeCategory === 'Municipality' && !geoJsonData.municipalities) {
-      import('@/features/platform/data/geoJsonData').then(({ getMunicipalitiesGeoJson }) => {
-        getMunicipalitiesGeoJson()
-          .then(data => setGeoJsonData(prev => ({ ...prev, municipalities: data })))
-          .catch(err => console.error('Failed to load Municipalities GeoJSON:', err));
-      });
+    if (isOpen && activeCategory === 'Municipality' && !territoriesData.municipios && !territoriesData.loading) {
+      setTerritoriesData(prev => ({ ...prev, loading: true }));
+      getAvailableMunicipios()
+        .then(municipios => {
+          setTerritoriesData(prev => ({
+            ...prev,
+            municipios,
+            loading: false,
+          }));
+        })
+        .catch(err => {
+          console.error('Failed to load municipalities from API:', err);
+          setTerritoriesData(prev => ({ ...prev, loading: false }));
+        });
     }
-  }, [isOpen, activeCategory, geoJsonData.municipalities]);
+  }, [isOpen, activeCategory, territoriesData.municipios, territoriesData.loading]);
 
   // Flatten and index data for searching
   const allTerritories = useMemo(() => {
     const results: TerritoryResult[] = [];
 
-    if (geoJsonData.country?.features) {
-      geoJsonData.country.features.forEach((f: any) => {
-        const name = f.properties?.name || 'Brasil';
-        if (name !== 'Unknown') {
-          results.push({
-            id: `country-${name}`,
-            name: name,
-            type: 'Country',
-            feature: f,
-          });
-        }
-      });
-    }
-
-    if (geoJsonData.biomes?.features) {
-      geoJsonData.biomes.features.forEach((f: any) => {
-        const name = f.properties?.name || f.properties?.Name;
-        if (name && name !== 'Unknown') {
-          results.push({
-            id: `biome-${name}`,
-            name: name,
-            type: 'Biome',
-            feature: f,
-          });
-        }
-      });
-    }
-
-    // Add Regions (Macro-regions)
-    Object.keys(BRAZIL_REGIONS).forEach((regionName) => {
-      results.push({
-        id: `region-${regionName}`,
-        name: regionName,
-        type: 'Region',
-        feature: null
-      });
+    // País (Brasil)
+    results.push({
+      id: 'country-Brasil',
+      name: 'Brasil',
+      type: 'Country',
+      feature: null,
     });
 
-    if (geoJsonData.states?.features) {
-      geoJsonData.states.features.forEach((f: any) => {
-        const name = f.properties?.name || f.properties?.NM_UF;
-        if (name && name !== 'Unknown') {
-          results.push({
-            id: `state-${name}`,
-            name: name,
-            type: 'State',
-            feature: f,
-          });
-        }
+    // Biomas da API
+    if (territoriesData.biomes) {
+      territoriesData.biomes.forEach((biome) => {
+        results.push({
+          id: `biome-${biome}`,
+          name: biome,
+          type: 'Biome',
+          feature: null,
+        });
       });
     }
 
-    if (geoJsonData.municipalities?.features) {
-      geoJsonData.municipalities.features.forEach((f: any) => {
-        const name = f.properties?.name || f.properties?.NM_MUN;
-        if (name && name !== 'Unknown') {
-          results.push({
-            id: `muni-${name}`,
-            name: name,
-            type: 'Municipality',
-            feature: f,
-          });
-        }
+    // Regiões da API
+    if (territoriesData.regioes) {
+      territoriesData.regioes.forEach((regiao) => {
+        results.push({
+          id: `region-${regiao}`,
+          name: regiao,
+          type: 'Region',
+          feature: null,
+        });
+      });
+    }
+
+    // Estados da API
+    if (territoriesData.estados) {
+      territoriesData.estados.forEach((estado) => {
+        results.push({
+          id: `state-${estado}`,
+          name: estado,
+          type: 'State',
+          feature: null,
+        });
+      });
+    }
+
+    // Municípios da API (carregados sob demanda)
+    if (territoriesData.municipios) {
+      territoriesData.municipios.forEach((municipio) => {
+        results.push({
+          id: `muni-${municipio}`,
+          name: municipio,
+          type: 'Municipality',
+          feature: null,
+        });
       });
     }
 
     return results;
-  }, [geoJsonData]);
+  }, [territoriesData]);
 
   // Filter results based on search query
   const filteredResults = useMemo(() => {

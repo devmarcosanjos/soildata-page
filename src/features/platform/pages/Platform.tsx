@@ -56,28 +56,28 @@ export function PlatformPage() {
           <div style={{
             width: '100%',
             height: `calc(100vh - ${headerHeight}px)`,
-            overflow: 'hidden'
-          }}>
-            <Platform>
-              <Platform.Subheader>
-                <PlatformSubheader />
-              </Platform.Subheader>
-              <Platform.Leftbar>
-                <PlatformLeftbar 
-                  selectedSoloDataset={selectedSoloDataset}
-                  onSoloDatasetChange={setSelectedSoloDataset}
-                />
-              </Platform.Leftbar>
-              <Platform.Content>
-                <PlatformMap 
-                  selectedDatasetId={selectedSoloDataset}
-                  onStatisticsChange={setMapStatistics}
-                />
-              </Platform.Content>
-              <Platform.Rightbar>
-                <PlatformStatistics statistics={mapStatistics} />
-              </Platform.Rightbar>
-            </Platform>
+              overflow: 'hidden'
+            }}>
+              <Platform>
+                <Platform.Subheader>
+                  <PlatformSubheader />
+                </Platform.Subheader>
+                <Platform.Leftbar>
+                  <PlatformLeftbar 
+                    selectedSoloDataset={selectedSoloDataset}
+                    onSoloDatasetChange={setSelectedSoloDataset}
+                  />
+                </Platform.Leftbar>
+                <Platform.Content>
+                  <PlatformMap 
+                    selectedDatasetId={selectedSoloDataset}
+                    onStatisticsChange={setMapStatistics}
+                  />
+                </Platform.Content>
+                <Platform.Rightbar>
+                  <PlatformStatistics statistics={mapStatistics} />
+                </Platform.Rightbar>
+              </Platform>
           </div>
         </div>
       </div>

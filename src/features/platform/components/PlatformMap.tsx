@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Rectangle } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -11,6 +11,7 @@ import type { TerritoryResult } from './TerritorySelector';
 import { usePlatformStore } from '@/stores/platformStore';
 import { VectorTileLayer } from './VectorTileLayer';
 import bbox from '@turf/bbox';
+import { points } from '@turf/helpers';
 
 
 // Fix for default Leaflet marker icons in React
@@ -71,17 +72,17 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     setSelectedTerritory,
   } = usePlatformStore();
 
+  // State para armazenar bounds do território selecionado (usa state para forçar re-render)
+  const [territoryBounds, setTerritoryBounds] = useState<[[number, number], [number, number]] | null>(null);
 
-  // Use filtered points if filters are active, otherwise use grouping filter
-  // Use grouping filter
+
+  // Os pontos já vêm filtrados da API quando selectedTerritory está definido
+  // O groupingValue é usado apenas para exibir a camada de vector tiles correspondente
   const displayPoints = useMemo(() => {
-    if (groupingValue === 'pais') return datasetPoints;
-    if (groupingValue === 'estados') return datasetPoints.filter(p => p.state);
-    if (groupingValue === 'municipios') return datasetPoints.filter(p => p.municipality);
-    if (groupingValue === 'biomas') return datasetPoints.filter(p => p.biome);
-    
+    // Quando há um território selecionado, os dados já vêm filtrados da API
+    // Não precisamos filtrar novamente aqui
     return datasetPoints;
-  }, [datasetPoints, groupingValue]);
+  }, [datasetPoints]);
 
   // Determina qual divisionCategoryId usar baseado no groupingValue
   const divisionCategoryId = useMemo(() => {
@@ -151,22 +152,50 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDatasetId, selectedTerritory]);
 
-  // Handle territory selection and zoom to bounds
+  // Calculate bounding box and zoom to area when territory is selected and data is loaded
+  useEffect(() => {
+    if (!map || !selectedTerritory || datasetPoints.length === 0 || isDatasetLoading) {
+      setTerritoryBounds(null);
+      return;
+    }
+
+    // Calculate bounding box from filtered points
+    try {
+      const pointsCollection = points(
+        datasetPoints.map(p => [p.longitude, p.latitude])
+      );
+      const bounds = bbox(pointsCollection);
+      
+      // bbox returns [minX, minY, maxX, maxY]
+      const boundsArray: [[number, number], [number, number]] = [
+        [bounds[1], bounds[0]], // Southwest [lat, lng]
+        [bounds[3], bounds[2]], // Northeast [lat, lng]
+      ];
+      
+      setTerritoryBounds(boundsArray);
+      
+      // Zoom to bounds with padding
+      map.fitBounds(boundsArray, {
+        padding: [50, 50],
+        maxZoom: 12,
+      });
+    } catch (error) {
+      console.error('Failed to calculate bounds:', error);
+      setTerritoryBounds(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, selectedTerritory, datasetPoints, isDatasetLoading]);
+
+  // Handle territory selection
   const handleTerritorySelect = (territory: TerritoryResult | null) => {
     setSelectedTerritory(territory);
+    setTerritoryBounds(null); // Reset bounds when territory changes
     
-    if (territory?.feature && map) {
-      try {
-        const bounds = bbox(territory.feature);
-        map.fitBounds([
-          [bounds[1], bounds[0]],
-          [bounds[3], bounds[2]]
-        ], { padding: [50, 50] });
-      } catch (error) {
-        console.error('Failed to zoom to territory:', error);
-      }
-    } else if (!territory && map) {
-      // Reset to Brazil view
+    // Quando um território é selecionado, os dados serão recarregados automaticamente
+    // via useEffect que depende de selectedTerritory
+    // O zoom será ajustado automaticamente quando os dados forem carregados
+    if (!territory && map) {
+      // Reset to Brazil view quando nenhum território está selecionado
       map.setView([-15.7801, -55.9292], 3.5);
     }
   };
@@ -352,22 +381,18 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
           ))}
         </MarkerClusterGroup>
         
-        {/* Highlight selected territory - usando GeoJSON apenas para highlight */}
-        {selectedTerritory?.feature && (
-          <>
-            {/* @ts-ignore */}
-            <GeoJSON
-              key={selectedTerritory.id}
-              data={selectedTerritory.feature as any}
-              // @ts-ignore
-              style={{
-                color: '#C55B28',
-                weight: 2,
-                fillColor: '#FED7AA',
-                fillOpacity: 0.3,
-              }}
-            />
-          </>
+        {/* Highlight selected territory - Rectangle baseado no bounding box dos pontos */}
+        {selectedTerritory && territoryBounds && (
+          <Rectangle
+            bounds={territoryBounds}
+            pathOptions={{
+              color: '#C55B28',
+              weight: 2,
+              fillColor: '#FED7AA',
+              fillOpacity: 0.2,
+              dashArray: '5, 5',
+            }}
+          />
         )}
 
       </MapContainer>
