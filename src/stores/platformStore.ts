@@ -1,21 +1,8 @@
 import { create } from 'zustand';
-import type L from 'leaflet';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
 import type { MapStatistics } from '@/features/platform/components/PlatformMap';
 import type { TerritoryResult } from '@/features/platform/components/TerritorySelector';
 import { PSD_PLATFORM_DATASET_ID } from '@/features/platform/data/soloDatasets';
-
-interface GeoJSONData {
-  type: string;
-  features?: Array<{
-    type: string;
-    properties?: Record<string, unknown>;
-    geometry: {
-      type: string;
-      coordinates: unknown;
-    };
-  }>;
-}
 
 interface PlatformState {
   // Dataset selection
@@ -31,8 +18,8 @@ interface PlatformState {
   setHeaderHeight: (height: number) => void;
 
   // Map instance
-  map: L.Map | null;
-  setMap: (map: L.Map | null) => void;
+  map: any;
+  setMap: (map: any) => void;
 
   // Dataset points
   datasetPoints: SoloDatasetPoint[];
@@ -53,19 +40,6 @@ interface PlatformState {
   // Selected territory
   selectedTerritory: TerritoryResult | null;
   setSelectedTerritory: (territory: TerritoryResult | null) => void;
-
-  // GeoJSON data
-  countryGeoJson: GeoJSONData | null;
-  setCountryGeoJson: (geoJson: GeoJSONData | null) => void;
-
-  brazilGeoJson: GeoJSONData | null;
-  setBrazilGeoJson: (geoJson: GeoJSONData | null) => void;
-
-  biomesGeoJson: GeoJSONData | null;
-  setBiomesGeoJson: (geoJson: GeoJSONData | null) => void;
-
-  municipalitiesGeoJson: GeoJSONData | null;
-  setMunicipalitiesGeoJson: (geoJson: GeoJSONData | null) => void;
 }
 
 export const usePlatformStore = create<PlatformState>((set) => ({
@@ -79,10 +53,6 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   datasetError: null,
   groupingValue: 'pais',
   selectedTerritory: null,
-  countryGeoJson: null,
-  brazilGeoJson: null,
-  biomesGeoJson: null,
-  municipalitiesGeoJson: null,
 
   // Actions - usando função estável para evitar re-renders
   setSelectedSoloDataset: (dataset) => set({ selectedSoloDataset: dataset }),
@@ -94,9 +64,5 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   setDatasetError: (error) => set({ datasetError: error }),
   setGroupingValue: (value) => set({ groupingValue: value }),
   setSelectedTerritory: (territory) => set({ selectedTerritory: territory }),
-  setCountryGeoJson: (geoJson) => set({ countryGeoJson: geoJson }),
-  setBrazilGeoJson: (geoJson) => set({ brazilGeoJson: geoJson }),
-  setBiomesGeoJson: (geoJson) => set({ biomesGeoJson: geoJson }),
-  setMunicipalitiesGeoJson: (geoJson) => set({ municipalitiesGeoJson: geoJson }),
 }));
 

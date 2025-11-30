@@ -4,10 +4,6 @@ import { ChevronRight } from 'lucide-react';
 import type { TerritoryResult } from './TerritorySelector';
 
 interface TerritorySearchBarProps {
-  countryGeoJson: any;
-  statesGeoJson: any;
-  biomesGeoJson: any;
-  municipalitiesGeoJson: any;
   onSelectTerritory: (territory: TerritoryResult | null) => void;
   selectedTerritory: TerritoryResult | null;
 }
@@ -21,10 +17,6 @@ const BRAZIL_REGIONS = {
 };
 
 export function TerritorySearchBar({
-  countryGeoJson,
-  statesGeoJson,
-  biomesGeoJson,
-  municipalitiesGeoJson,
   onSelectTerritory,
   selectedTerritory,
 }: TerritorySearchBarProps) {
@@ -32,6 +24,12 @@ export function TerritorySearchBar({
   const [isOpen, setIsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('General result');
   const [tempSelected, setTempSelected] = useState<TerritoryResult | null>(selectedTerritory);
+  const [geoJsonData, setGeoJsonData] = useState<{
+    country?: any;
+    states?: any;
+    biomes?: any;
+    municipalities?: any;
+  }>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Sync temp selection when prop changes
@@ -50,12 +48,40 @@ export function TerritorySearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Carregar GeoJSON apenas quando necessário (para busca de territórios)
+  useEffect(() => {
+    if (isOpen && Object.keys(geoJsonData).length === 0) {
+      import('@/features/platform/data/geoJsonData').then(({ 
+        getCountryGeoJson, 
+        getStatesGeoJson, 
+        getBiomesGeoJson 
+      }) => {
+        setGeoJsonData({
+          country: getCountryGeoJson(),
+          states: getStatesGeoJson(),
+          biomes: getBiomesGeoJson(),
+        });
+      }).catch(err => console.error('Failed to load GeoJSON:', err));
+    }
+  }, [isOpen, geoJsonData]);
+
+  // Lazy load municipalities only when needed
+  useEffect(() => {
+    if (isOpen && activeCategory === 'Municipality' && !geoJsonData.municipalities) {
+      import('@/features/platform/data/geoJsonData').then(({ getMunicipalitiesGeoJson }) => {
+        getMunicipalitiesGeoJson()
+          .then(data => setGeoJsonData(prev => ({ ...prev, municipalities: data })))
+          .catch(err => console.error('Failed to load Municipalities GeoJSON:', err));
+      });
+    }
+  }, [isOpen, activeCategory, geoJsonData.municipalities]);
+
   // Flatten and index data for searching
   const allTerritories = useMemo(() => {
     const results: TerritoryResult[] = [];
 
-    if (countryGeoJson?.features) {
-      countryGeoJson.features.forEach((f: any) => {
+    if (geoJsonData.country?.features) {
+      geoJsonData.country.features.forEach((f: any) => {
         const name = f.properties?.name || 'Brasil';
         if (name !== 'Unknown') {
           results.push({
@@ -68,8 +94,8 @@ export function TerritorySearchBar({
       });
     }
 
-    if (biomesGeoJson?.features) {
-      biomesGeoJson.features.forEach((f: any) => {
+    if (geoJsonData.biomes?.features) {
+      geoJsonData.biomes.features.forEach((f: any) => {
         const name = f.properties?.name || f.properties?.Name;
         if (name && name !== 'Unknown') {
           results.push({
@@ -92,8 +118,8 @@ export function TerritorySearchBar({
       });
     });
 
-    if (statesGeoJson?.features) {
-      statesGeoJson.features.forEach((f: any) => {
+    if (geoJsonData.states?.features) {
+      geoJsonData.states.features.forEach((f: any) => {
         const name = f.properties?.name || f.properties?.NM_UF;
         if (name && name !== 'Unknown') {
           results.push({
@@ -106,8 +132,8 @@ export function TerritorySearchBar({
       });
     }
 
-    if (municipalitiesGeoJson?.features) {
-      municipalitiesGeoJson.features.forEach((f: any) => {
+    if (geoJsonData.municipalities?.features) {
+      geoJsonData.municipalities.features.forEach((f: any) => {
         const name = f.properties?.name || f.properties?.NM_MUN;
         if (name && name !== 'Unknown') {
           results.push({
@@ -121,7 +147,7 @@ export function TerritorySearchBar({
     }
 
     return results;
-  }, [countryGeoJson, statesGeoJson, biomesGeoJson, municipalitiesGeoJson]);
+  }, [geoJsonData]);
 
   // Filter results based on search query
   const filteredResults = useMemo(() => {
