@@ -3,7 +3,7 @@ import type L from 'leaflet';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
 import type { MapStatistics } from '@/features/platform/components/PlatformMap';
 import type { TerritoryResult } from '@/features/platform/components/TerritorySelector';
-import { BRAZILIAN_SOIL_DATASET_ID } from '@/features/platform/data/soloDatasets';
+import { PSD_PLATFORM_DATASET_ID } from '@/features/platform/data/soloDatasets';
 
 interface GeoJSONData {
   type: string;
@@ -70,7 +70,7 @@ interface PlatformState {
 
 export const usePlatformStore = create<PlatformState>((set) => ({
   // Initial state
-  selectedSoloDataset: BRAZILIAN_SOIL_DATASET_ID,
+  selectedSoloDataset: PSD_PLATFORM_DATASET_ID,
   mapStatistics: undefined,
   headerHeight: 65,
   map: null,

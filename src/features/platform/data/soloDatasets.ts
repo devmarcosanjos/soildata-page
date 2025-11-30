@@ -177,36 +177,6 @@ const soloDatasetDefinitions: SoloDatasetDefinition[] = [
     loader: loadPSDPlatformDatasetPoints,
     description: 'Dados de granulometria de solo (41.925 amostras) com informações de bioma, estado, município e região',
   },
-  {
-    id: BRAZILIAN_SOIL_DATASET_ID,
-    label: 'Brazilian Soil Dataset (Legado)',
-    loader: loadBrazilianSoilDatasetPoints,
-  },
-  {
-    id: 'estoque-carbono-organico',
-    label: 'Estoque de carbono orgânico',
-    loader: emptyLoader,
-  },
-  {
-    id: 'fracao-grossa',
-    label: 'Fração grossa',
-    loader: emptyLoader,
-  },
-  {
-    id: 'fracao-areia',
-    label: 'Fração areia',
-    loader: emptyLoader,
-  },
-  {
-    id: 'fracao-silte',
-    label: 'Fração silte',
-    loader: emptyLoader,
-  },
-  {
-    id: 'fracao-argila',
-    label: 'Fração argila',
-    loader: emptyLoader,
-  },
 ];
 
 export const soloDatasetOptions = soloDatasetDefinitions.map(({ id, label }, index) => ({
