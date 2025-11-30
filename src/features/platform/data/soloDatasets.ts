@@ -36,61 +36,7 @@ import {
 import { mapPSDRecordsToSoloPoints } from './psdDataMapper';
 import type { TerritoryResult } from '@/features/platform/components/TerritorySelector';
 
-export const BRAZILIAN_SOIL_DATASET_ID = 'brazilian-soil-dataset';
 export const PSD_PLATFORM_DATASET_ID = 'psd-platform-dataset';
-
-const loadBrazilianSoilDatasetPoints: SoloDatasetLoader = async () => {
-  try {
-    // Buscar dados da API
-    const { apiUrl } = await import('@/lib/api-config');
-    const response = await fetch(apiUrl('api/soil-data'), {
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorMessage = `Falha ao buscar dados de solo da API: ${response.status} ${response.statusText}`;
-      console.error('❌ [Solo Datasets]', errorMessage);
-      
-      if (response.status === 0 || response.status === 500) {
-        console.error('   Possível problema de CORS ou servidor indisponível');
-      }
-      
-      return [];
-    }
-
-    const payload = await response.json();
-    
-    if (payload.success && Array.isArray(payload.data)) {
-      // Map compact field names to descriptive names
-      return payload.data.map((p: any) => ({
-        id: p.id,
-        latitude: p.lat,
-        longitude: p.lon,
-        depth: p.d,
-        logClaySand: p.lcs,
-        logSiltSand: p.lss,
-        datasetCode: p.dc,
-        state: p.st,
-        municipality: p.mu,
-        biome: p.bi,
-        title: p.ti,
-        doi: p.doi,
-        datasetUrl: p.url,
-        csvDataUri: p.csv,
-      })) as SoloDatasetPoint[];
-    }
-
-    return [];
-  } catch (error) {
-    console.error('❌ [Solo Datasets] Erro ao buscar dados de solo:', error);
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      console.error('   Erro de rede - API pode estar indisponível ou bloqueada por CORS');
-    }
-    return [];
-  }
-};
 
 const loadPSDPlatformDatasetPoints: SoloDatasetLoader = async () => {
   try {
@@ -168,12 +114,10 @@ export async function loadPSDPlatformWithFilters(territory: TerritoryResult | nu
   }
 }
 
-const emptyLoader: SoloDatasetLoader = async () => [];
-
 const soloDatasetDefinitions: SoloDatasetDefinition[] = [
   {
     id: PSD_PLATFORM_DATASET_ID,
-    label: 'PSD Platform - Granulometria de Solo',
+    label: 'Pontos Soildata',
     loader: loadPSDPlatformDatasetPoints,
     description: 'Dados de granulometria de solo (41.925 amostras) com informações de bioma, estado, município e região',
   },
