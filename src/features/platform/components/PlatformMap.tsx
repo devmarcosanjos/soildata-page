@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
@@ -8,6 +8,7 @@ import { soloDatasetLoaders, PSD_PLATFORM_DATASET_ID, loadPSDPlatformWithFilters
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
 import { TerritorySearchBar } from './TerritorySearchBar';
 import type { TerritoryResult } from './TerritorySelector';
+import { MarkerPopup } from './MarkerPopup';
 import { usePlatformStore } from '@/stores/platformStore';
 import { VectorTileLayer } from './VectorTileLayer';
 // import { LayerControls } from './LayerControls'; // Oculto - camada controlada automaticamente
@@ -84,9 +85,9 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
   const displayPoints = useMemo(() => {
     // Quando há um território selecionado, os dados já vêm filtrados da API
     // Não precisamos filtrar novamente aqui
-    console.log(`📍 [PlatformMap] Exibindo ${datasetPoints.length} pontos${selectedTerritory ? ` filtrados por ${selectedTerritory.type}: ${selectedTerritory.name}` : ' (todos os dados)'}`);
+    // Limitar quantidade de pontos para melhor performance (cluster já ajuda, mas isso é extra)
     return datasetPoints;
-  }, [datasetPoints, selectedTerritory]);
+  }, [datasetPoints]);
 
   // Determina qual divisionCategoryId usar baseado no groupingValue
   // Se groupingValue for 'pais', não mostra nenhuma camada
@@ -235,8 +236,8 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTerritory, map]);
 
-  // Handle territory selection
-  const handleTerritorySelect = (territory: TerritoryResult | null) => {
+  // Handle territory selection - memoizado para evitar re-renders
+  const handleTerritorySelect = useCallback((territory: TerritoryResult | null) => {
     setSelectedTerritory(territory);
     setTerritoryGeoJSON(null); // Reset GeoJSON when territory changes
     
@@ -276,7 +277,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
       // Reset to Brazil view quando nenhum território está selecionado
       map.setView([-15.7801, -55.9292], 3.5);
     }
-  };
+  }, [map, groupingValue]);
 
   // Calculate and emit statistics whenever data or territory changes
   useEffect(() => {
@@ -400,7 +401,9 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
           maxClusterRadius={50}
           disableClusteringAtZoom={15}
           spiderfyOnMaxZoom={true}
-          showCoverageOnHover={true}
+          showCoverageOnHover={false}
+          chunkDelay={100}
+          chunkInterval={200}
           removeOutsideVisibleBounds={true}
         >
           {displayPoints.map((point: SoloDatasetPoint) => (
@@ -410,50 +413,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
             >
               {/* @ts-ignore - react-leaflet types */}
               <Popup maxWidth={360} minWidth={260}>
-                <div className="flex flex-col gap-4 p-1">
-                  <div>
-                    <div className="text-lg font-bold mb-2" style={{ color: '#C55B28' }}>
-                      {point.id}
-                    </div>
-                    <div className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: '#C55B28' }}>
-                      Título do projeto
-                    </div>
-                    <div className="text-sm text-base-content leading-relaxed" style={{ lineHeight: 1.6 }}>
-                      {point.title || point.datasetCode.toUpperCase()}
-                    </div>
-                    {point.doi && (
-                      <div className="text-xs font-semibold mt-2" style={{ color: '#C55B28' }}>
-                        <a 
-                          href={`https://soildata.mapbiomas.org/dataset.xhtml?persistentId=${point.doi}`}
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{ color: '#C55B28', textDecoration: 'underline' }}
-                        >
-                          DOI: {point.doi}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <a
-                      className="btn btn-sm text-white border-none hover:opacity-90"
-                      style={{ backgroundColor: '#C55B28', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                      href={point.datasetUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Acessar trabalho de origem
-                    </a>
-                    <a
-                      className="btn btn-sm btn-outline hover:bg-orange-50"
-                      style={{ borderColor: '#C55B28', color: '#C55B28', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                      href={point.csvDataUri}
-                      download={`${point.id}.csv`}
-                    >
-                      Descarregar dados do ponto
-                    </a>
-                  </div>
-                </div>
+                <MarkerPopup point={point} />
               </Popup>
             </Marker>
           ))}

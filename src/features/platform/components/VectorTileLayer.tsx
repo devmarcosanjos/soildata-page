@@ -35,6 +35,11 @@ export function VectorTileLayer({
   const layerRef = useRef<any>(null);
 
   useEffect(() => {
+    // Só recria a camada se divisionCategoryId mudou
+    if (layerRef.current && layerRef.current._divisionCategoryId === divisionCategoryId) {
+      return;
+    }
+
     // Import leaflet.vectorgrid dinamicamente
     // O plugin adiciona L.vectorGrid globalmente ao Leaflet
     import('leaflet.vectorgrid').then(() => {
@@ -63,6 +68,9 @@ export function VectorTileLayer({
         maxNativeZoom,
       });
 
+      // Marca o divisionCategoryId para evitar recriação desnecessária
+      layer._divisionCategoryId = divisionCategoryId;
+
       layer.addTo(map);
       layerRef.current = layer;
     }).catch((error) => {
@@ -76,7 +84,7 @@ export function VectorTileLayer({
         layerRef.current = null;
       }
     };
-  }, [map, divisionCategoryId, style, attribution, interactive, maxNativeZoom]);
+  }, [map, divisionCategoryId]); // Removido style, attribution, interactive, maxNativeZoom das dependências
 
   return null;
 }
