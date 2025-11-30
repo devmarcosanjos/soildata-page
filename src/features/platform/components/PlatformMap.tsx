@@ -83,11 +83,38 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
   // Os pontos já vêm filtrados da API quando selectedTerritory está definido
   // O groupingValue é usado apenas para exibir a camada de vector tiles correspondente
   const displayPoints = useMemo(() => {
-    // Quando há um território selecionado, os dados já vêm filtrados da API
-    // Não precisamos filtrar novamente aqui
-    // Limitar quantidade de pontos para melhor performance (cluster já ajuda, mas isso é extra)
-    return datasetPoints;
-  }, [datasetPoints]);
+    // Filtro extra no frontend para garantir que o mapa reflita o território selecionado,
+    // mesmo que a API retorne todos os registros
+    if (!selectedTerritory || selectedDatasetId !== PSD_PLATFORM_DATASET_ID) {
+      return datasetPoints;
+    }
+
+    const normalize = (value: string) =>
+      value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+
+    const targetName = normalize(selectedTerritory.name);
+
+    return datasetPoints.filter((point) => {
+      if (!point) return false;
+
+      switch (selectedTerritory.type) {
+        case 'State':
+          return point.state ? normalize(point.state) === targetName : false;
+        case 'Biome':
+          return point.biome ? normalize(point.biome) === targetName : false;
+        case 'Municipality':
+          return point.municipality ? normalize(point.municipality) === targetName : false;
+        case 'Region':
+          return point.region ? normalize(point.region) === targetName : false;
+        default:
+          return true;
+      }
+    });
+  }, [datasetPoints, selectedTerritory, selectedDatasetId]);
 
   // Determina qual divisionCategoryId usar baseado no groupingValue
   // Se groupingValue for 'pais', não mostra nenhuma camada
@@ -128,29 +155,29 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
         });
     } else {
       // Para outros datasets, usar loader padrão
-      const loader = soloDatasetLoaders[selectedDatasetId];
-      if (!loader) {
-        setDatasetPoints([]);
-        setDatasetError('Dataset não configurado.');
-        setIsDatasetLoading(false);
-        return;
-      }
+    const loader = soloDatasetLoaders[selectedDatasetId];
+    if (!loader) {
+      setDatasetPoints([]);
+      setDatasetError('Dataset não configurado.');
+      setIsDatasetLoading(false);
+      return;
+    }
 
-      loader()
-        .then((points) => {
-          if (isCancelled) return;
-          setDatasetPoints(points);
-        })
-        .catch((error) => {
-          console.error('Falha ao carregar pontos do dataset', error);
-          if (isCancelled) return;
-          setDatasetPoints([]);
-          setDatasetError('Não foi possível carregar os pontos deste conjunto de dados.');
-        })
-        .finally(() => {
-          if (isCancelled) return;
-          setIsDatasetLoading(false);
-        });
+    loader()
+      .then((points) => {
+        if (isCancelled) return;
+        setDatasetPoints(points);
+      })
+      .catch((error) => {
+        console.error('Falha ao carregar pontos do dataset', error);
+        if (isCancelled) return;
+        setDatasetPoints([]);
+        setDatasetError('Não foi possível carregar os pontos deste conjunto de dados.');
+      })
+      .finally(() => {
+        if (isCancelled) return;
+        setIsDatasetLoading(false);
+      });
     }
 
     return () => { 
@@ -285,19 +312,19 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
 
     const stats: MapStatistics = {
       totalDatasets: selectedDatasetId ? 1 : 0,
-      totalSamples: datasetPoints.length,
-      totalLocations: new Set(datasetPoints.map(p => `${p.latitude},${p.longitude}`)).size,
-      totalProperties: datasetPoints.length > 0 ? Object.keys(datasetPoints[0]).length - 2 : 0, // -2 for lat/lng
+      totalSamples: displayPoints.length,
+      totalLocations: new Set(displayPoints.map(p => `${p.latitude},${p.longitude}`)).size,
+      totalProperties: displayPoints.length > 0 ? Object.keys(displayPoints[0]).length - 2 : 0, // -2 for lat/lng
       territoryName: selectedTerritory?.name || 'Brasil',
     };
 
     onStatisticsChange(stats);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [datasetPoints, selectedTerritory, selectedDatasetId]);
+  }, [displayPoints, selectedTerritory, selectedDatasetId]);
 
 
   const showEmptyState =
-    !isDatasetLoading && !datasetError && !!selectedDatasetId && datasetPoints.length === 0;
+    !isDatasetLoading && !datasetError && !!selectedDatasetId && displayPoints.length === 0;
 
   return (
     <div className="h-full w-full relative z-0">
@@ -366,24 +393,24 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
             style={
               groupingValue === 'estados'
                 ? {
-                    color: '#D97706', // Amber-600
-                    weight: 1,
-                    fillColor: '#FEF3C7', // Amber-100
-                    fillOpacity: 0.2,
+              color: '#D97706', // Amber-600
+              weight: 1,
+              fillColor: '#FEF3C7', // Amber-100
+              fillOpacity: 0.2,
                   }
                 : groupingValue === 'biomas'
                 ? {
-                    color: '#059669', // Emerald-600
-                    weight: 1,
-                    fillColor: '#D1FAE5', // Emerald-100
-                    fillOpacity: 0.2,
+              color: '#059669', // Emerald-600
+              weight: 1,
+              fillColor: '#D1FAE5', // Emerald-100
+              fillOpacity: 0.2,
                   }
                 : groupingValue === 'municipios'
                 ? {
-                    color: '#2563EB', // Blue-600
-                    weight: 0.5,
-                    fillColor: '#DBEAFE', // Blue-100
-                    fillOpacity: 0.2,
+              color: '#2563EB', // Blue-600
+              weight: 0.5,
+              fillColor: '#DBEAFE', // Blue-100
+              fillOpacity: 0.2,
                   }
                 : {
                     weight: 1,

@@ -19,7 +19,9 @@
     "@turf/bbox": "^7.3.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/helpers": "^6.5.0",
+    "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.21",
+    "@types/maplibre-gl": "^1.14.0",
     "@types/react-leaflet": "^3.0.0",
     "clsx": "^2.1.1",
     "i18next": "^25.6.3",
@@ -35,6 +37,7 @@
     "react-i18next": "^16.3.5",
     "react-leaflet": "^4.2.1",
     "react-leaflet-cluster": "^2.1.0",
+    "react-map-gl": "^8.1.0",
     "react-router-dom": "^7.9.5",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.8"

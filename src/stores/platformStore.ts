@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
-import type { MapStatistics } from '@/features/platform/components/PlatformMap';
+import type { MapStatistics } from '@/features/platform/components/PlatformMapMapLibre';
 import type { TerritoryResult } from '@/features/platform/components/TerritorySelector';
 import { PSD_PLATFORM_DATASET_ID } from '@/features/platform/data/soloDatasets';
 

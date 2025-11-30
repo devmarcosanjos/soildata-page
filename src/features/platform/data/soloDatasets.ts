@@ -9,6 +9,7 @@ export interface SoloDatasetPoint {
   
   // Enriched fields (pre-computed)
   state?: string | null;
+  region?: string | null;
   municipality?: string | null;
   biome?: string | null;
   title?: string;

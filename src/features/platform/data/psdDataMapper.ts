@@ -67,6 +67,7 @@ export function mapPSDRecordToSoloPoint(record: PSDRecord): SoloDatasetPoint {
     logSiltSand,
     datasetCode: record.dataset_id,
     state: record.estado,
+    region: record.regiao,
     municipality: record.municipio,
     biome: record.biome,
     // title, doi e csvDataUri são opcionais e não estão disponíveis no PSD Platform
@@ -80,4 +81,3 @@ export function mapPSDRecordToSoloPoint(record: PSDRecord): SoloDatasetPoint {
 export function mapPSDRecordsToSoloPoints(records: PSDRecord[]): SoloDatasetPoint[] {
   return records.map(mapPSDRecordToSoloPoint);
 }
-

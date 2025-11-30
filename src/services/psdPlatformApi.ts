@@ -218,7 +218,7 @@ export async function getAvailableRegioes(): Promise<string[]> {
  * Busca GeoJSON do território selecionado da API MapBiomas
  */
 export async function getTerritoryGeoJSON(
-  type: 'State' | 'Biome' | 'Municipality',
+  type: 'State' | 'Biome' | 'Municipality' | 'Region',
   name: string
 ): Promise<any | null> {
   try {
@@ -235,9 +235,17 @@ export async function getTerritoryGeoJSON(
       case 'Municipality':
         url = `${mapbiomasApiUrl}/municipio/${encodeURIComponent(name)}`;
         break;
+      case 'Region':
+        // Para regiões, vamos tentar buscar como macro-região
+        // Se não funcionar, podemos construir a partir dos estados
+        url = `${mapbiomasApiUrl}/regiao/${encodeURIComponent(name)}`;
+        break;
       default:
+        console.warn(`⚠️ [MapBiomas API] Tipo de território não suportado: ${type}`);
         return null;
     }
+    
+    console.log(`🌐 [MapBiomas API] Buscando GeoJSON: ${url}`);
     
     const response = await fetch(url, {
       headers: {
@@ -246,14 +254,31 @@ export async function getTerritoryGeoJSON(
     });
     
     if (!response.ok) {
-      console.warn(`⚠️ [MapBiomas API] Não foi possível buscar GeoJSON para ${type}: ${name}`);
+      console.warn(`⚠️ [MapBiomas API] HTTP ${response.status}: Não foi possível buscar GeoJSON para ${type}: ${name}`);
+      console.warn(`⚠️ [MapBiomas API] URL: ${url}`);
+      
+      // Para Region, pode não existir endpoint específico
+      if (type === 'Region' && response.status === 404) {
+        console.warn(`⚠️ [MapBiomas API] Endpoint de região não encontrado. Regiões podem precisar ser construídas a partir dos estados.`);
+      }
+      
       return null;
     }
     
     const data = await response.json();
+    console.log(`✅ [MapBiomas API] GeoJSON recebido para ${type}: ${name}`, {
+      type: data?.type,
+      hasFeatures: Array.isArray(data?.features),
+      featureCount: data?.features?.length,
+      hasGeometry: !!data?.geometry
+    });
+    
     return data;
   } catch (error) {
     console.error(`❌ [MapBiomas API] Erro ao buscar GeoJSON para ${type}: ${name}`, error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error('   Erro de rede - API pode estar indisponível ou bloqueada por CORS');
+    }
     return null;
   }
 }

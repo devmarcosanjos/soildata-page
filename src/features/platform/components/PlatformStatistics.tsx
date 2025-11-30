@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { SummaryCard } from '@mapbiomas/ui';
 import { Database, Layers, MapPin, FlaskConical } from 'lucide-react';
-import type { MapStatistics } from './PlatformMap';
+import type { MapStatistics } from './PlatformMapMapLibre';
 
 interface PlatformStatisticsProps {
   statistics?: MapStatistics;

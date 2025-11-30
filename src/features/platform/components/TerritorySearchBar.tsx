@@ -230,19 +230,22 @@ export function TerritorySearchBar({
               if (!isOpen) setIsOpen(true);
             }}
             className="w-[320px] bg-white shadow-sm"
+            aria-label="Buscar territórios (biomas, estados, municípios ou regiões)"
           />
         </div>
 
         {isOpen && (
-          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 w-[800px] max-w-[90vw] z-[500] overflow-hidden flex flex-col font-sans">
+          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 w-[800px] max-w-[90vw] z-500 overflow-hidden flex flex-col font-sans">
             <div className="flex h-[500px]">
               {/* Sidebar Categories */}
-              <div className="w-64 flex-shrink-0 border-r border-gray-100 overflow-y-auto bg-white py-2">
+              <div className="w-64 shrink-0 border-r border-gray-100 overflow-y-auto bg-white py-2">
                 <div className="px-2 space-y-1">
                   {categories.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setActiveCategory(cat.id)}
+                      aria-label={`Filtrar por ${cat.label}`}
+                      aria-pressed={activeCategory === cat.id}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-full text-sm transition-all ${
                         activeCategory === cat.id
                           ? 'bg-[#FED7AA] text-[#1F2937] font-bold border border-[#C55B28] border-opacity-20'
@@ -271,17 +274,18 @@ export function TerritorySearchBar({
                     <div className="text-xs font-bold text-gray-700 mb-2">
                       Seleção (1)
                     </div>
-                    <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-3 cursor-pointer">
                       <Checkbox
                         checked={true}
                         onChange={() => setTempSelected(null)}
                         className="text-[#C55B28] focus:ring-[#C55B28]"
+                        aria-label={`Desmarcar seleção de ${tempSelected.name}`}
                       />
                       <span className="text-base font-medium text-gray-900">{tempSelected.name}</span>
                       <span className="text-xs bg-[#FED7AA] text-[#C55B28] px-2 py-1 rounded font-medium">
                         {tempSelected.type}
                       </span>
-                    </div>
+                    </label>
                   </div>
                 )}
 
@@ -293,24 +297,29 @@ export function TerritorySearchBar({
                   
                   <div className="space-y-2">
                     {displayedItems.length > 0 ? (
-                      displayedItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer group"
-                          onClick={() => toggleSelection(item)}
-                        >
-                          <Checkbox
-                            checked={tempSelected?.id === item.id}
-                            onChange={() => toggleSelection(item)}
-                            className={`w-5 h-5 rounded border-gray-300 text-[#C55B28] focus:ring-[#C55B28] ${
-                              tempSelected?.id === item.id
-                              ? 'bg-[#C55B28] border-[#C55B28]' 
-                              : ''
-                            }`}
-                          />
-                          <span className="text-base text-gray-700 font-medium group-hover:text-gray-900">{item.name}</span>
-                        </div>
-                      ))
+                      displayedItems.map((item) => {
+                        const isSelected = tempSelected?.id === item.id;
+                        const itemId = `territory-item-${item.id}`;
+                        return (
+                          <label
+                            key={item.id}
+                            id={itemId}
+                            className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer group"
+                          >
+                            <Checkbox
+                              checked={isSelected}
+                              onChange={() => toggleSelection(item)}
+                              className={`w-5 h-5 rounded border-gray-300 text-[#C55B28] focus:ring-[#C55B28] ${
+                                isSelected
+                                ? 'bg-[#C55B28] border-[#C55B28]' 
+                                : ''
+                              }`}
+                              aria-labelledby={itemId}
+                            />
+                            <span className="text-base text-gray-700 font-medium group-hover:text-gray-900">{item.name}</span>
+                          </label>
+                        );
+                      })
                     ) : (
                       <div className="p-8 text-center text-gray-400 text-sm">
                         Nenhum território encontrado
@@ -329,6 +338,7 @@ export function TerritorySearchBar({
                   <button
                     onClick={handleApply}
                     disabled={!tempSelected}
+                    aria-label={tempSelected ? `Aplicar seleção de ${tempSelected.name}` : 'Aplicar seleção (nenhum território selecionado)'}
                     className={`px-8 py-2.5 rounded-lg text-sm font-bold text-white transition-all shadow-sm ${
                       tempSelected
                         ? 'bg-[#C55B28] hover:bg-[#A04820] shadow-md'

@@ -3,7 +3,7 @@ import { Platform, ThemeProvider, BaseColorsKeys } from '@mapbiomas/ui';
 import { Header } from '@/shared/components/Header';
 import {
   PlatformSubheader,
-  PlatformMap,
+  PlatformMapMapLibre as PlatformMap,
   PlatformStatistics,
   PlatformLeftbar,
 } from '@/features/platform/components';
