@@ -1,22 +1,22 @@
 import { useEffect } from 'react';
-import { /* Platform, */ ThemeProvider, BaseColorsKeys } from '@mapbiomas/ui';
+import { Platform, ThemeProvider, BaseColorsKeys } from '@mapbiomas/ui';
 import { Header } from '@/shared/components/Header';
-// import {
-//   PlatformSubheader,
-//   PlatformMap,
-//   PlatformStatistics,
-//   PlatformLeftbar,
-// } from '@/features/platform/components';
+import {
+  PlatformSubheader,
+  PlatformMap,
+  PlatformStatistics,
+  PlatformLeftbar,
+} from '@/features/platform/components';
 import { usePlatformStore } from '@/stores/platformStore';
 
 export function PlatformPage() {
   const {
     headerHeight,
     setHeaderHeight,
-    // selectedSoloDataset,
-    // setSelectedSoloDataset,
-    // mapStatistics,
-    // setMapStatistics,
+    selectedSoloDataset,
+    setSelectedSoloDataset,
+    mapStatistics,
+    setMapStatistics,
   } = usePlatformStore();
 
   useEffect(() => {
@@ -56,50 +56,28 @@ export function PlatformPage() {
           <div style={{
             width: '100%',
             height: `calc(100vh - ${headerHeight}px)`,
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'var(--color-base-100)'
+            overflow: 'hidden'
           }}>
-            {/* Mensagem de em construção */}
-            <div className="text-center p-8">
-              <div className="text-6xl mb-4">🚧</div>
-              <h1 className="text-4xl font-bold text-base-content mb-4">
-                Em Construção
-              </h1>
-              <p className="text-lg text-base-content/70">
-                Estamos trabalhando para trazer uma experiência incrível. Em breve!
-              </p>
-            </div>
-
-            {/* Código original da plataforma - comentado */}
-            {/* <div style={{
-              width: '100%',
-              height: `calc(100vh - ${headerHeight}px)`,
-              overflow: 'hidden'
-            }}>
-              <Platform>
-                <Platform.Subheader>
-                  <PlatformSubheader />
-                </Platform.Subheader>
-                <Platform.Leftbar>
-                  <PlatformLeftbar 
-                    selectedSoloDataset={selectedSoloDataset}
-                    onSoloDatasetChange={setSelectedSoloDataset}
-                  />
-                </Platform.Leftbar>
-                <Platform.Content>
-                  <PlatformMap 
-                    selectedDatasetId={selectedSoloDataset}
-                    onStatisticsChange={setMapStatistics}
-                  />
-                </Platform.Content>
-                <Platform.Rightbar>
-                  <PlatformStatistics statistics={mapStatistics} />
-                </Platform.Rightbar>
-              </Platform>
-            </div> */}
+            <Platform>
+              <Platform.Subheader>
+                <PlatformSubheader />
+              </Platform.Subheader>
+              <Platform.Leftbar>
+                <PlatformLeftbar 
+                  selectedSoloDataset={selectedSoloDataset}
+                  onSoloDatasetChange={setSelectedSoloDataset}
+                />
+              </Platform.Leftbar>
+              <Platform.Content>
+                <PlatformMap 
+                  selectedDatasetId={selectedSoloDataset}
+                  onStatisticsChange={setMapStatistics}
+                />
+              </Platform.Content>
+              <Platform.Rightbar>
+                <PlatformStatistics statistics={mapStatistics} />
+              </Platform.Rightbar>
+            </Platform>
           </div>
         </div>
       </div>
