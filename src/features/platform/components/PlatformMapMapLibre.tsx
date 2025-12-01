@@ -52,7 +52,6 @@ function TerritoryHighlightVectorTiles({
   // Efeito para inspecionar as propriedades dos vector tiles e encontrar o ID do território
   useEffect(() => {
     if (!mapRef.current || !divisionCategoryId) return;
-
     const mapInstance = mapRef.current.getMap();
     const territoryName = territory.name;
 
@@ -140,6 +139,78 @@ function TerritoryHighlightVectorTiles({
       mapInstance.off('sourcedata', findTerritory);
     };
   }, [mapRef, divisionCategoryId, territory.name]);
+
+  // Quando encontrarmos o ID do território via vector tiles,
+  // buscar os bounds oficiais da API MapBiomas e aplicar fitBounds no mapa
+  useEffect(() => {
+    if (!mapRef.current || territoryId === null) return;
+
+    const mapInstance = mapRef.current.getMap();
+    const territoryName = territory.name;
+    const id = territoryId;
+
+    const fetchAndFitBounds = async () => {
+      try {
+        const url = `https://prd.plataforma.mapbiomas.org/api/v1/brazil/territories/bounds?territoryId=${id}`;
+        console.log(`🌐 [Vector Tiles Highlight] Buscando bounds do território ID=${id} (${territoryName}): ${url}`);
+
+        const response = await fetch(url, {
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.warn(
+            `⚠️ [Vector Tiles Highlight] HTTP ${response.status} ao buscar bounds para território ID=${id} (${territoryName})`
+          );
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!data || !data.bounds) {
+          console.warn(
+            '⚠️ [Vector Tiles Highlight] Resposta de bounds não possui propriedade "bounds":',
+            data
+          );
+          return;
+        }
+
+        const geometry = data.bounds as Geometry;
+
+        const bounds = bbox({
+          type: 'Feature',
+          geometry,
+          properties: {},
+        } as Feature);
+
+        console.log(
+          `✅ [Vector Tiles Highlight] Bounds recebidos para território ID=${id} (${territoryName}):`,
+          bounds
+        );
+
+        mapInstance.fitBounds(
+          [
+            [bounds[0], bounds[1]],
+            [bounds[2], bounds[3]],
+          ] as [[number, number], [number, number]],
+          {
+            padding: 50,
+            maxZoom: 12,
+            duration: 1200,
+          }
+        );
+      } catch (error) {
+        console.error(
+          `❌ [Vector Tiles Highlight] Erro ao buscar/aplicar bounds para território ID=${id} (${territoryName})`,
+          error
+        );
+      }
+    };
+
+    fetchAndFitBounds();
+  }, [territoryId, mapRef, territory.name]);
 
   if (!divisionCategoryId) {
     console.log('⚠️ [Vector Tiles Highlight] divisionCategoryId não disponível');
@@ -338,6 +409,46 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
   const [exaggerationActive, setExaggerationActive] = useState(false);
 
   const { setMap } = usePlatformStore();
+
+  // Helper para aplicar fitBounds usando Turf.js a partir de diferentes formatos de GeoJSON
+  const fitMapToBounds = useCallback(
+    (
+      geo: FeatureCollection | Feature | Geometry,
+      options?: { padding?: number; maxZoom?: number; duration?: number }
+    ) => {
+      if (!mapRef.current) {
+        throw new Error('[fitMapToBounds] Mapa não disponível');
+      }
+
+      const isFeatureCollection = (geo as any).type === 'FeatureCollection';
+      const isFeature = (geo as any).type === 'Feature';
+
+      const featureLike: FeatureCollection | Feature =
+        isFeatureCollection || isFeature
+          ? (geo as FeatureCollection | Feature)
+          : ({
+              type: 'Feature',
+              geometry: geo as Geometry,
+              properties: {},
+            } as Feature);
+
+      const bounds = bbox(featureLike as any);
+
+      const mapInstance = mapRef.current.getMap();
+      mapInstance.fitBounds(
+        [
+          [bounds[0], bounds[1]],
+          [bounds[2], bounds[3]],
+        ] as [[number, number], [number, number]],
+        {
+          padding: options?.padding ?? 50,
+          maxZoom: options?.maxZoom ?? 12,
+          duration: options?.duration ?? 1200,
+        }
+      );
+    },
+    [mapRef]
+  );
 
   // Atualizar referência do mapa no store
   useEffect(() => {
@@ -560,21 +671,10 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
               hasGeometry: 'geometry' in geoJSON
             });
             setTerritoryGeoJSON(geoJSON);
-            
+
             try {
-              const mapInstance = mapRef.current.getMap();
-              // Calcular bounds do GeoJSON usando turf
-              const bounds = bbox(geoJSON as FeatureCollection);
-              mapInstance.fitBounds(
-                [
-                  [bounds[0], bounds[1]],
-                  [bounds[2], bounds[3]],
-                ] as [[number, number], [number, number]],
-                {
-                  padding: 50,
-                  maxZoom: 12,
-                }
-              );
+              // Calcular bounds do GeoJSON usando função helper
+              fitMapToBounds(geoJSON as FeatureCollection);
             } catch (error) {
               console.error('Failed to fit bounds from GeoJSON:', error);
               if (filteredPoints.length > 0) {
@@ -582,18 +682,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
                   const pointsCollection = points(
                     filteredPoints.map(p => [p.longitude, p.latitude])
                   );
-                  const bounds = bbox(pointsCollection);
-                  const mapInstance = mapRef.current.getMap();
-                  mapInstance.fitBounds(
-                    [
-                      [bounds[0], bounds[1]],
-                      [bounds[2], bounds[3]],
-                    ] as [[number, number], [number, number]],
-                    {
-                      padding: 50,
-                      maxZoom: 12,
-                    }
-                  );
+                  fitMapToBounds(pointsCollection);
                 } catch (err) {
                   console.error('Failed to calculate bounds from points:', err);
                 }
@@ -607,18 +696,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
                 const pointsCollection = points(
                   filteredPoints.map(p => [p.longitude, p.latitude])
                 );
-                const bounds = bbox(pointsCollection);
-                const mapInstance = mapRef.current.getMap();
-                mapInstance.fitBounds(
-                  [
-                    [bounds[0], bounds[1]],
-                    [bounds[2], bounds[3]],
-                  ] as [[number, number], [number, number]],
-                  {
-                    padding: 50,
-                    maxZoom: 12,
-                  }
-                );
+                fitMapToBounds(pointsCollection);
               } catch (err) {
                 console.error('Failed to calculate bounds from points:', err);
               }
@@ -633,7 +711,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
       console.log(`⚠️ [Territory Highlight] Tipo de território não suportado para highlight: ${selectedTerritory.type}`);
       setTerritoryGeoJSON(null);
     }
-  }, [selectedTerritory, datasetPoints, isDatasetLoading]);
+  }, [selectedTerritory, filteredPoints, isDatasetLoading, fitMapToBounds]);
 
   // Handle territory selection
   const handleTerritorySelect = useCallback((territory: TerritoryResult | null) => {

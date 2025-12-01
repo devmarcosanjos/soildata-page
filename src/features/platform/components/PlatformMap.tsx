@@ -452,10 +452,10 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
             key={selectedTerritory.id}
             data={territoryGeoJSON as any}
             pathOptions={{
-              color: '#C55B28',
+              color: '#2563EB', // Blue-600
               weight: 2,
-              fillColor: '#FED7AA',
-              fillOpacity: 0.2,
+              fillColor: '#DBEAFE', // Blue-100
+              fillOpacity: 0.4,
             }}
           />
         )}
