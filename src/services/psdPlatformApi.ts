@@ -9,14 +9,14 @@ async function fetchPSDPlatform<T>(
     const response = await fetch(url, {
       ...options,
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         ...options?.headers,
       },
     });
-    
+
     if (!response.ok) {
       const errorMessage = `HTTP error fetching ${url}: ${response.status} ${response.statusText}`;
-      
+
       if (response.status === 0 || response.status === 500) {
         console.error('❌ [PSD Platform API]', errorMessage);
         console.error('   Possível problema de CORS ou servidor indisponível');
@@ -26,16 +26,16 @@ async function fetchPSDPlatform<T>(
       } else {
         console.warn('⚠️ [PSD Platform API]', errorMessage);
       }
-      
+
       throw new Error(errorMessage);
     }
-    
+
     const responseData = await response.json();
-    
+
     if (responseData.success !== undefined) {
       return responseData as T;
     }
-    
+
     return responseData as T;
   } catch (error) {
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -44,6 +44,59 @@ async function fetchPSDPlatform<T>(
       console.error('   Verifique se a API está rodando e acessível');
     } else if (error instanceof Error && !error.message.includes('status: 500')) {
       console.error(`❌ [PSD Platform API] Erro ao buscar ${url}:`, error);
+    }
+    throw error;
+  }
+}
+
+// Base URL da API pública da plataforma MapBiomas Brasil
+const MAPBIOMAS_API_BASE_URL = 'https://prd.plataforma.mapbiomas.org/api/v1';
+
+// Tipos auxiliares para as APIs de ponto da plataforma MapBiomas
+export interface MapBiomasPropertyAtPoint {
+  propertyCode: string;
+}
+
+export interface MapBiomasTerritoryCategory {
+  id: number;
+  name: Record<string, string>;
+}
+
+export interface MapBiomasTerritoryAtPoint {
+  id: string;
+  name: string;
+  nameFormatted?: string;
+  category: MapBiomasTerritoryCategory;
+}
+
+export interface MapBiomasPixelHistoryItem {
+  pixelValue: number;
+  year: number;
+}
+
+async function fetchMapBiomas<T>(pathAndQuery: string): Promise<T> {
+  const url = `${MAPBIOMAS_API_BASE_URL}${pathAndQuery}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = `HTTP error fetching ${url}: ${response.status} ${response.statusText}`;
+      console.warn('⚠️ [MapBiomas API]', errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error(`❌ [MapBiomas API] Erro de rede ao buscar ${url}`);
+      console.error('   API pode estar indisponível ou bloqueada por CORS');
+    } else {
+      console.error(`❌ [MapBiomas API] Erro ao buscar ${url}:`, error);
     }
     throw error;
   }
@@ -283,3 +336,105 @@ export async function getTerritoryGeoJSON(
   }
 }
 
+/**
+ * Consulta os códigos de imóvel (CAR) que interceptam um ponto.
+ *
+ * GET /brazil/properties/point
+ */
+export async function getPropertiesByPoint(
+  longitude: number,
+  latitude: number
+): Promise<MapBiomasPropertyAtPoint[]> {
+  const params = new URLSearchParams({
+    longitude: String(longitude),
+    latitude: String(latitude),
+  });
+
+  const data = await fetchMapBiomas<any>(`/brazil/properties/point?${params.toString()}`);
+
+  if (Array.isArray(data)) {
+    return data as MapBiomasPropertyAtPoint[];
+  }
+
+  if (Array.isArray((data as any).properties)) {
+    return (data as any).properties as MapBiomasPropertyAtPoint[];
+  }
+
+  if (Array.isArray((data as any).data)) {
+    return (data as any).data as MapBiomasPropertyAtPoint[];
+  }
+
+  return [];
+}
+
+/**
+ * Consulta todos os recortes territoriais que contêm um ponto.
+ *
+ * GET /brazil/territories/point
+ */
+export async function getTerritoriesByPoint(
+  longitude: number,
+  latitude: number
+): Promise<MapBiomasTerritoryAtPoint[]> {
+  const params = new URLSearchParams({
+    longitude: String(longitude),
+    latitude: String(latitude),
+  });
+
+  const data = await fetchMapBiomas<any>(`/brazil/territories/point?${params.toString()}`);
+
+  if (Array.isArray(data)) {
+    return data as MapBiomasTerritoryAtPoint[];
+  }
+
+  if (Array.isArray((data as any).territories)) {
+    return (data as any).territories as MapBiomasTerritoryAtPoint[];
+  }
+
+  if (Array.isArray((data as any).data)) {
+    return (data as any).data as MapBiomasTerritoryAtPoint[];
+  }
+
+  return [];
+}
+
+/**
+ * Consulta o histórico anual da classe de uso/cobertura de um pixel.
+ *
+ * GET /brazil/maps/pixel-history
+ */
+export async function getPixelHistoryByPoint(
+  longitude: number,
+  latitude: number,
+  options?: {
+    subthemeKey?: string;
+    legendId?: string;
+  }
+): Promise<MapBiomasPixelHistoryItem[]> {
+  const params = new URLSearchParams({
+    longitude: String(longitude),
+    latitude: String(latitude),
+  });
+
+  const subthemeKey = options?.subthemeKey ?? 'coverage_lclu';
+  const legendId = options?.legendId ?? 'default';
+
+  if (subthemeKey) params.set('subthemeKey', subthemeKey);
+  if (legendId) params.set('legendId', legendId);
+
+  const data = await fetchMapBiomas<any>(`/brazil/maps/pixel-history?${params.toString()}`);
+
+  if (Array.isArray(data)) {
+    return data as MapBiomasPixelHistoryItem[];
+  }
+
+  if (Array.isArray((data as any).history)) {
+    return (data as any).history as MapBiomasPixelHistoryItem[];
+  }
+
+  if (Array.isArray((data as any).data)) {
+    return (data as any).data as MapBiomasPixelHistoryItem[];
+  }
+
+  return [];
+}

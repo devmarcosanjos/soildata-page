@@ -11,10 +11,34 @@ import { TerritorySearchBar } from './TerritorySearchBar';
 import type { TerritoryResult } from './TerritorySelector';
 import { MarkerPopup } from './MarkerPopup';
 import { usePlatformStore } from '@/stores/platformStore';
-import { getTerritoryGeoJSON } from '@/services/psdPlatformApi';
+import {
+  getTerritoryGeoJSON,
+  getPropertiesByPoint,
+  getTerritoriesByPoint,
+  getPixelHistoryByPoint,
+  type MapBiomasPixelHistoryItem,
+  type MapBiomasPropertyAtPoint,
+  type MapBiomasTerritoryAtPoint,
+} from '@/services/psdPlatformApi';
 import bbox from '@turf/bbox';
 import { points, featureCollection } from '@turf/helpers';
 import type { FeatureCollection, Feature, Geometry, Point } from 'geojson';
+import { searchDatasets } from '@/services/datasetsApi';
+import type { Dataset } from '@/types/dataset';
+
+interface ClickInfoState {
+  lngLat: [number, number];
+  datasetPoint?: SoloDatasetPoint | null;
+  relatedSamples?: SoloDatasetPoint[];
+  datasetDetails?: Dataset | null;
+  datasetDetailsLoading?: boolean;
+  datasetDetailsError?: string | null;
+  properties?: MapBiomasPropertyAtPoint[];
+  territories?: MapBiomasTerritoryAtPoint[];
+  pixelHistory?: MapBiomasPixelHistoryItem[];
+  isLoading: boolean;
+  error?: string | null;
+}
 
 // Normaliza respostas diversas da API MapBiomas para um FeatureCollection válido
 function normalizeTerritoryFeatureCollection(
@@ -439,6 +463,301 @@ function TerritoryHighlightGeoJSON({
   );
 }
 
+function ClickInfoPopupContent({ info }: { info: ClickInfoState }) {
+  const {
+    lngLat,
+    datasetPoint,
+    relatedSamples,
+    datasetDetails,
+    datasetDetailsLoading,
+    datasetDetailsError,
+    properties,
+    territories,
+    pixelHistory,
+    isLoading,
+    error,
+  } = info;
+
+  const [activeTab, setActiveTab] = useState<'soildata' | 'context'>('soildata');
+
+  const formatLat = lngLat[1].toFixed(5);
+  const formatLng = lngLat[0].toFixed(5);
+
+  const municipality = territories?.find(
+    (t) =>
+      t.category?.id === 95 ||
+      t.category?.name?.['pt-BR']?.toLowerCase() === 'município' ||
+      t.category?.name?.['pt-BR']?.toLowerCase() === 'municipio'
+  );
+
+  const samplesForPoint = (() => {
+    if (!datasetPoint) return [];
+    if (Array.isArray(relatedSamples) && relatedSamples.length > 0) {
+      return relatedSamples;
+    }
+    return [datasetPoint];
+  })();
+
+  const depthLayers = samplesForPoint
+    .filter((p) => typeof p.depth === 'number' && p.depth !== null)
+    .sort((a, b) => (a.depth ?? 0) - (b.depth ?? 0));
+
+  const maxDepth = depthLayers.reduce(
+    (max, p) => Math.max(max, p.depth ?? 0),
+    0
+  );
+
+  const displayTitle =
+    datasetDetails?.title ||
+    datasetPoint?.title ||
+    datasetPoint?.datasetCode?.toUpperCase();
+
+  const displayDoi =
+    datasetDetails?.doi || datasetPoint?.doi || undefined;
+
+  const datasetLink =
+    datasetDetails?.url ||
+    datasetPoint?.datasetUrl ||
+    (displayDoi
+      ? `https://soildata.mapbiomas.org/dataset.xhtml?persistentId=${displayDoi}`
+      : '#');
+
+  const selectedPointBlock = (
+    <div className="pt-3 border-t border-gray-100 mt-2">
+      <div className="text-[11px] md:text-xs uppercase tracking-wide text-gray-500">
+        Ponto selecionado
+      </div>
+      <div className="text-sm md:text-base font-mono text-gray-900">
+        lat {formatLat}, lng {formatLng}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-4 text-sm md:text-base max-w-lg p-4 md:p-5">
+      {/* Tabs */}
+      <div className="flex rounded-full bg-gray-100 p-1 text-xs md:text-sm font-semibold border border-gray-200 mr-9 md:mr-10 mt-1">
+        <button
+          type="button"
+          className={`flex-1 py-1.5 md:py-2 rounded-full transition-colors ${
+            activeTab === 'soildata'
+              ? 'bg-white text-[#C55B28] shadow-sm'
+              : 'text-gray-500'
+          }`}
+          onClick={() => setActiveTab('soildata')}
+        >
+          Descrição
+        </button>
+        <button
+          type="button"
+          className={`flex-1 py-1.5 md:py-2 rounded-full transition-colors ${
+            activeTab === 'context'
+              ? 'bg-white text-[#C55B28] shadow-sm'
+              : 'text-gray-500'
+          }`}
+          onClick={() => setActiveTab('context')}
+        >
+          Contexto territorial
+        </button>
+      </div>
+
+      {activeTab === 'soildata' && (
+        <div className="flex flex-col gap-3">
+          {datasetPoint ? (
+            <>
+              <div className="border border-orange-100 rounded-2xl p-4 bg-orange-50/70">
+                <div className="text-sm md:text-base font-bold mb-1 text-[#C55B28] break-words">
+                  {datasetPoint.id}
+                </div>
+                <div className="text-[11px] md:text-xs uppercase tracking-wide text-[#C55B28] mb-0.5 font-semibold">
+                  Título do projeto
+                </div>
+                <div className="text-sm text-gray-900 mb-2">
+                  {displayTitle}
+                </div>
+                {displayDoi && (
+                  <div className="text-xs text-[#C55B28] mb-2">
+                    DOI:{' '}
+                    <a
+                      href={`https://soildata.mapbiomas.org/dataset.xhtml?persistentId=${displayDoi}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      {displayDoi}
+                    </a>
+                  </div>
+                )}
+                {datasetDetailsLoading && (
+                  <div className="text-[11px] text-gray-500 mb-1">
+                    Carregando detalhes do trabalho no SoilData…
+                  </div>
+                )}
+                {datasetDetailsError && (
+                  <div className="text-[11px] text-red-600 mb-1">
+                    {datasetDetailsError}
+                  </div>
+                )}
+                <div className="flex">
+                  <a
+                    className="btn btn-sm md:btn-md text-white border-none flex-1 justify-center"
+                    style={{ backgroundColor: '#C55B28' }}
+                    href={datasetLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Acessar trabalho de origem
+                  </a>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs md:text-sm uppercase tracking-wide text-gray-700 mb-1.5">
+                  Quantidade de amostras por camada
+                </div>
+                {depthLayers.length === 0 ? (
+                  <div className="text-sm text-gray-600">
+                    Não há informação de profundidade disponível para este ponto.
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+                    {depthLayers.map((sample, index) => {
+                      const depthValue = sample.depth ?? 0;
+                      const widthPercent =
+                        maxDepth > 0 ? Math.max(15, (depthValue / maxDepth) * 100) : 50;
+
+                      return (
+                        <div
+                          key={`${sample.id}-${index}`}
+                          className="flex items-center gap-3"
+                        >
+                          <div className="w-16 text-xs text-gray-600">
+                            {depthValue > 0
+                              ? `${Math.round(depthValue)} cm`
+                              : 'Prof. N/D'}
+                          </div>
+                          <div className="flex-1 bg-orange-100 rounded-full h-2 overflow-hidden">
+                            <div
+                              className="h-2 rounded-full"
+                              style={{
+                                width: `${widthPercent}%`,
+                                backgroundColor: '#C55B28',
+                              }}
+                            />
+                          </div>
+                          <div className="w-8 text-right text-xs text-gray-600">
+                            1
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div className="text-[11px] text-gray-500 mt-1">
+                      Cada barra representa uma camada amostrada neste ponto.
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="text-sm text-gray-600">
+              Nenhum ponto de solo associado a este clique.
+            </div>
+          )}
+          {selectedPointBlock}
+        </div>
+      )}
+
+      {activeTab === 'context' && (
+        <div className="flex flex-col gap-3">
+          {isLoading && (
+            <div className="text-sm text-gray-500">
+              Carregando CAR, territórios e histórico do pixel…
+            </div>
+          )}
+
+          {error && (
+            <div className="text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {!isLoading && properties && (
+            <div>
+              <div className="text-xs md:text-sm uppercase tracking-wide text-gray-700 mb-1.5">
+                CAR no ponto (properties/point)
+              </div>
+              {properties.length === 0 ? (
+                <div className="text-sm text-gray-600">
+                  Nenhum CAR encontrado na coordenada.
+                </div>
+              ) : (
+                <ul className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
+                  {properties.slice(0, 5).map((p) => (
+                    <li
+                      key={p.propertyCode}
+                      className="text-xs font-mono text-gray-900 break-all"
+                    >
+                      {p.propertyCode}
+                    </li>
+                  ))}
+                  {properties.length > 5 && (
+                    <li className="text-xs text-gray-500">
+                      +{properties.length - 5} outros códigos…
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {!isLoading && territories && (
+            <div>
+              <div className="text-xs md:text-sm uppercase tracking-wide text-gray-700 mb-1.5">
+                Territórios no ponto (territories/point)
+              </div>
+              <ul className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                {territories.map((t) => (
+                  <li key={t.id} className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-900">
+                      {t.name}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {t.category?.name?.['pt-BR'] || 'Categoria'}{' '}
+                      {t.nameFormatted ? `· ${t.nameFormatted}` : ''}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {municipality && (
+                <div className="mt-1 text-xs text-emerald-700">
+                  Município detectado automaticamente:{' '}
+                  <span className="font-semibold">{municipality.name}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isLoading && pixelHistory && pixelHistory.length > 0 && (
+            <div>
+              <div className="text-xs md:text-sm uppercase tracking-wide text-gray-700 mb-1.5">
+                Histórico de uso do solo (pixel-history)
+              </div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-900 max-h-32 overflow-y-auto pr-1">
+                {pixelHistory.map((item) => (
+                  <div key={item.year} className="flex justify-between">
+                    <span>{item.year}</span>
+                    <span className="font-mono">{item.pixelValue}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: PlatformMapProps) {
   const {
     datasetPoints,
@@ -462,7 +781,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
     pitch: 0,
     bearing: 0,
   });
-  const [popupInfo, setPopupInfo] = useState<{ point: SoloDatasetPoint; lngLat: [number, number] } | null>(null);
+  const [clickInfo, setClickInfo] = useState<ClickInfoState | null>(null);
   const [bearing, setBearing] = useState(0);
   const [pitch, setPitch] = useState(0);
   const [exaggerationActive, setExaggerationActive] = useState(false);
@@ -515,6 +834,30 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
       setMap(mapRef.current.getMap() as unknown as maplibregl.Map);
     }
   }, [setMap]);
+
+  // Cursor de pointer apenas sobre os pontos de dados de solo
+  useEffect(() => {
+    const mapInstance = mapRef.current?.getMap();
+    if (!mapInstance) return;
+
+    const handleMouseEnter = () => {
+      mapInstance.getCanvas().style.cursor = 'pointer';
+    };
+
+    const handleMouseLeave = () => {
+      mapInstance.getCanvas().style.cursor = '';
+    };
+
+    // Eventos atrelados à camada de pontos
+    mapInstance.on('mouseenter', 'all-points', handleMouseEnter);
+    mapInstance.on('mouseleave', 'all-points', handleMouseLeave);
+
+    return () => {
+      mapInstance.off('mouseenter', 'all-points', handleMouseEnter);
+      mapInstance.off('mouseleave', 'all-points', handleMouseLeave);
+      mapInstance.getCanvas().style.cursor = '';
+    };
+  }, []);
 
   // Configurar projeção Globe e Terreno 3D após o mapa carregar
   useEffect(() => {
@@ -854,22 +1197,183 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
         onClick={(e) => {
           const mapInstance = mapRef.current?.getMap();
           if (!mapInstance) return;
-          
-          const features = mapInstance.queryRenderedFeatures(e.point, {
-            layers: ['all-points'],
+
+        const features = mapInstance.queryRenderedFeatures(e.point, {
+          layers: ['all-points'],
+        });
+
+          // Só abrimos popup e consultamos APIs quando o clique cai em um ponto de dados de solo
+          if (features.length === 0) {
+            setClickInfo(null);
+            return;
+          }
+
+          const feature = features[0];
+          const datasetPoint = feature.properties as SoloDatasetPoint;
+          const geometry = feature.geometry as Point | undefined;
+
+          // Todas as amostras (camadas) do mesmo ponto (mesmo dataset, lat e lon)
+          const relatedSamples =
+            filteredPoints.filter((p) => {
+              const sameDataset = p.datasetCode === datasetPoint.datasetCode;
+              const sameLat =
+                Math.abs(p.latitude - datasetPoint.latitude) < 1e-6;
+              const sameLng =
+              Math.abs(p.longitude - datasetPoint.longitude) < 1e-6;
+              return sameDataset && sameLat && sameLng;
+            }) || [];
+
+          const lngLat: [number, number] =
+            geometry && geometry.type === 'Point' && Array.isArray(geometry.coordinates)
+              ? [geometry.coordinates[0], geometry.coordinates[1]]
+              : [e.lngLat.lng, e.lngLat.lat];
+
+          // Ajustar o mapa para garantir que o popup fique totalmente visível,
+          // posicionando o ponto um pouco abaixo do centro da tela e aplicando um zoom mínimo.
+          try {
+            const canvas = mapInstance.getCanvas();
+            const mapHeight = canvas?.clientHeight ?? 0;
+
+            if (mapHeight > 0) {
+              const currentPixel = mapInstance.project({
+                lng: lngLat[0],
+                lat: lngLat[1],
+              });
+
+              const targetY = mapHeight * 0.65; // ponto mais próximo da parte inferior
+              const targetPixel = {
+                x: currentPixel.x,
+                y: targetY,
+              };
+
+              const targetCenter = mapInstance.unproject(
+                targetPixel as maplibregl.PointLike
+              );
+
+              const currentZoom = mapInstance.getZoom();
+              const targetZoom = currentZoom < 6 ? 6 : currentZoom;
+
+              mapInstance.easeTo({
+                center: targetCenter,
+                zoom: targetZoom,
+                duration: 700,
+              });
+            }
+          } catch (zoomError) {
+            console.warn(
+              '⚠️ [Map Click] Não foi possível ajustar o zoom/centro para o popup:',
+              zoomError
+            );
+          }
+
+          // Estado inicial do popup ao clicar
+          setClickInfo({
+            lngLat,
+            datasetPoint,
+            relatedSamples,
+            datasetDetails: undefined,
+            datasetDetailsLoading: true,
+            datasetDetailsError: null,
+            properties: undefined,
+            territories: undefined,
+            pixelHistory: undefined,
+            isLoading: true,
+            error: null,
           });
 
-          if (features.length > 0) {
-            const feature = features[0];
-            const pointData = feature.properties as SoloDatasetPoint;
-            const geometry = feature.geometry as Point;
-            setPopupInfo({
-              point: pointData,
-              lngLat: geometry.coordinates as [number, number],
-            });
-          } else {
-            setPopupInfo(null);
-          }
+          (async () => {
+            try {
+              const [properties, territories, pixelHistory, datasetsResponse] = await Promise.all([
+                getPropertiesByPoint(lngLat[0], lngLat[1]).catch(() => []),
+                getTerritoriesByPoint(lngLat[0], lngLat[1]).catch(() => []),
+                getPixelHistoryByPoint(lngLat[0], lngLat[1], {
+                  subthemeKey: 'coverage_lclu',
+                  legendId: 'default',
+                }).catch(() => []),
+                (async () => {
+                  try {
+                    const query =
+                      datasetPoint.doi && datasetPoint.doi.trim().length > 0
+                        ? datasetPoint.doi.trim()
+                        : datasetPoint.datasetCode || '';
+
+                    if (!query) {
+                      return null;
+                    }
+
+                    return await searchDatasets(query, { limit: 1 }).catch(() => null);
+                  } catch {
+                    return null;
+                  }
+                })(),
+              ]);
+
+              const datasetDetails =
+                datasetsResponse && Array.isArray(datasetsResponse.data) && datasetsResponse.data.length > 0
+                  ? datasetsResponse.data[0]
+                  : null;
+
+              // Selecionar automaticamente o município para highlight, quando existir
+              const municipality = territories.find(
+                (t) =>
+                  t.category?.id === 95 ||
+                  t.category?.name?.['pt-BR']?.toLowerCase() === 'município' ||
+                  t.category?.name?.['pt-BR']?.toLowerCase() === 'municipio'
+              );
+
+              if (municipality) {
+                setSelectedTerritory({
+                  id: municipality.id,
+                  name: municipality.name,
+                  type: 'Municipality',
+                  feature: null,
+                });
+                setGroupingValue('municipios');
+              }
+
+              setClickInfo((current) => {
+                if (!current) return current;
+                // Garante que atualizamos apenas o último clique
+                if (
+                  current.lngLat[0] !== lngLat[0] ||
+                  current.lngLat[1] !== lngLat[1]
+                ) {
+                  return current;
+                }
+
+                return {
+                  ...current,
+                  properties,
+                  territories,
+                  pixelHistory,
+                  datasetDetails,
+                  datasetDetailsLoading: false,
+                  datasetDetailsError: null,
+                  isLoading: false,
+                  error: null,
+                };
+              });
+            } catch (err) {
+              console.error('❌ [Map Click] Erro ao carregar informações do ponto:', err);
+              setClickInfo((current) => {
+                if (!current) return current;
+                if (
+                  current.lngLat[0] !== lngLat[0] ||
+                  current.lngLat[1] !== lngLat[1]
+                ) {
+                  return current;
+                }
+
+                return {
+                  ...current,
+                  isLoading: false,
+                  datasetDetailsLoading: false,
+                  datasetDetailsError: 'Não foi possível carregar os detalhes do trabalho no SoilData.',
+                  error: 'Não foi possível carregar as informações deste ponto.',
+                };
+              });
+            }
+          })();
         }}
       >
         {/* Vector Tiles do MapBiomas - Camada base de territórios */}
@@ -931,18 +1435,18 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
           />
         </Source>
 
-        {/* Popup para marcadores */}
-        {popupInfo && (
+        {/* Popup com informações completas do clique (CAR, territórios, pixel history + ponto SoloData) */}
+        {clickInfo && (
           <Popup
-            longitude={popupInfo.lngLat[0]}
-            latitude={popupInfo.lngLat[1]}
+            longitude={clickInfo.lngLat[0]}
+            latitude={clickInfo.lngLat[1]}
             anchor="bottom"
-            onClose={() => setPopupInfo(null)}
-            maxWidth="360px"
+            onClose={() => setClickInfo(null)}
+            maxWidth="560px"
             closeButton={true}
             closeOnClick={false}
           >
-            <MarkerPopup point={popupInfo.point} />
+            <ClickInfoPopupContent info={clickInfo} />
           </Popup>
         )}
 

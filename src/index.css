@@ -89,6 +89,34 @@ html {
   }
 }
 
+/* Estilo do botão de fechar do popup MapLibre para combinar com o tema SoloData */
+.maplibregl-popup-close-button {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #6B7280;
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.maplibregl-popup-close-button:hover {
+  background: #FEF3C7;
+  color: #C55B28;
+  border-color: rgba(234, 88, 12, 0.4);
+}
+
+.maplibregl-popup-close-button:focus-visible {
+  outline: 2px solid #C55B28;
+  outline-offset: 1px;
+}
+
 .maplibregl-ctrl-attrib.maplibregl-compact {
   margin: 1.5rem;
 }
