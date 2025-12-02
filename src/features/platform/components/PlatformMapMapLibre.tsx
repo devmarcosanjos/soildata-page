@@ -2,14 +2,12 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import Map, { Source, Layer, Popup } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { MapLayout, CompassControl, ZoomControl, Button, Switch } from '@mapbiomas/ui';
+import { MapLayout, CompassControl, ZoomControl, Button } from '@mapbiomas/ui';
 import { MountainIcon } from 'lucide-react';
 import { TooltipTrigger, Tooltip } from 'react-aria-components';
 import { soloDatasetLoaders, PSD_PLATFORM_DATASET_ID, loadPSDPlatformWithFilters } from '@/features/platform/data/soloDatasets';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
-import { TerritorySearchBar } from './TerritorySearchBar';
 import type { TerritoryResult } from './TerritorySelector';
-import { MarkerPopup } from './MarkerPopup';
 import { usePlatformStore } from '@/stores/platformStore';
 import {
   getTerritoryGeoJSON,
@@ -904,7 +902,6 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
     selectedTerritory,
     setSelectedTerritory,
     aggregateByBiome,
-    setAggregateByBiome,
   } = usePlatformStore();
 
   const mapRef = useRef<MapRef>(null);
@@ -1341,43 +1338,6 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
     }
   }, [selectedTerritory, filteredPoints, isDatasetLoading, fitMapToBounds]);
 
-  // Handle territory selection
-  const handleTerritorySelect = useCallback((territory: TerritoryResult | null) => {
-    setSelectedTerritory(territory);
-    setTerritoryGeoJSON(null);
-    
-    if (territory) {
-      switch (territory.type) {
-        case 'State':
-          setGroupingValue('estados');
-          break;
-        case 'Biome':
-          setGroupingValue('biomas');
-          break;
-        case 'Municipality':
-          setGroupingValue('municipios');
-          break;
-        case 'Country':
-        case 'Region':
-        default:
-          if (groupingValue === 'pais') {
-            setGroupingValue('biomas');
-          }
-          break;
-      }
-    } else {
-      if (groupingValue === 'pais') {
-        setGroupingValue('biomas');
-      }
-      if (mapRef.current) {
-        const mapInstance = mapRef.current.getMap();
-        mapInstance.flyTo({
-          center: [-55.9292, -15.7801],
-          zoom: 3.5,
-        });
-      }
-    }
-  }, [setSelectedTerritory, setGroupingValue, groupingValue]);
 
   // Calculate and emit statistics
   useEffect(() => {

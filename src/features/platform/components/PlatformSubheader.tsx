@@ -53,11 +53,9 @@ export function PlatformSubheader() {
           <span className="text-xs font-medium text-gray-700">
             Agregar pontos por bioma
           </span>
-          {/* @ts-ignore - Switch typing from @mapbiomas/ui */}
           <Switch
-            size="small"
             aria-label="Alternar visualização agregada por bioma"
-            isSelected={aggregateByBiome}
+            checked={aggregateByBiome}
             onChange={(value: boolean) => {
               setAggregateByBiome(value);
               // Quando desativar agregação, voltar a mostrar todos os pontos (Brasil inteiro)

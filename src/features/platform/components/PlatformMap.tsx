@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
@@ -6,8 +6,6 @@ import 'leaflet/dist/leaflet.css';
 import { MapLayout, CompassControl, ZoomControl } from '@mapbiomas/ui';
 import { soloDatasetLoaders, PSD_PLATFORM_DATASET_ID, loadPSDPlatformWithFilters } from '@/features/platform/data/soloDatasets';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
-import { TerritorySearchBar } from './TerritorySearchBar';
-import type { TerritoryResult } from './TerritorySelector';
 import { MarkerPopup } from './MarkerPopup';
 import { usePlatformStore } from '@/stores/platformStore';
 import { VectorTileLayer } from './VectorTileLayer';
@@ -71,9 +69,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     datasetError,
     setDatasetError,
     groupingValue,
-    setGroupingValue,
     selectedTerritory,
-    setSelectedTerritory,
   } = usePlatformStore();
 
   // State para armazenar GeoJSON do território selecionado
@@ -263,48 +259,6 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTerritory, map]);
 
-  // Handle territory selection - memoizado para evitar re-renders
-  const handleTerritorySelect = useCallback((territory: TerritoryResult | null) => {
-    setSelectedTerritory(territory);
-    setTerritoryGeoJSON(null); // Reset GeoJSON when territory changes
-    
-    // Atualiza a camada de vector tiles baseado no tipo de território selecionado
-    if (territory) {
-      switch (territory.type) {
-        case 'State':
-          setGroupingValue('estados');
-          break;
-        case 'Biome':
-          setGroupingValue('biomas');
-          break;
-        case 'Municipality':
-          setGroupingValue('municipios');
-          break;
-        case 'Country':
-        case 'Region':
-        default:
-          // Para País e Região, manter a camada atual ou usar biomas como padrão
-          if (groupingValue === 'pais') {
-            setGroupingValue('biomas');
-          }
-          break;
-      }
-    } else {
-      // Quando nenhum território está selecionado, manter a camada atual
-      // ou voltar para biomas se estiver em 'pais'
-      if (groupingValue === 'pais') {
-        setGroupingValue('biomas');
-      }
-    }
-    
-    // Quando um território é selecionado, os dados serão recarregados automaticamente
-    // via useEffect que depende de selectedTerritory
-    // O zoom será ajustado automaticamente quando os dados forem carregados
-    if (!territory && map) {
-      // Reset to Brazil view quando nenhum território está selecionado
-      map.setView([-15.7801, -55.9292], 3.5);
-    }
-  }, [map, groupingValue]);
 
   // Calculate and emit statistics whenever data or territory changes
   useEffect(() => {
