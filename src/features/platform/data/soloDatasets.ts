@@ -88,36 +88,44 @@ const loadGranulometryDatasetPoints: SoloDatasetLoader = async () => {
 };
 
 /**
- * Loader dinâmico que aceita filtros baseados em território selecionado
+ * Loader dinâmico que aceita filtros baseados em território selecionado e filtros adicionais
  */
-export async function loadGranulometryWithFilters(territory: TerritoryResult | null): Promise<SoloDatasetPoint[]> {
+export async function loadGranulometryWithFilters(
+  territory: TerritoryResult | null,
+  additionalFilters?: any
+): Promise<SoloDatasetPoint[]> {
   try {
     let response;
     
+    // Construir query com filtros adicionais
+    const queryFilters: any = {
+      ...additionalFilters,
+    };
+    
     if (!territory) {
-      console.log('🔄 [Granulometry] Carregando todos os dados...');
-      response = await getAllGranulometryData();
+      console.log('🔄 [Granulometry] Carregando todos os dados...', queryFilters);
+      response = await getAllGranulometryData(queryFilters);
     } else {
-      console.log(`🔄 [Granulometry] Carregando dados filtrados por ${territory.type}: ${territory.name}`);
+      console.log(`🔄 [Granulometry] Carregando dados filtrados por ${territory.type}: ${territory.name}`, queryFilters);
       
       switch (territory.type) {
         case 'Biome':
-          response = await getGranulometryByBiome(territory.name);
+          response = await getGranulometryByBiome(territory.name, queryFilters);
           break;
         case 'State':
           console.log(`🔍 [Granulometry] Filtrando por estado: "${territory.name}"`);
-          response = await getGranulometryByState(territory.name);
+          response = await getGranulometryByState(territory.name, queryFilters);
           console.log(`✅ [Granulometry] Resposta recebida: ${response.success ? 'sucesso' : 'erro'}, ${response.total || 0} registros`);
           break;
         case 'Municipality':
-          response = await getGranulometryByMunicipality(territory.name);
+          response = await getGranulometryByMunicipality(territory.name, queryFilters);
           break;
         case 'Region':
-          response = await getGranulometryByRegion(territory.name);
+          response = await getGranulometryByRegion(territory.name, queryFilters);
           break;
         default:
           console.warn(`⚠️ [Granulometry] Tipo de território não suportado: ${territory.type}`);
-          response = await getAllGranulometryData();
+          response = await getAllGranulometryData(queryFilters);
       }
     }
     

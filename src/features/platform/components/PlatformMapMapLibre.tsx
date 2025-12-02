@@ -902,6 +902,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
     selectedTerritory,
     setSelectedTerritory,
     aggregateByBiome,
+    granulometryFilters,
   } = usePlatformStore();
 
   const mapRef = useRef<MapRef>(null);
@@ -1226,7 +1227,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
     setDatasetError(null);
 
     if (selectedDatasetId === GRANULOMETRY_DATASET_ID) {
-      loadGranulometryWithFilters(selectedTerritory)
+      loadGranulometryWithFilters(selectedTerritory, granulometryFilters)
         .then((points) => {
           if (isCancelled) return;
           setDatasetPoints(points);
@@ -1271,7 +1272,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
       isCancelled = true; 
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDatasetId, selectedTerritory]);
+  }, [selectedDatasetId, selectedTerritory, granulometryFilters]);
 
   // Buscar GeoJSON do território selecionado e fazer zoom
   useEffect(() => {

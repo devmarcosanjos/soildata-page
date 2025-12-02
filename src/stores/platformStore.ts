@@ -44,6 +44,10 @@ interface PlatformState {
   // Aggregation mode
   aggregateByBiome: boolean;
   setAggregateByBiome: (value: boolean) => void;
+
+  // Granulometry filters
+  granulometryFilters: any;
+  setGranulometryFilters: (filters: any) => void;
 }
 
 export const usePlatformStore = create<PlatformState>((set) => ({
@@ -58,6 +62,7 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   groupingValue: 'biomas',
   selectedTerritory: null,
   aggregateByBiome: false,
+  granulometryFilters: {},
 
   // Actions - usando função estável para evitar re-renders
   setSelectedSoloDataset: (dataset) => set({ selectedSoloDataset: dataset }),
@@ -70,4 +75,5 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   setGroupingValue: (value) => set({ groupingValue: value }),
   setSelectedTerritory: (territory) => set({ selectedTerritory: territory }),
   setAggregateByBiome: (value) => set({ aggregateByBiome: value }),
+  setGranulometryFilters: (filters) => set({ granulometryFilters: filters }),
 }));

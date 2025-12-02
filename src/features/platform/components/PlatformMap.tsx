@@ -70,6 +70,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     setDatasetError,
     groupingValue,
     selectedTerritory,
+    granulometryFilters,
   } = usePlatformStore();
 
   // State para armazenar GeoJSON do território selecionado
@@ -132,9 +133,9 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
     setIsDatasetLoading(true);
     setDatasetError(null);
 
-    // Se for Granulometry, usar loader com filtros baseado em selectedTerritory
+    // Se for Granulometry, usar loader com filtros baseado em selectedTerritory e filtros adicionais
     if (selectedDatasetId === GRANULOMETRY_DATASET_ID) {
-      loadGranulometryWithFilters(selectedTerritory)
+      loadGranulometryWithFilters(selectedTerritory, granulometryFilters)
         .then((points) => {
           if (isCancelled) return;
           setDatasetPoints(points);
@@ -180,7 +181,7 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
       isCancelled = true; 
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDatasetId, selectedTerritory]);
+  }, [selectedDatasetId, selectedTerritory, granulometryFilters]);
 
   // Buscar GeoJSON do território selecionado e fazer zoom
   useEffect(() => {

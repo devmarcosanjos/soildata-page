@@ -2,6 +2,7 @@ import { Accordion, RadioGroup, Tabs } from '@mapbiomas/ui';
 import { EarthIcon, Settings2Icon } from 'lucide-react';
 import { soloDatasetOptions } from '@/features/platform/data/soloDatasets';
 import { useUIStore } from '@/stores/uiStore';
+import { GranulometryFilters } from '../GranulometryFilters';
 
 interface LeftMenuProps {
   selectedSoloDataset: string;
@@ -204,6 +205,9 @@ export function LeftMenu({ selectedSoloDataset, onSoloDatasetChange, isMinimized
               />
             </div>
           </Accordion>
+          
+          {/* Filtros de Granulometria */}
+          <GranulometryFilters />
         </div>
       </div>
   );
