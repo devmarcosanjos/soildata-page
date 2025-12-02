@@ -37,7 +37,7 @@ export function TerritorySelector({
 }: TerritorySelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('General result');
+  const [activeCategory, setActiveCategory] = useState('Country');
   const [tempSelected, setTempSelected] = useState<TerritoryResult | null>(selectedTerritory);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -151,7 +151,6 @@ export function TerritorySelector({
   }, [filteredResults]);
 
   const categories = [
-    { id: 'General result', label: 'General result', count: filteredResults.length },
     { id: 'Country', label: 'Country', count: groupedResults['Country']?.length || 0 },
     { id: 'Biome', label: 'Biome', count: groupedResults['Biome']?.length || 0 },
     { id: 'Region', label: 'Region', count: groupedResults['Region']?.length || 0 },
@@ -160,11 +159,8 @@ export function TerritorySelector({
   ];
 
   const displayedItems = useMemo(() => {
-    if (activeCategory === 'General result') {
-      return filteredResults.slice(0, 100); // Limit for performance
-    }
     return groupedResults[activeCategory] || [];
-  }, [activeCategory, filteredResults, groupedResults]);
+  }, [activeCategory, groupedResults]);
 
   const handleApply = () => {
     onSelectTerritory(tempSelected);

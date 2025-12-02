@@ -462,14 +462,6 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
 
       </MapContainer>
 
-      {/* Territory Search Bar - Positioned absolutely over the map */}
-      <div className="absolute top-4 left-4 z-[500]">
-        <TerritorySearchBar
-          onSelectTerritory={handleTerritorySelect}
-          selectedTerritory={selectedTerritory}
-        />
-      </div>
-
       {/* Layer Controls - Oculto pois a camada é controlada automaticamente pelo tipo de território selecionado */}
       {/* A camada de vector tiles é atualizada automaticamente quando um território é selecionado */}
 

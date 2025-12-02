@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { SearchInput, Checkbox } from '@mapbiomas/ui';
+import { Checkbox } from '@mapbiomas/ui';
 import { ChevronRight } from 'lucide-react';
 import type { TerritoryResult } from './TerritorySelector';
 import {
@@ -20,7 +20,7 @@ export function TerritorySearchBar({
 }: TerritorySearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('General result');
+  const [activeCategory, setActiveCategory] = useState('Country');
   const [tempSelected, setTempSelected] = useState<TerritoryResult | null>(selectedTerritory);
   const [territoriesData, setTerritoriesData] = useState<{
     biomes?: string[];
@@ -186,7 +186,6 @@ export function TerritorySearchBar({
   }, [filteredResults]);
 
   const categories = [
-    { id: 'General result', label: 'Resultado geral', count: filteredResults.length },
     { id: 'Country', label: 'País', count: groupedResults['Country']?.length || 0 },
     { id: 'Biome', label: 'Bioma', count: groupedResults['Biome']?.length || 0 },
     { id: 'Region', label: 'Região', count: groupedResults['Region']?.length || 0 },
@@ -195,11 +194,8 @@ export function TerritorySearchBar({
   ];
 
   const displayedItems = useMemo(() => {
-    if (activeCategory === 'General result') {
-      return filteredResults.slice(0, 100);
-    }
     return groupedResults[activeCategory] || [];
-  }, [activeCategory, filteredResults, groupedResults]);
+  }, [activeCategory, groupedResults]);
 
   const handleApply = () => {
     onSelectTerritory(tempSelected);
@@ -217,25 +213,27 @@ export function TerritorySearchBar({
 
 
   return (
-    <div className="flex items-center gap-4" ref={containerRef}>
+    <div className="flex items-center justify-start w-full max-w-[800px]" ref={containerRef}>
       {/* Search Input */}
-      <div className="relative">
+      <div className="relative w-full">
         <div className="relative" onFocus={() => setIsOpen(true)}>
-          <SearchInput
+          <input
             key={selectedTerritory?.id || 'search-input'}
-            placeholder="Buscar um ou mais territórios"
+            type="text"
+            placeholder="Pesquise um ou mais territórios"
             defaultValue={selectedTerritory?.name || searchQuery}
-            onChange={(value: string) => {
+            onChange={(event) => {
+              const value = event.target.value;
               setSearchQuery(value);
               if (!isOpen) setIsOpen(true);
             }}
-            className="w-[320px] bg-white shadow-sm"
+            className="w-full text-left bg-white shadow-none rounded-full border border-[#D1D5DB] px-5 py-2 text-base text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C55B28]/40 focus:border-[#C55B28]"
             aria-label="Buscar territórios (biomas, estados, municípios ou regiões)"
           />
         </div>
 
         {isOpen && (
-          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 w-[800px] max-w-[90vw] z-500 overflow-hidden flex flex-col font-sans">
+          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 w-full max-w-[90vw] z-500 overflow-hidden flex flex-col font-sans">
             <div className="flex h-[500px]">
               {/* Sidebar Categories */}
               <div className="w-64 shrink-0 border-r border-gray-100 overflow-y-auto bg-white py-2">

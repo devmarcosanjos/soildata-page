@@ -1,28 +1,50 @@
-import { Breadcrumbs } from '@mapbiomas/ui';
+import { TerritorySearchBar } from './TerritorySearchBar';
+import { usePlatformStore } from '@/stores/platformStore';
+import type { TerritoryResult } from './TerritorySelector';
 
 export function PlatformSubheader() {
+  const {
+    selectedTerritory,
+    setSelectedTerritory,
+    groupingValue,
+    setGroupingValue,
+  } = usePlatformStore();
+
+  const handleTerritorySelect = (territory: TerritoryResult | null) => {
+    setSelectedTerritory(territory);
+
+    if (territory) {
+      switch (territory.type) {
+        case 'State':
+          setGroupingValue('estados');
+          break;
+        case 'Biome':
+          setGroupingValue('biomas');
+          break;
+        case 'Municipality':
+          setGroupingValue('municipios');
+          break;
+        case 'Country':
+        case 'Region':
+        default:
+          if (groupingValue === 'pais') {
+            setGroupingValue('biomas');
+          }
+          break;
+      }
+    } else {
+      if (groupingValue === 'pais') {
+        setGroupingValue('biomas');
+      }
+    }
+  };
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--spacing-size-large)',
-      }}
-    >
-      <Breadcrumbs
-        items={[
-          {
-            id: 1,
-            label: 'América do Sul',
-          },
-          {
-            id: 2,
-            label: 'Brasil',
-          },
-        ]}
-        onClick={() => {}}
+    <div className="w-full">
+      <TerritorySearchBar
+        onSelectTerritory={handleTerritorySelect}
+        selectedTerritory={selectedTerritory}
       />
     </div>
   );
 }
-

@@ -16,6 +16,89 @@ import bbox from '@turf/bbox';
 import { points, featureCollection } from '@turf/helpers';
 import type { FeatureCollection, Feature, Geometry, Point } from 'geojson';
 
+// Normaliza respostas diversas da API MapBiomas para um FeatureCollection válido
+function normalizeTerritoryFeatureCollection(
+  geoJSON: any
+): FeatureCollection | null {
+  if (!geoJSON) return null;
+
+  // Desembrulhar se vier aninhado em data/bounds
+  if (geoJSON.data) {
+    return normalizeTerritoryFeatureCollection(geoJSON.data);
+  }
+
+  if (geoJSON.bounds) {
+    return normalizeTerritoryFeatureCollection(geoJSON.bounds);
+  }
+
+  // FeatureCollection direto
+  if (
+    geoJSON.type === 'FeatureCollection' &&
+    Array.isArray(geoJSON.features) &&
+    geoJSON.features.length > 0
+  ) {
+    return geoJSON as FeatureCollection;
+  }
+
+  // Feature único
+  if (geoJSON.type === 'Feature' && geoJSON.geometry) {
+    return {
+      type: 'FeatureCollection',
+      features: [geoJSON as Feature],
+    };
+  }
+
+  // Geometry direto (Polygon, MultiPolygon, etc.)
+  if (
+    typeof geoJSON.type === 'string' &&
+    Array.isArray(geoJSON.coordinates)
+  ) {
+    return {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: geoJSON as Geometry,
+          properties: {},
+        },
+      ],
+    };
+  }
+
+  // Objeto com geometry interno
+  if (
+    geoJSON.geometry &&
+    typeof geoJSON.geometry === 'object' &&
+    typeof geoJSON.geometry.type === 'string' &&
+    Array.isArray(geoJSON.geometry.coordinates)
+  ) {
+    return {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: geoJSON.geometry as Geometry,
+          properties: geoJSON.properties || {},
+        },
+      ],
+    };
+  }
+
+  // Array de features
+  if (Array.isArray(geoJSON) && geoJSON.length > 0) {
+    return {
+      type: 'FeatureCollection',
+      features: geoJSON as Feature[],
+    };
+  }
+
+  console.warn(
+    '⚠️ [GeoJSON Normalize] Formato de GeoJSON não reconhecido:',
+    geoJSON
+  );
+  return null;
+}
+
 // MapStatistics exportado para compatibilidade
 export interface MapStatistics {
   totalDatasets: number;
@@ -293,46 +376,22 @@ function TerritoryHighlightGeoJSON({
       console.warn('⚠️ [GeoJSON Highlight] GeoJSON é null ou undefined');
       return null;
     }
-    
-    // Se for FeatureCollection válido
-    if ('type' in geoJSON && geoJSON.type === 'FeatureCollection' && 'features' in geoJSON && Array.isArray(geoJSON.features) && geoJSON.features.length > 0) {
-      console.log(`✅ [GeoJSON Highlight] FeatureCollection válido com ${geoJSON.features.length} features`);
-      return geoJSON as FeatureCollection;
+
+    const normalized = normalizeTerritoryFeatureCollection(geoJSON);
+    if (!normalized) {
+      console.warn('⚠️ [GeoJSON Highlight] Não foi possível normalizar o GeoJSON');
+      return null;
     }
-    
-    // Se for um único Feature, converter para FeatureCollection
-    if ('type' in geoJSON && geoJSON.type === 'Feature' && 'geometry' in geoJSON) {
-      console.log('🔄 [GeoJSON Highlight] Convertendo Feature para FeatureCollection');
-      return {
-        type: 'FeatureCollection',
-        features: [geoJSON as Feature]
-      } as FeatureCollection;
-    }
-    
-    // Se tiver geometry diretamente, converter para Feature
-    if ('geometry' in geoJSON && geoJSON.geometry && typeof geoJSON.geometry === 'object' && 'type' in geoJSON.geometry) {
-      console.log('🔄 [GeoJSON Highlight] Convertendo geometry para Feature');
-      return {
-        type: 'FeatureCollection',
-        features: [{
-          type: 'Feature',
-          geometry: geoJSON.geometry as Geometry,
-          properties: ('properties' in geoJSON && geoJSON.properties) ? geoJSON.properties : {}
-        }]
-      } as FeatureCollection;
-    }
-    
-    // Se for um array de features
-    if (Array.isArray(geoJSON) && geoJSON.length > 0) {
-      console.log('🔄 [GeoJSON Highlight] Convertendo array para FeatureCollection');
-      return {
-        type: 'FeatureCollection',
-        features: geoJSON as Feature[]
-      } as FeatureCollection;
-    }
-    
-    console.warn('⚠️ [GeoJSON Highlight] Formato de GeoJSON não reconhecido:', geoJSON);
-    return null;
+
+    console.log(
+      '✅ [GeoJSON Highlight] GeoJSON normalizado para FeatureCollection',
+      {
+        type: normalized.type,
+        featuresCount: normalized.features?.length ?? 0,
+      }
+    );
+
+    return normalized;
   }, [geoJSON, territory.name]);
 
   if (!normalizedGeoJSON) {
@@ -638,43 +697,17 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
         .then((geoJSON) => {
           console.log(`📦 [Territory Highlight] GeoJSON recebido:`, geoJSON);
           console.log(`📦 [Territory Highlight] Tipo do GeoJSON:`, geoJSON?.type, geoJSON?.features ? `(${geoJSON.features?.length} features)` : '');
-          
-          if (geoJSON && mapRef.current) {
-            console.log('🔍 [Territory Highlight] Validando GeoJSON recebido...');
-            console.log('🔍 [Territory Highlight] Tipo:', geoJSON.type);
-            const isFeatureCollection = geoJSON.type === 'FeatureCollection' && 'features' in geoJSON;
-            console.log('🔍 [Territory Highlight] Tem features?', isFeatureCollection, isFeatureCollection && Array.isArray(geoJSON.features));
-            console.log('🔍 [Territory Highlight] Tem geometry?', 'geometry' in geoJSON);
-            
-            // Validar formato do GeoJSON - ser mais flexível
-            const hasValidStructure = 
-              (geoJSON.type === 'FeatureCollection' && 'features' in geoJSON) ||
-              (geoJSON.type === 'Feature' && 'geometry' in geoJSON) ||
-              (geoJSON.type === 'GeometryCollection') ||
-              ('geometry' in geoJSON && geoJSON.type === 'Feature' && geoJSON.geometry !== undefined);
-            
-            console.log('🔍 [Territory Highlight] GeoJSON tem estrutura válida?', hasValidStructure);
-            
-            if (!hasValidStructure) {
-              console.warn('⚠️ [Territory Highlight] GeoJSON em formato inválido:', geoJSON);
-              console.warn('⚠️ [Territory Highlight] Estrutura:', Object.keys(geoJSON));
-              setTerritoryGeoJSON(null);
-              return;
-            }
-            
-            console.log('✅ [Territory Highlight] GeoJSON válido, definindo no state');
-            const featuresCount = isFeatureCollection ? geoJSON.features?.length ?? 0 : 0;
-            console.log('✅ [Territory Highlight] GeoJSON será renderizado:', {
-              type: geoJSON.type,
-              hasFeatures: isFeatureCollection,
-              featuresCount,
-              hasGeometry: 'geometry' in geoJSON
+          const normalized = normalizeTerritoryFeatureCollection(geoJSON);
+
+          if (normalized && mapRef.current) {
+            console.log('✅ [Territory Highlight] GeoJSON normalizado, definindo no state', {
+              type: normalized.type,
+              featuresCount: normalized.features?.length ?? 0,
             });
-            setTerritoryGeoJSON(geoJSON);
+            setTerritoryGeoJSON(normalized);
 
             try {
-              // Calcular bounds do GeoJSON usando função helper
-              fitMapToBounds(geoJSON as FeatureCollection);
+              fitMapToBounds(normalized);
             } catch (error) {
               console.error('Failed to fit bounds from GeoJSON:', error);
               if (filteredPoints.length > 0) {
@@ -689,7 +722,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
               }
             }
           } else {
-            console.warn('⚠️ [Territory Highlight] GeoJSON vazio ou mapa não disponível');
+            console.warn('⚠️ [Territory Highlight] GeoJSON vazio ou inválido ou mapa não disponível');
             setTerritoryGeoJSON(null);
             if (mapRef.current && filteredPoints.length > 0 && !isDatasetLoading) {
               try {
@@ -874,11 +907,26 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
             id="all-points"
             type="circle"
             paint={{
-              'circle-color': '#C55B28',
-              'circle-radius': 6,
-              'circle-stroke-width': 2,
-              'circle-stroke-color': '#fff',
-              'circle-opacity': 0.9,
+              // Cor principal alinhada ao tema SoloData
+              'circle-color': '#D65A2A', // laranja solo mais vivo
+              // Raio responsivo ao zoom para leitura em diferentes escalas
+              'circle-radius': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                3, 4,
+                6, 5.5,
+                9, 7,
+                12, 8.5,
+                15, 10,
+              ],
+              // Borda clara para destacar sobre qualquer fundo
+              'circle-stroke-width': 1.75,
+              'circle-stroke-color': '#FEF3E6',
+              // Sombra leve para sensação de profundidade
+              'circle-blur': 0.1,
+              'circle-opacity': 0.95,
+              'circle-stroke-opacity': 0.95,
             }}
           />
         </Source>
@@ -926,14 +974,6 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
         )}
 
       </Map>
-
-      {/* Territory Search Bar */}
-      <div className="absolute top-4 left-4 z-500">
-        <TerritorySearchBar
-          onSelectTerritory={handleTerritorySelect}
-          selectedTerritory={selectedTerritory}
-        />
-      </div>
 
       {/* Map Controls */}
       <MapLayout>
