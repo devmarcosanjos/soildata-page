@@ -360,7 +360,7 @@ function TerritoryHighlightVectorTiles({
         type="fill"
         source-layer="default"
         filter={filterExpression as maplibregl.FilterSpecification}
-        beforeId="points"
+        beforeId="all-points"
         paint={{
           'fill-color': '#F97316', // Laranja vibrante
           'fill-opacity': 0.7, // Opacidade alta para destaque máximo
@@ -490,6 +490,19 @@ function ClickInfoPopupContent({ info }: { info: ClickInfoState }) {
       t.category?.name?.['pt-BR']?.toLowerCase() === 'municipio'
   );
 
+  const biome = territories?.find(
+    (t) =>
+      t.category?.id === 4 ||
+      t.category?.name?.['pt-BR']?.toLowerCase() === 'bioma'
+  );
+
+  const region = territories?.find(
+    (t) =>
+      t.category?.id === 2 ||
+      t.category?.name?.['pt-BR']?.toLowerCase() === 'região' ||
+      t.category?.name?.['pt-BR']?.toLowerCase() === 'regiao'
+  );
+
   const samplesForPoint = (() => {
     if (!datasetPoint) return [];
     if (Array.isArray(relatedSamples) && relatedSamples.length > 0) {
@@ -522,6 +535,34 @@ function ClickInfoPopupContent({ info }: { info: ClickInfoState }) {
       ? `https://soildata.mapbiomas.org/dataset.xhtml?persistentId=${displayDoi}`
       : '#');
 
+  const pixelSummary = useMemo(() => {
+    if (!pixelHistory || pixelHistory.length === 0) return null;
+
+    const sorted = [...pixelHistory].sort((a, b) => a.year - b.year);
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+
+    let firstChangeYear: number | null = null;
+    let previousValue = first.pixelValue;
+
+    for (let i = 1; i < sorted.length; i += 1) {
+      const current = sorted[i];
+      if (current.pixelValue !== previousValue) {
+        firstChangeYear = current.year;
+        break;
+      }
+      previousValue = current.pixelValue;
+    }
+
+    return {
+      firstYear: first.year,
+      lastYear: last.year,
+      firstValue: first.pixelValue,
+      lastValue: last.pixelValue,
+      firstChangeYear,
+    };
+  }, [pixelHistory]);
+
   const selectedPointBlock = (
     <div className="pt-3 border-t border-gray-100 mt-2">
       <div className="text-[11px] md:text-xs uppercase tracking-wide text-gray-500">
@@ -534,7 +575,13 @@ function ClickInfoPopupContent({ info }: { info: ClickInfoState }) {
   );
 
   return (
-    <div className="flex flex-col gap-4 text-sm md:text-base max-w-lg p-4 md:p-5">
+    <div
+      className="flex flex-col gap-4 text-sm md:text-base max-w-lg p-4 md:p-5"
+      onClick={(event) => {
+        // Evita que cliques nas abas ou conteúdo sejam interpretados como clique no mapa
+        event.stopPropagation();
+      }}
+    >
       {/* Tabs */}
       <div className="flex rounded-full bg-gray-100 p-1 text-xs md:text-sm font-semibold border border-gray-200 mr-9 md:mr-10 mt-1">
         <button
@@ -566,9 +613,6 @@ function ClickInfoPopupContent({ info }: { info: ClickInfoState }) {
           {datasetPoint ? (
             <>
               <div className="border border-orange-100 rounded-2xl p-4 bg-orange-50/70">
-                <div className="text-sm md:text-base font-bold mb-1 text-[#C55B28] break-words">
-                  {datasetPoint.id}
-                </div>
                 <div className="text-[11px] md:text-xs uppercase tracking-wide text-[#C55B28] mb-0.5 font-semibold">
                   Título do projeto
                 </div>
@@ -715,6 +759,28 @@ function ClickInfoPopupContent({ info }: { info: ClickInfoState }) {
               <div className="text-xs md:text-sm uppercase tracking-wide text-gray-700 mb-1.5">
                 Territórios no ponto (territories/point)
               </div>
+              {(municipality || biome || region) && (
+                <div className="mb-2 text-xs text-gray-700">
+                  {municipality && (
+                    <div>
+                      <span className="font-semibold">Município: </span>
+                      {municipality.name}
+                    </div>
+                  )}
+                  {biome && (
+                    <div>
+                      <span className="font-semibold">Bioma: </span>
+                      {biome.name}
+                    </div>
+                  )}
+                  {region && (
+                    <div>
+                      <span className="font-semibold">Região: </span>
+                      {region.name}
+                    </div>
+                  )}
+                </div>
+              )}
               <ul className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
                 {territories.map((t) => (
                   <li key={t.id} className="flex flex-col">
@@ -750,6 +816,24 @@ function ClickInfoPopupContent({ info }: { info: ClickInfoState }) {
                   </div>
                 ))}
               </div>
+              {pixelSummary && (
+                <div className="mt-2 text-xs text-gray-700">
+                  <div>
+                    <span className="font-semibold">Classe inicial: </span>
+                    {pixelSummary.firstValue} ({pixelSummary.firstYear})
+                  </div>
+                  <div>
+                    <span className="font-semibold">Classe atual: </span>
+                    {pixelSummary.lastValue} ({pixelSummary.lastYear})
+                  </div>
+                  {pixelSummary.firstChangeYear && (
+                    <div>
+                      <span className="font-semibold">Primeira mudança detectada em: </span>
+                      {pixelSummary.firstChangeYear}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1388,6 +1472,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
             <Layer
               id="territories-fill"
               type="fill"
+              source-layer="default"
               paint={{
                 'fill-color': groupingValue === 'estados' ? '#FEF3C7' : groupingValue === 'biomas' ? '#D1FAE5' : '#DBEAFE',
                 'fill-opacity': 0.15, // Reduzido para dar mais destaque ao território selecionado
@@ -1396,6 +1481,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
             <Layer
               id="territories-outline"
               type="line"
+              source-layer="default"
               paint={{
                 'line-color': groupingValue === 'estados' ? '#D97706' : groupingValue === 'biomas' ? '#059669' : '#2563EB',
                 'line-width': groupingValue === 'municipios' ? 0.5 : 1,

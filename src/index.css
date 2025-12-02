@@ -542,3 +542,9 @@ div[class*="Rightbar"] {
   max-width: 220px !important;
   width: 100% !important;
 }
+
+/* Ocultar resizer do rightbar da Platform UI */
+div[class*="rightbarResizer"],
+div[class*="RightbarResizer"] {
+  display: none !important;
+}
