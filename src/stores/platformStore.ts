@@ -40,6 +40,10 @@ interface PlatformState {
   // Selected territory
   selectedTerritory: TerritoryResult | null;
   setSelectedTerritory: (territory: TerritoryResult | null) => void;
+
+  // Aggregation mode
+  aggregateByBiome: boolean;
+  setAggregateByBiome: (value: boolean) => void;
 }
 
 export const usePlatformStore = create<PlatformState>((set) => ({
@@ -53,6 +57,7 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   datasetError: null,
   groupingValue: 'biomas',
   selectedTerritory: null,
+  aggregateByBiome: false,
 
   // Actions - usando função estável para evitar re-renders
   setSelectedSoloDataset: (dataset) => set({ selectedSoloDataset: dataset }),
@@ -64,5 +69,5 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   setDatasetError: (error) => set({ datasetError: error }),
   setGroupingValue: (value) => set({ groupingValue: value }),
   setSelectedTerritory: (territory) => set({ selectedTerritory: territory }),
+  setAggregateByBiome: (value) => set({ aggregateByBiome: value }),
 }));
-

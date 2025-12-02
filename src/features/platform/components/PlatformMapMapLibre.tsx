@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import Map, { Source, Layer, Popup } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { MapLayout, CompassControl, ZoomControl, Button } from '@mapbiomas/ui';
+import { MapLayout, CompassControl, ZoomControl, Button, Switch } from '@mapbiomas/ui';
 import { MountainIcon } from 'lucide-react';
 import { TooltipTrigger, Tooltip } from 'react-aria-components';
 import { soloDatasetLoaders, PSD_PLATFORM_DATASET_ID, loadPSDPlatformWithFilters } from '@/features/platform/data/soloDatasets';
@@ -143,6 +143,55 @@ const GROUPING_TO_DIVISION_CATEGORY: Record<string, number> = {
   'estados': 3,
   'municipios': 95,
 };
+
+// Paleta de cores por bioma (tonalidades SoloData)
+// Nomes baseados nos atributos "name", "Name" ou "NM_BIOMA" dos tiles de bioma
+const BIOME_FILL_EXPRESSION: any = [
+  'case',
+  [
+    'any',
+    ['==', ['get', 'name'], 'Amazônia'],
+    ['==', ['get', 'Name'], 'Amazônia'],
+    ['==', ['get', 'NM_BIOMA'], 'Amazônia'],
+  ],
+  '#FFE8D6', // Amazônia - laranja muito claro
+  [
+    'any',
+    ['==', ['get', 'name'], 'Cerrado'],
+    ['==', ['get', 'Name'], 'Cerrado'],
+    ['==', ['get', 'NM_BIOMA'], 'Cerrado'],
+  ],
+  '#FED7AA', // Cerrado
+  [
+    'any',
+    ['==', ['get', 'name'], 'Mata Atlântica'],
+    ['==', ['get', 'Name'], 'Mata Atlântica'],
+    ['==', ['get', 'NM_BIOMA'], 'Mata Atlântica'],
+  ],
+  '#FFE4CF', // Mata Atlântica
+  [
+    'any',
+    ['==', ['get', 'name'], 'Caatinga'],
+    ['==', ['get', 'Name'], 'Caatinga'],
+    ['==', ['get', 'NM_BIOMA'], 'Caatinga'],
+  ],
+  '#FECACA', // Caatinga
+  [
+    'any',
+    ['==', ['get', 'name'], 'Pampa'],
+    ['==', ['get', 'Name'], 'Pampa'],
+    ['==', ['get', 'NM_BIOMA'], 'Pampa'],
+  ],
+  '#E5E7EB', // Pampa
+  [
+    'any',
+    ['==', ['get', 'name'], 'Pantanal'],
+    ['==', ['get', 'Name'], 'Pantanal'],
+    ['==', ['get', 'NM_BIOMA'], 'Pantanal'],
+  ],
+  '#FDE68A', // Pantanal
+  '#F3F4F6', // Cor padrão para biomas desconhecidos
+];
 
 // Componente para renderizar highlight do território usando Vector Tiles do MapBiomas
 function TerritoryHighlightVectorTiles({ 
@@ -854,6 +903,8 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
     setGroupingValue,
     selectedTerritory,
     setSelectedTerritory,
+    aggregateByBiome,
+    setAggregateByBiome,
   } = usePlatformStore();
 
   const mapRef = useRef<MapRef>(null);
@@ -869,6 +920,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
   const [bearing, setBearing] = useState(0);
   const [pitch, setPitch] = useState(0);
   const [exaggerationActive, setExaggerationActive] = useState(false);
+  const [hoveredBiomeName, setHoveredBiomeName] = useState<string | null>(null);
 
   const { setMap } = usePlatformStore();
 
@@ -942,6 +994,60 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
       mapInstance.getCanvas().style.cursor = '';
     };
   }, []);
+
+  // Hover de biomas: destacar bioma sob o mouse quando visualizando biomas em modo agregado
+  useEffect(() => {
+    const mapInstance = mapRef.current?.getMap();
+    if (!mapInstance) return;
+
+    // Apenas quando o agrupamento atual é por biomas E estamos em modo agregado
+    if (!aggregateByBiome || groupingValue !== 'biomas') {
+      setHoveredBiomeName(null);
+      return;
+    }
+
+    const handleMove = (e: maplibregl.MapLayerMouseEvent) => {
+      try {
+        const features = mapInstance.queryRenderedFeatures(e.point, {
+          layers: ['territories-fill'],
+        });
+
+        if (!features.length) {
+          setHoveredBiomeName(null);
+          return;
+        }
+
+        const feature = features[0];
+        const props = feature.properties as any;
+        const name =
+          (props?.name as string) ||
+          (props?.Name as string) ||
+          (props?.NM_BIOMA as string) ||
+          null;
+
+        if (name && typeof name === 'string') {
+          setHoveredBiomeName(name);
+        } else {
+          setHoveredBiomeName(null);
+        }
+      } catch {
+        setHoveredBiomeName(null);
+      }
+    };
+
+    const handleLeave = () => {
+      setHoveredBiomeName(null);
+    };
+
+    mapInstance.on('mousemove', 'territories-fill', handleMove);
+    mapInstance.on('mouseleave', 'territories-fill', handleLeave);
+
+    return () => {
+      mapInstance.off('mousemove', 'territories-fill', handleMove);
+      mapInstance.off('mouseleave', 'territories-fill', handleLeave);
+      setHoveredBiomeName(null);
+    };
+  }, [aggregateByBiome, groupingValue]);
 
   // Configurar projeção Globe e Terreno 3D após o mapa carregar
   useEffect(() => {
@@ -1045,6 +1151,68 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
       }
     });
   }, [datasetPoints, selectedTerritory, selectedDatasetId]);
+
+  // Pontos agregados por bioma para visão resumida
+  const aggregatedBiomePoints = useMemo(() => {
+    const groups: Record<string, {
+      biomeLabel: string;
+      latSum: number;
+      lngSum: number;
+      count: number;
+    }> = {};
+
+    filteredPoints.forEach((point) => {
+      const biomeName = point.biome || 'Sem bioma';
+      const key = biomeName;
+
+      if (!groups[key]) {
+        groups[key] = {
+          biomeLabel: biomeName,
+          latSum: 0,
+          lngSum: 0,
+          count: 0,
+        };
+      }
+
+      groups[key].latSum += point.latitude;
+      groups[key].lngSum += point.longitude;
+      groups[key].count += 1;
+    });
+
+    return Object.values(groups).map((group) => ({
+      id: group.biomeLabel,
+      latitude: group.latSum / group.count,
+      longitude: group.lngSum / group.count,
+      biome: group.biomeLabel,
+      samplesCount: group.count,
+    }));
+  }, [filteredPoints]);
+
+  const hoveredBiomeInfo = useMemo(() => {
+    if (!aggregateByBiome || !hoveredBiomeName) return null;
+
+    const normalize = (value: string) =>
+      value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+
+    const target = normalize(hoveredBiomeName);
+
+    const match = aggregatedBiomePoints.find((item) => {
+      const label = item.biome || item.id;
+      return normalize(label) === target;
+    });
+
+    if (!match) return null;
+
+    return {
+      biomeName: match.biome,
+      count: match.samplesCount,
+      lngLat: [match.longitude, match.latitude] as [number, number],
+    };
+  }, [aggregateByBiome, hoveredBiomeName, aggregatedBiomePoints]);
 
   // Carregar dados do dataset
   useEffect(() => {
@@ -1229,8 +1397,10 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
 
   // Converter pontos para GeoJSON para clustering
   const pointsGeoJSON = useMemo<FeatureCollection<Point>>(() => {
+    const basePoints = aggregateByBiome ? aggregatedBiomePoints : filteredPoints;
+
     return featureCollection(
-      filteredPoints.map(point => ({
+      basePoints.map((point: any) => ({
         type: 'Feature' as const,
         geometry: {
           type: 'Point' as const,
@@ -1241,7 +1411,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
         },
       }))
     );
-  }, [filteredPoints]);
+  }, [filteredPoints, aggregatedBiomePoints, aggregateByBiome]);
 
   const showEmptyState = !isDatasetLoading && !datasetError && !!selectedDatasetId && filteredPoints.length === 0;
 
@@ -1279,6 +1449,11 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
         attributionControl={false}
         projection="globe"
         onClick={(e) => {
+          // Em modo agregado por bioma, não abrimos popup de ponto individual
+          if (aggregateByBiome) {
+            return;
+          }
+
           const mapInstance = mapRef.current?.getMap();
           if (!mapInstance) return;
 
@@ -1474,7 +1649,12 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
               type="fill"
               source-layer="default"
               paint={{
-                'fill-color': groupingValue === 'estados' ? '#FEF3C7' : groupingValue === 'biomas' ? '#D1FAE5' : '#DBEAFE',
+                'fill-color':
+                  groupingValue === 'biomas'
+                    ? BIOME_FILL_EXPRESSION
+                    : groupingValue === 'estados'
+                    ? '#FEF3C7'
+                    : '#DBEAFE',
                 'fill-opacity': 0.15, // Reduzido para dar mais destaque ao território selecionado
               }}
             />
@@ -1483,11 +1663,56 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
               type="line"
               source-layer="default"
               paint={{
-                'line-color': groupingValue === 'estados' ? '#D97706' : groupingValue === 'biomas' ? '#059669' : '#2563EB',
+                'line-color':
+                  groupingValue === 'biomas'
+                    ? '#C55B28' // borda biomas com cor SoloData
+                    : groupingValue === 'estados'
+                    ? '#D97706'
+                    : '#2563EB',
                 'line-width': groupingValue === 'municipios' ? 0.5 : 1,
                 'line-opacity': 0.6, // Reduzido para dar mais destaque ao território selecionado
               }}
             />
+            {/* Hover highlight de bioma em modo agregado */}
+            {aggregateByBiome && groupingValue === 'biomas' && hoveredBiomeName && (
+              <>
+                <Layer
+                  id="biome-hover-fill"
+                  type="fill"
+                  source-layer="default"
+                  filter={
+                    [
+                      'any',
+                      ['==', ['get', 'name'], hoveredBiomeName],
+                      ['==', ['get', 'Name'], hoveredBiomeName],
+                      ['==', ['get', 'NM_BIOMA'], hoveredBiomeName],
+                    ] as any
+                  }
+                  paint={{
+                    'fill-color': '#FED7AA',
+                    'fill-opacity': 0.35,
+                  }}
+                />
+                <Layer
+                  id="biome-hover-outline"
+                  type="line"
+                  source-layer="default"
+                  filter={
+                    [
+                      'any',
+                      ['==', ['get', 'name'], hoveredBiomeName],
+                      ['==', ['get', 'Name'], hoveredBiomeName],
+                      ['==', ['get', 'NM_BIOMA'], hoveredBiomeName],
+                    ] as any
+                  }
+                  paint={{
+                    'line-color': '#C2410C',
+                    'line-width': 2,
+                    'line-opacity': 0.9,
+                  }}
+                />
+              </>
+            )}
           </Source>
         )}
 
@@ -1499,27 +1724,77 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
             paint={{
               // Cor principal alinhada ao tema SoloData
               'circle-color': '#D65A2A', // laranja solo mais vivo
-              // Raio responsivo ao zoom para leitura em diferentes escalas
+              // Raio responsivo ao zoom; em modo agregado (features com samplesCount),
+              // os círculos ficam maiores para maior destaque, usando uma única expressão de zoom
               'circle-radius': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
-                3, 4,
-                6, 5.5,
-                9, 7,
-                12, 8.5,
-                15, 10,
+                3,
+                ['case', ['has', 'samplesCount'], 6, 4],
+                6,
+                ['case', ['has', 'samplesCount'], 8, 5.5],
+                9,
+                ['case', ['has', 'samplesCount'], 10, 7],
+                12,
+                ['case', ['has', 'samplesCount'], 12, 8.5],
+                15,
+                ['case', ['has', 'samplesCount'], 14, 10],
               ],
               // Borda clara para destacar sobre qualquer fundo
-              'circle-stroke-width': 1.75,
+              'circle-stroke-width': [
+                'case',
+                ['has', 'samplesCount'],
+                2.25,
+                1.75,
+              ],
               'circle-stroke-color': '#FEF3E6',
               // Sombra leve para sensação de profundidade
-              'circle-blur': 0.1,
-              'circle-opacity': 0.95,
-              'circle-stroke-opacity': 0.95,
+              'circle-blur': 0.08,
+              'circle-opacity': 0.97,
+              'circle-stroke-opacity': 0.97,
             }}
           />
+          {aggregateByBiome && (
+            <Layer
+              id="biome-count-labels"
+              type="symbol"
+              layout={{
+                'text-field': ['to-string', ['get', 'samplesCount']],
+                'text-size': 12,
+                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                'text-offset': [0, 1.6],
+                'text-allow-overlap': true,
+              }}
+              paint={{
+                'text-color': '#C55B28',
+                'text-halo-color': 'rgba(255, 255, 255, 0.98)',
+                'text-halo-width': 1.6,
+              }}
+            />
+          )}
         </Source>
+
+        {/* Popup com quantidade de pontos do bioma em hover */}
+        {aggregateByBiome && groupingValue === 'biomas' && hoveredBiomeInfo && (
+          <Popup
+            longitude={hoveredBiomeInfo.lngLat[0]}
+            latitude={hoveredBiomeInfo.lngLat[1]}
+            anchor="center"
+            closeButton={false}
+            closeOnClick={false}
+            maxWidth="260px"
+          >
+            <div className="px-3 py-2 rounded-2xl bg-white/95 shadow-lg border border-orange-100 text-xs md:text-sm text-gray-800">
+              <div className="font-semibold text-[#C55B28] mb-0.5 text-sm md:text-base">
+                {hoveredBiomeInfo.biomeName}
+              </div>
+              <div className="text-[11px] md:text-xs text-gray-700">
+                {hoveredBiomeInfo.count.toLocaleString('pt-BR')} pontos
+              </div>
+            </div>
+          </Popup>
+        )}
 
         {/* Popup com informações completas do clique (CAR, territórios, pixel history + ponto SoloData) */}
         {clickInfo && (

@@ -1,4 +1,5 @@
 import { TerritorySearchBar } from './TerritorySearchBar';
+import { Switch } from '@mapbiomas/ui';
 import { usePlatformStore } from '@/stores/platformStore';
 import type { TerritoryResult } from './TerritorySelector';
 
@@ -8,6 +9,8 @@ export function PlatformSubheader() {
     setSelectedTerritory,
     groupingValue,
     setGroupingValue,
+    aggregateByBiome,
+    setAggregateByBiome,
   } = usePlatformStore();
 
   const handleTerritorySelect = (territory: TerritoryResult | null) => {
@@ -40,11 +43,32 @@ export function PlatformSubheader() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-3">
       <TerritorySearchBar
         onSelectTerritory={handleTerritorySelect}
         selectedTerritory={selectedTerritory}
       />
+      <div className="flex justify-end pr-2">
+        <div className="bg-white/95 rounded-full shadow-sm px-4 py-1.5 flex items-center gap-3 border border-gray-200">
+          <span className="text-xs font-medium text-gray-700">
+            Agregar pontos por bioma
+          </span>
+          {/* @ts-ignore - Switch typing from @mapbiomas/ui */}
+          <Switch
+            size="small"
+            aria-label="Alternar visualização agregada por bioma"
+            isSelected={aggregateByBiome}
+            onChange={(value: boolean) => {
+              setAggregateByBiome(value);
+              // Quando desativar agregação, voltar a mostrar todos os pontos (Brasil inteiro)
+              if (!value) {
+                setSelectedTerritory(null);
+                setGroupingValue('biomas');
+              }
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
