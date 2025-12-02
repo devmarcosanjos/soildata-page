@@ -31,7 +31,8 @@ Para mais detalhes, veja [ENV_SETUP.md](./ENV_SETUP.md)
 1. **`src/lib/api-config.ts`** - Configuração da URL base da API
 2. **`src/services/latestDatasetsApi.ts`** - Agora usa `/api/datasets/latest`
 3. **`src/services/metricsApi.ts`** - Agora usa `/api/metrics/*`
-4. **`src/features/platform/data/soloDatasets.ts`** - Agora busca de `/api/soil-data`
+4. **`src/services/granulometryApi.ts`** - Serviço para endpoints de granulometria
+5. **`src/features/platform/data/soloDatasets.ts`** - Agora usa `/api/granulometry`
 
 ## Como Usar
 
@@ -69,12 +70,17 @@ O frontend automaticamente usará a API local em `http://localhost:3000`
 - `GET /api/metrics/monthly/*` - Métricas mensais
 - E mais...
 
-### Dados de Solo
-- `GET /api/soil-data` - Lista pontos de solo (com filtros opcionais)
+### Granulometria
+- `GET /api/granulometry` - Lista dados de granulometria com filtros opcionais
+  - Parâmetros de query: `biome`, `state`, `region`, `municipality`, `datasetId`, `layerId`, `limit`, `offset`, `sortBy`, `sortOrder`, e filtros de profundidade, coordenadas e frações
+- `GET /api/granulometry/summary` - Resumo/estatísticas de granulometria
+- `GET /api/granulometry/filters` - Lista filtros disponíveis (biomas, estados, regiões, municípios, datasets, camadas)
+- `GET /api/granulometry/fractions` - Análise de frações (clay, silt, sand, coarse)
+  - Parâmetros: `fraction` (obrigatório), `biome`, `region`, `state`, `municipality`, `limit`, `offset`
 
 ## Fallback
 
-O `soloDatasets.ts` tem um fallback automático: se a API não estiver disponível, ele tenta carregar o JSON local como antes. Isso garante que o frontend continue funcionando mesmo sem a API.
+O `soloDatasets.ts` agora usa os endpoints de granulometria. Se a API não estiver disponível, os erros serão tratados e o usuário será notificado.
 
 ## Troubleshooting
 

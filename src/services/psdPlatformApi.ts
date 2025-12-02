@@ -268,6 +268,32 @@ export async function getAvailableRegioes(): Promise<string[]> {
 }
 
 /**
+ * Normaliza nomes de biomas do SoilData para o formato esperado pela API MapBiomas
+ */
+function normalizeBiomeNameForMapBiomas(name: string): string {
+  const normalize = (value: string) =>
+    value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+  const n = normalize(name);
+
+  switch (n) {
+    case 'amazonia':
+      // API MapBiomas costuma usar "Amazonia" (sem acento)
+      return 'Amazonia';
+    case 'mata atlantica':
+      return 'Mata Atlantica';
+    default:
+      // Para outros biomas (Cerrado, Caatinga, Pampa, Pantanal),
+      // normalmente o nome já é aceito como está
+      return name;
+  }
+}
+
+/**
  * Busca GeoJSON do território selecionado da API MapBiomas
  */
 export async function getTerritoryGeoJSON(
@@ -282,9 +308,11 @@ export async function getTerritoryGeoJSON(
       case 'State':
         url = `${mapbiomasApiUrl}/estado/${encodeURIComponent(name)}`;
         break;
-      case 'Biome':
-        url = `${mapbiomasApiUrl}/bioma/${encodeURIComponent(name)}`;
+      case 'Biome': {
+        const apiName = normalizeBiomeNameForMapBiomas(name);
+        url = `${mapbiomasApiUrl}/bioma/${encodeURIComponent(apiName)}`;
         break;
+      }
       case 'Municipality':
         url = `${mapbiomasApiUrl}/municipio/${encodeURIComponent(name)}`;
         break;

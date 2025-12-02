@@ -28,36 +28,60 @@ export interface SoloDatasetDefinition {
 }
 
 import { 
-  getAllPSDPlatformData,
-  getPSDByBiome,
-  getPSDByEstado,
-  getPSDByMunicipio,
-  getPSDByRegiao,
-} from '@/services/psdPlatformApi';
-import { mapPSDRecordsToSoloPoints } from './psdDataMapper';
+  getAllGranulometryData,
+  getGranulometryByBiome,
+  getGranulometryByState,
+  getGranulometryByMunicipality,
+  getGranulometryByRegion,
+} from '@/services/granulometryApi';
+import { mapGranulometryRecordsToSoloPoints } from './granulometryDataMapper';
 import type { TerritoryResult } from '@/features/platform/components/TerritorySelector';
 
-export const PSD_PLATFORM_DATASET_ID = 'psd-platform-dataset';
+export const GRANULOMETRY_DATASET_ID = 'granulometry-dataset';
 
-const loadPSDPlatformDatasetPoints: SoloDatasetLoader = async () => {
+const loadGranulometryDatasetPoints: SoloDatasetLoader = async () => {
   try {
-    console.log('🔄 [PSD Platform] Carregando dados da API...');
-    const response = await getAllPSDPlatformData();
+    console.log('🔄 [Granulometry] Carregando dados da API...');
+    const response = await getAllGranulometryData();
     
-    if (!response.success || !Array.isArray(response.data)) {
-      console.error('❌ [PSD Platform] Resposta inválida da API');
+    console.log('📋 [Granulometry] Resposta completa:', {
+      success: response.success,
+      total: response.total,
+      returned: response.returned,
+      dataIsArray: Array.isArray(response.data),
+      dataLength: response.data?.length || 0,
+      firstRecord: response.data?.[0] || null,
+    });
+    
+    if (!response.success) {
+      console.error('❌ [Granulometry] Resposta não foi bem-sucedida:', response);
       return [];
     }
     
-    console.log(`✅ [PSD Platform] ${response.data.length} registros recebidos`);
-    const points = mapPSDRecordsToSoloPoints(response.data);
-    console.log(`✅ [PSD Platform] ${points.length} pontos mapeados`);
+    if (!Array.isArray(response.data)) {
+      console.error('❌ [Granulometry] Resposta inválida da API - data não é um array:', typeof response.data, response.data);
+      return [];
+    }
+    
+    if (response.data.length === 0) {
+      console.warn('⚠️ [Granulometry] Nenhum registro retornado pela API');
+      return [];
+    }
+    
+    console.log(`✅ [Granulometry] ${response.data.length} registros recebidos`);
+    const points = mapGranulometryRecordsToSoloPoints(response.data);
+    console.log(`✅ [Granulometry] ${points.length} pontos mapeados`);
+    
+    if (points.length === 0) {
+      console.warn('⚠️ [Granulometry] Nenhum ponto foi mapeado após conversão');
+    }
     
     return points;
   } catch (error) {
-    console.error('❌ [PSD Platform] Erro ao buscar dados:', error);
+    console.error('❌ [Granulometry] Erro ao buscar dados:', error);
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
       console.error('   Erro de rede - API pode estar indisponível ou bloqueada por CORS');
+      console.error('   Verifique se a API está rodando em http://localhost:3000');
     }
     return [];
   }
@@ -66,50 +90,69 @@ const loadPSDPlatformDatasetPoints: SoloDatasetLoader = async () => {
 /**
  * Loader dinâmico que aceita filtros baseados em território selecionado
  */
-export async function loadPSDPlatformWithFilters(territory: TerritoryResult | null): Promise<SoloDatasetPoint[]> {
+export async function loadGranulometryWithFilters(territory: TerritoryResult | null): Promise<SoloDatasetPoint[]> {
   try {
     let response;
     
     if (!territory) {
-      console.log('🔄 [PSD Platform] Carregando todos os dados...');
-      response = await getAllPSDPlatformData();
+      console.log('🔄 [Granulometry] Carregando todos os dados...');
+      response = await getAllGranulometryData();
     } else {
-      console.log(`🔄 [PSD Platform] Carregando dados filtrados por ${territory.type}: ${territory.name}`);
+      console.log(`🔄 [Granulometry] Carregando dados filtrados por ${territory.type}: ${territory.name}`);
       
       switch (territory.type) {
         case 'Biome':
-          response = await getPSDByBiome(territory.name);
+          response = await getGranulometryByBiome(territory.name);
           break;
         case 'State':
-          // A API aceita tanto nome completo quanto sigla
-          console.log(`🔍 [PSD Platform] Filtrando por estado: "${territory.name}"`);
-          response = await getPSDByEstado(territory.name);
-          console.log(`✅ [PSD Platform] Resposta recebida: ${response.success ? 'sucesso' : 'erro'}, ${response.data?.length || 0} registros`);
+          console.log(`🔍 [Granulometry] Filtrando por estado: "${territory.name}"`);
+          response = await getGranulometryByState(territory.name);
+          console.log(`✅ [Granulometry] Resposta recebida: ${response.success ? 'sucesso' : 'erro'}, ${response.total || 0} registros`);
           break;
         case 'Municipality':
-          response = await getPSDByMunicipio(territory.name);
+          response = await getGranulometryByMunicipality(territory.name);
           break;
         case 'Region':
-          response = await getPSDByRegiao(territory.name);
+          response = await getGranulometryByRegion(territory.name);
           break;
         default:
-          console.warn(`⚠️ [PSD Platform] Tipo de território não suportado: ${territory.type}`);
-          response = await getAllPSDPlatformData();
+          console.warn(`⚠️ [Granulometry] Tipo de território não suportado: ${territory.type}`);
+          response = await getAllGranulometryData();
       }
     }
     
     if (!response.success || !Array.isArray(response.data)) {
-      console.error('❌ [PSD Platform] Resposta inválida da API');
+      console.error('❌ [Granulometry] Resposta inválida da API');
       return [];
     }
     
-    console.log(`✅ [PSD Platform] ${response.data.length} registros recebidos`);
-    const points = mapPSDRecordsToSoloPoints(response.data);
-    console.log(`✅ [PSD Platform] ${points.length} pontos mapeados`);
+    console.log(`✅ [Granulometry] ${response.data.length} registros recebidos`);
+    
+    // Verificar se os dados recebidos têm o bioma correto (para debug)
+    if (territory?.type === 'Biome' && response.data.length > 0) {
+      const biomesCount = response.data.reduce((acc: Record<string, number>, r: any) => {
+        const biome = r.biome || 'null';
+        acc[biome] = (acc[biome] || 0) + 1;
+        return acc;
+      }, {});
+      console.log(`🔍 [Granulometry] Distribuição de biomas nos dados recebidos:`, biomesCount);
+      
+      const normalize = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      const wrongBiomes = Object.keys(biomesCount).filter(b => {
+        return normalize(b) !== normalize(territory.name);
+      });
+      if (wrongBiomes.length > 0) {
+        console.warn(`⚠️ [Granulometry] Dados com biomas incorretos encontrados:`, wrongBiomes);
+        console.warn(`   Esperado: "${territory.name}", Recebido:`, Object.keys(biomesCount));
+      }
+    }
+    
+    const points = mapGranulometryRecordsToSoloPoints(response.data);
+    console.log(`✅ [Granulometry] ${points.length} pontos mapeados`);
     
     return points;
   } catch (error) {
-    console.error('❌ [PSD Platform] Erro ao buscar dados:', error);
+    console.error('❌ [Granulometry] Erro ao buscar dados:', error);
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
       console.error('   Erro de rede - API pode estar indisponível ou bloqueada por CORS');
     }
@@ -119,10 +162,10 @@ export async function loadPSDPlatformWithFilters(territory: TerritoryResult | nu
 
 const soloDatasetDefinitions: SoloDatasetDefinition[] = [
   {
-    id: PSD_PLATFORM_DATASET_ID,
+    id: GRANULOMETRY_DATASET_ID,
     label: 'Pontos Soildata',
-    loader: loadPSDPlatformDatasetPoints,
-    description: 'Dados de granulometria de solo (41.925 amostras) com informações de bioma, estado, município e região',
+    loader: loadGranulometryDatasetPoints,
+    description: 'Dados de granulometria de solo com informações de bioma, estado, município e região',
   },
 ];
 

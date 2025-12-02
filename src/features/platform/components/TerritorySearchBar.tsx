@@ -3,11 +3,8 @@ import { Checkbox } from '@mapbiomas/ui';
 import { ChevronRight } from 'lucide-react';
 import type { TerritoryResult } from './TerritorySelector';
 import {
-  getAvailableBiomes,
-  getAvailableEstados,
-  getAvailableMunicipios,
-  getAvailableRegioes,
-} from '@/services/psdPlatformApi';
+  getGranulometryFilters,
+} from '@/services/granulometryApi';
 
 interface TerritorySearchBarProps {
   onSelectTerritory: (territory: TerritoryResult | null) => void;
@@ -47,49 +44,41 @@ export function TerritorySearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Carregar territórios da API quando necessário
+  // Carregar todos os territórios da API quando o dropdown for aberto
   useEffect(() => {
-    if (isOpen && !territoriesData.loading && !territoriesData.biomes) {
+    if (isOpen && !territoriesData.loading && (!territoriesData.biomes || !territoriesData.municipios)) {
       setTerritoriesData(prev => ({ ...prev, loading: true }));
       
-      Promise.all([
-        getAvailableBiomes().catch(() => []),
-        getAvailableEstados().catch(() => []),
-        getAvailableRegioes().catch(() => []),
-      ])
-        .then(([biomes, estados, regioes]) => {
-          setTerritoriesData({
-            biomes,
-            estados,
-            regioes,
-            loading: false,
-          });
+      console.log('🔄 [TerritorySearchBar] Carregando todos os territórios da API...');
+      
+      getGranulometryFilters()
+        .then(response => {
+          if (response.success && response.filters) {
+            console.log('✅ [TerritorySearchBar] Territórios carregados:', {
+              biomes: response.filters.biomes?.length || 0,
+              estados: response.filters.states?.length || 0,
+              regioes: response.filters.regions?.length || 0,
+              municipios: response.filters.municipalities?.length || 0,
+            });
+            
+            setTerritoriesData({
+              biomes: response.filters.biomes || [],
+              estados: response.filters.states || [],
+              regioes: response.filters.regions || [],
+              municipios: response.filters.municipalities || [],
+              loading: false,
+            });
+          } else {
+            console.error('❌ [TerritorySearchBar] Resposta inválida da API:', response);
+            setTerritoriesData(prev => ({ ...prev, loading: false }));
+          }
         })
         .catch(err => {
-          console.error('Failed to load territories from API:', err);
+          console.error('❌ [TerritorySearchBar] Erro ao carregar territórios da API:', err);
           setTerritoriesData(prev => ({ ...prev, loading: false }));
         });
     }
-  }, [isOpen, territoriesData.loading, territoriesData.biomes]);
-
-  // Lazy load municipalities only when needed
-  useEffect(() => {
-    if (isOpen && activeCategory === 'Municipality' && !territoriesData.municipios && !territoriesData.loading) {
-      setTerritoriesData(prev => ({ ...prev, loading: true }));
-      getAvailableMunicipios()
-        .then(municipios => {
-          setTerritoriesData(prev => ({
-            ...prev,
-            municipios,
-            loading: false,
-          }));
-        })
-        .catch(err => {
-          console.error('Failed to load municipalities from API:', err);
-          setTerritoriesData(prev => ({ ...prev, loading: false }));
-        });
-    }
-  }, [isOpen, activeCategory, territoriesData.municipios, territoriesData.loading]);
+  }, [isOpen, territoriesData.loading, territoriesData.biomes, territoriesData.municipios]);
 
   // Flatten and index data for searching
   const allTerritories = useMemo(() => {
@@ -255,7 +244,9 @@ export function TerritorySearchBar({
                         <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
                           activeCategory === cat.id ? 'bg-[#C55B28] text-white' : 'bg-[#4B5563] text-white'
                         }`}>
-                          {cat.count > 999 ? '9,999+' : cat.count}
+                          {cat.count > 9999 
+                            ? `${Math.floor(cat.count / 1000)}k+` 
+                            : cat.count.toLocaleString('pt-BR')}
                         </span>
                         <ChevronRight className={`w-4 h-4 ${activeCategory === cat.id ? 'text-[#C55B28]' : 'text-gray-300'}`} />
                       </div>
@@ -294,7 +285,14 @@ export function TerritorySearchBar({
                   </div>
                   
                   <div className="space-y-2">
-                    {displayedItems.length > 0 ? (
+                    {territoriesData.loading ? (
+                      <div className="p-8 text-center text-gray-400 text-sm">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C55B28]"></div>
+                          <span>Carregando territórios...</span>
+                        </div>
+                      </div>
+                    ) : displayedItems.length > 0 ? (
                       displayedItems.map((item) => {
                         const isSelected = tempSelected?.id === item.id;
                         const itemId = `territory-item-${item.id}`;

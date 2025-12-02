@@ -5,7 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapLayout, CompassControl, ZoomControl, Button } from '@mapbiomas/ui';
 import { MountainIcon } from 'lucide-react';
 import { TooltipTrigger, Tooltip } from 'react-aria-components';
-import { soloDatasetLoaders, PSD_PLATFORM_DATASET_ID, loadPSDPlatformWithFilters } from '@/features/platform/data/soloDatasets';
+import { soloDatasetLoaders, GRANULOMETRY_DATASET_ID, loadGranulometryWithFilters } from '@/features/platform/data/soloDatasets';
 import type { SoloDatasetPoint } from '@/features/platform/data/soloDatasets';
 import type { TerritoryResult } from './TerritorySelector';
 import { usePlatformStore } from '@/stores/platformStore';
@@ -17,7 +17,7 @@ import {
   type MapBiomasPixelHistoryItem,
   type MapBiomasPropertyAtPoint,
   type MapBiomasTerritoryAtPoint,
-} from '@/services/psdPlatformApi';
+} from '@/services/granulometryApi';
 import bbox from '@turf/bbox';
 import { points, featureCollection } from '@turf/helpers';
 import type { FeatureCollection, Feature, Geometry, Point } from 'geojson';
@@ -1118,7 +1118,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
 
   // Filtrar pontos no frontend como fallback caso a API retorne todos os registros
   const filteredPoints = useMemo(() => {
-    if (!selectedTerritory || selectedDatasetId !== PSD_PLATFORM_DATASET_ID) {
+    if (!selectedTerritory || selectedDatasetId !== GRANULOMETRY_DATASET_ID) {
       return datasetPoints;
     }
 
@@ -1225,14 +1225,14 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
     setIsDatasetLoading(true);
     setDatasetError(null);
 
-    if (selectedDatasetId === PSD_PLATFORM_DATASET_ID) {
-      loadPSDPlatformWithFilters(selectedTerritory)
+    if (selectedDatasetId === GRANULOMETRY_DATASET_ID) {
+      loadGranulometryWithFilters(selectedTerritory)
         .then((points) => {
           if (isCancelled) return;
           setDatasetPoints(points);
         })
         .catch((error) => {
-          console.error('Falha ao carregar pontos do PSD Platform', error);
+          console.error('Falha ao carregar pontos de granulometria', error);
           if (isCancelled) return;
           setDatasetPoints([]);
           setDatasetError('Não foi possível carregar os pontos deste conjunto de dados.');
