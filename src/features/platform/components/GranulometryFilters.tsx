@@ -9,30 +9,36 @@ export function GranulometryFilters() {
   const { selectedSoloDataset } = usePlatformStore();
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Ler fração da URL ao montar
+  // Ler fração da URL ao montar, ou usar 'clay' como padrão
   const fractionFromUrl = searchParams.get('fraction') as 'clay' | 'silt' | 'sand' | 'coarse' | null;
-  const [selectedFraction, setSelectedFraction] = useState<'clay' | 'silt' | 'sand' | 'coarse' | null>(
-    fractionFromUrl || null
+  const defaultFraction = fractionFromUrl || 'clay'; // Primeira opção como padrão
+  const [selectedFraction, setSelectedFraction] = useState<'clay' | 'silt' | 'sand' | 'coarse'>(
+    defaultFraction
   );
+  
+  // Se não há fração na URL, adicionar 'clay' como padrão
+  useEffect(() => {
+    if (!searchParams.get('fraction')) {
+      searchParams.set('fraction', 'clay');
+      setSearchParams(searchParams, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Apenas ao montar
 
   // Sincronizar com a URL quando a fração mudar
   useEffect(() => {
-    if (selectedFraction) {
-      searchParams.set('fraction', selectedFraction);
-      setSearchParams(searchParams, { replace: true });
-    } else {
-      searchParams.delete('fraction');
-      setSearchParams(searchParams, { replace: true });
-    }
+    searchParams.set('fraction', selectedFraction);
+    setSearchParams(searchParams, { replace: true });
   }, [selectedFraction, searchParams, setSearchParams]);
 
   // Ler da URL quando a URL mudar (ex: navegação do browser)
   useEffect(() => {
     const urlFraction = searchParams.get('fraction') as 'clay' | 'silt' | 'sand' | 'coarse' | null;
-    if (urlFraction !== selectedFraction) {
-      setSelectedFraction(urlFraction);
+    const fractionToUse = urlFraction || 'clay'; // Usar 'clay' como padrão se não houver na URL
+    if (fractionToUse !== selectedFraction) {
+      setSelectedFraction(fractionToUse);
     }
-  }, [searchParams, selectedFraction]);
+  }, [searchParams]);
 
   // Só mostrar filtros se o dataset de granulometria estiver selecionado
   if (selectedSoloDataset !== GRANULOMETRY_DATASET_ID) {
@@ -56,7 +62,7 @@ export function GranulometryFilters() {
           <FilterIcon size={16} color="#FFFFFF" />
         </div>
       }
-      initialExpanded={false}
+      initialExpanded={true}
       hasPlusMinusIcon={true}
       type="theme"
       color="#EA580C"
@@ -78,9 +84,9 @@ export function GranulometryFilters() {
             { label: 'Fração areia (g/kg)', value: 'sand' },
             { label: 'Fração grossa (g/kg)', value: 'coarse' },
           ]}
-          value={selectedFraction || ''}
+          value={selectedFraction}
           onChange={(value) => {
-            setSelectedFraction(value as 'clay' | 'silt' | 'sand' | 'coarse' | null);
+            setSelectedFraction(value as 'clay' | 'silt' | 'sand' | 'coarse');
           }}
           orientation="vertical"
           size="large"
