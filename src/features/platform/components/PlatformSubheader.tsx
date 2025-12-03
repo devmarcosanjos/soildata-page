@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { TerritorySearchBar } from './TerritorySearchBar';
 import { Switch } from '@mapbiomas/ui';
 import { usePlatformStore } from '@/stores/platformStore';
@@ -12,6 +14,57 @@ export function PlatformSubheader() {
     aggregateByBiome,
     setAggregateByBiome,
   } = usePlatformStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Ler território da URL sempre que a URL mudar (URL é a fonte de verdade)
+  useEffect(() => {
+    const territoryType = searchParams.get('territoryType');
+    // URLSearchParams.get() já retorna o valor decodificado
+    const territoryName = searchParams.get('territoryName');
+    
+    if (territoryType && territoryName) {
+      // Sempre atualizar se a URL mudou (comparar com o que está no store)
+      const currentTerritoryKey = selectedTerritory ? `${selectedTerritory.type}-${selectedTerritory.name}` : null;
+      const urlTerritoryKey = `${territoryType}-${territoryName}`;
+      
+      if (currentTerritoryKey !== urlTerritoryKey) {
+        console.log(`🔄 [PlatformSubheader] Atualizando território da URL: ${territoryType} - ${territoryName}`);
+        const territory: TerritoryResult = {
+          id: `${territoryType.toLowerCase()}-${territoryName}`,
+          name: territoryName,
+          type: territoryType as TerritoryResult['type'],
+          feature: null,
+        };
+        setSelectedTerritory(territory);
+      }
+    } else {
+      // Se não há parâmetros na URL, garantir que Brasil está selecionado
+      if (!selectedTerritory || selectedTerritory.type !== 'Country' || selectedTerritory.name !== 'Brasil') {
+        const brasilTerritory: TerritoryResult = {
+          id: 'country-Brasil',
+          name: 'Brasil',
+          type: 'Country',
+          feature: null,
+        };
+        setSelectedTerritory(brasilTerritory);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]); // Apenas searchParams como dependência - selectedTerritory é usado apenas para comparação
+
+  // Sincronizar com a URL quando o território mudar
+  useEffect(() => {
+    if (selectedTerritory) {
+      searchParams.set('territoryType', selectedTerritory.type);
+      // URLSearchParams.set() já codifica automaticamente, não precisa encodeURIComponent
+      searchParams.set('territoryName', selectedTerritory.name);
+      setSearchParams(searchParams, { replace: true });
+    } else {
+      searchParams.delete('territoryType');
+      searchParams.delete('territoryName');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [selectedTerritory, searchParams, setSearchParams]);
 
   const handleTerritorySelect = (territory: TerritoryResult | null) => {
     setSelectedTerritory(territory);

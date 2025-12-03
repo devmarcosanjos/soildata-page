@@ -60,7 +60,12 @@ export const usePlatformStore = create<PlatformState>((set) => ({
   isDatasetLoading: false,
   datasetError: null,
   groupingValue: 'biomas',
-  selectedTerritory: null,
+  selectedTerritory: {
+    id: 'country-Brasil',
+    name: 'Brasil',
+    type: 'Country',
+    feature: null,
+  },
   aggregateByBiome: false,
   granulometryFilters: {},
 

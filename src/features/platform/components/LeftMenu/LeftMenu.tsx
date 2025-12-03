@@ -1,6 +1,5 @@
-import { Accordion, RadioGroup, Tabs } from '@mapbiomas/ui';
-import { EarthIcon, Settings2Icon } from 'lucide-react';
-import { soloDatasetOptions } from '@/features/platform/data/soloDatasets';
+import { Tabs } from '@mapbiomas/ui';
+import { Settings2Icon } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { GranulometryFilters } from '../GranulometryFilters';
 
@@ -162,53 +161,9 @@ export function LeftMenu({ selectedSoloDataset, onSoloDatasetChange, isMinimized
           flex: 1,
         }}
       >
-        <Accordion
-          title="SOLO"
-            icon={
-              <div style={{ 
-                width: '28px', 
-                height: '28px', 
-                borderRadius: '50%', 
-                backgroundColor: '#8B4513',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <EarthIcon size={16} color="#FFFFFF" />
-              </div>
-            }
-            badgeLabel="Beta"
-            initialExpanded={true}
-            hasPlusMinusIcon={true}
-            type="theme"
-            color="#EA580C"
-          >
-            <div 
-              id="solo-dataset-selection"
-              style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: 'var(--spacing-size-small)',
-                paddingTop: 'var(--spacing-size-small)',
-              }}
-              className="selecao-dados-soildata"
-            >
-              <RadioGroup
-                options={soloDatasetOptions}
-                value={selectedSoloDataset}
-                onChange={onSoloDatasetChange}
-                orientation="vertical"
-                size="large"
-                aria-label="Seleção de dataset de solo"
-                aria-labelledby="solo-dataset-selection"
-              />
-            </div>
-          </Accordion>
-          
-          {/* Filtros de Granulometria */}
-          <GranulometryFilters />
-        </div>
+        {/* Filtros de Granulometria */}
+        <GranulometryFilters />
+      </div>
       </div>
   );
 }

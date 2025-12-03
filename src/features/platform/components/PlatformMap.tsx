@@ -190,6 +190,27 @@ export function PlatformMap({ selectedDatasetId, onStatisticsChange }: PlatformM
       return;
     }
 
+    // Se for Country (Brasil), ajustar zoom para mostrar o Brasil completo
+    if (selectedTerritory.type === 'Country') {
+      console.log('🇧🇷 [Territory Highlight] Ajustando zoom para mostrar Brasil completo');
+      setTerritoryGeoJSON(null);
+      
+      // Bounds aproximados do Brasil
+      const brazilBounds: [[number, number], [number, number]] = [
+        [-73.9904, -33.7512], // Sudoeste (longitude, latitude)
+        [-34.7297, 5.2718],    // Nordeste
+      ];
+      
+      if (map) {
+        map.fitBounds(brazilBounds, {
+          padding: [50, 50],
+          maxZoom: 5,
+        });
+      }
+      
+      return;
+    }
+
     // Buscar GeoJSON apenas para State, Biome ou Municipality
     if (selectedTerritory.type === 'State' || selectedTerritory.type === 'Biome' || selectedTerritory.type === 'Municipality') {
       getTerritoryGeoJSON(selectedTerritory.type, selectedTerritory.name)

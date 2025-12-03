@@ -438,6 +438,8 @@ function TerritoryHighlightGeoJSON({
   territory: TerritoryResult; 
   geoJSON: FeatureCollection | Feature | Geometry | null;
 }) {
+  const mapRef = usePlatformStore((state) => state.map);
+  
   // Normalizar GeoJSON se necessário
   const normalizedGeoJSON = useMemo(() => {
     console.log('🎨 [GeoJSON Highlight] Renderizando highlight para:', territory.name);
@@ -465,6 +467,33 @@ function TerritoryHighlightGeoJSON({
     return normalized;
   }, [geoJSON, territory.name]);
 
+  // Limpar Source anterior quando o território mudar
+  useEffect(() => {
+    return () => {
+      // Limpar Source anterior quando o componente for desmontado
+      if (mapRef) {
+        try {
+          const mapInstance = (mapRef as any).getMap ? (mapRef as any).getMap() : mapRef;
+          const oldSourceId = 'territory-highlight-geojson';
+          if (mapInstance.getSource && mapInstance.getSource(oldSourceId)) {
+            console.log('🧹 [GeoJSON Highlight] Removendo Source anterior:', oldSourceId);
+            // Remover layers primeiro
+            if (mapInstance.getLayer('territory-geojson-fill')) {
+              mapInstance.removeLayer('territory-geojson-fill');
+            }
+            if (mapInstance.getLayer('territory-geojson-outline')) {
+              mapInstance.removeLayer('territory-geojson-outline');
+            }
+            // Remover source
+            mapInstance.removeSource(oldSourceId);
+          }
+        } catch (error) {
+          // Ignorar erros ao limpar
+        }
+      }
+    };
+  }, [territory.id, mapRef]);
+
   if (!normalizedGeoJSON) {
     console.warn('⚠️ [GeoJSON Highlight] Não foi possível normalizar o GeoJSON');
     return null;
@@ -480,30 +509,38 @@ function TerritoryHighlightGeoJSON({
     } : null
   });
 
+  // Usar ID único baseado no território para forçar atualização
+  // Incluir ID do território para garantir que seja recriado quando mudar
+  const sourceId = `territory-highlight-geojson-${territory.type}-${territory.name}-${territory.id}`;
+  
   return (
     <Source 
-      id="territory-highlight-geojson" 
+      key={sourceId}
+      id={sourceId}
       type="geojson" 
       data={normalizedGeoJSON as FeatureCollection}
     >
       {/* Camada de preenchimento principal - cor vibrante e opaca */}
       <Layer
-        id="territory-geojson-fill"
+        key={`${sourceId}-fill`}
+        id={`${sourceId}-fill`}
         type="fill"
         beforeId="all-points" // Renderizar antes dos pontos para garantir visibilidade
         paint={{
           'fill-color': '#F97316', // Laranja vibrante
-          'fill-opacity': 0.8, // Aumentado para 0.8 para máximo destaque
+          'fill-opacity': 0.25, // Opacidade reduzida para não esconder os pontos
         }}
       />
       {/* Contorno externo grosso para destaque máximo */}
       <Layer
-        id="territory-geojson-outline"
+        key={`${sourceId}-outline`}
+        id={`${sourceId}-outline`}
         type="line"
         paint={{
           'line-color': '#C55B28', // Cor laranja escura do tema
-          'line-width': 8, // Aumentado para 8 para máximo destaque
+          'line-width': 4, // Largura para destaque
           'line-opacity': 1.0, // Opacidade total
+          'line-dasharray': [2, 2], // Linha tracejada para mais destaque
         }}
       />
     </Source>
@@ -1282,18 +1319,57 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
       return;
     }
 
-    console.log(`🔍 [Territory Highlight] Buscando GeoJSON para ${selectedTerritory.type}: ${selectedTerritory.name}`);
+    // Limpar GeoJSON anterior imediatamente quando o território mudar
+    const territoryKey = `${selectedTerritory.type}-${selectedTerritory.name}`;
+    console.log(`🔄 [Territory Highlight] Território mudou para: ${territoryKey}, limpando GeoJSON anterior`);
+    // Limpar imediatamente para forçar atualização
+    setTerritoryGeoJSON(null);
+    
+    // Capturar valores antes de usar em callbacks assíncronos
+    const currentTerritory = selectedTerritory;
+    const currentMapRef = mapRef.current;
+
+    // Se for Country (Brasil), ajustar zoom para mostrar o Brasil completo
+    if (currentTerritory.type === 'Country') {
+      console.log('🇧🇷 [Territory Highlight] Ajustando zoom para mostrar Brasil completo');
+      setTerritoryGeoJSON(null);
+      
+      // Bounds aproximados do Brasil
+      const brazilBounds: [[number, number], [number, number]] = [
+        [-73.9904, -33.7512], // Sudoeste (longitude, latitude)
+        [-34.7297, 5.2718],    // Nordeste
+      ];
+      
+      if (currentMapRef) {
+        const mapInstance = currentMapRef.getMap();
+        mapInstance.fitBounds(brazilBounds, {
+          padding: { top: 50, bottom: 50, left: 50, right: 50 },
+          maxZoom: 5,
+        });
+      }
+      
+      return;
+    }
 
     // Buscar GeoJSON para State, Biome, Municipality ou Region
-    if (selectedTerritory.type === 'State' || selectedTerritory.type === 'Biome' || selectedTerritory.type === 'Municipality' || selectedTerritory.type === 'Region') {
-      getTerritoryGeoJSON(selectedTerritory.type, selectedTerritory.name)
+    if (currentTerritory.type === 'State' || currentTerritory.type === 'Biome' || currentTerritory.type === 'Municipality' || currentTerritory.type === 'Region') {
+      const territoryKey = `${currentTerritory.type}-${currentTerritory.name}`;
+      console.log(`🔍 [Territory Highlight] Buscando GeoJSON para ${territoryKey}`);
+      
+      getTerritoryGeoJSON(currentTerritory.type, currentTerritory.name)
         .then((geoJSON) => {
-          console.log(`📦 [Territory Highlight] GeoJSON recebido:`, geoJSON);
+          console.log(`📦 [Territory Highlight] GeoJSON recebido para ${territoryKey}:`, geoJSON);
           console.log(`📦 [Territory Highlight] Tipo do GeoJSON:`, geoJSON?.type, geoJSON?.features ? `(${geoJSON.features?.length} features)` : '');
           const normalized = normalizeTerritoryFeatureCollection(geoJSON);
 
-          if (normalized && mapRef.current) {
-            console.log('✅ [Territory Highlight] GeoJSON normalizado, definindo no state', {
+          // Verificar se o território ainda é o mesmo antes de atualizar
+          // Usar comparação mais robusta baseada em tipo e nome
+          const isStillCurrentTerritory = selectedTerritory && 
+            selectedTerritory.type === currentTerritory.type && 
+            selectedTerritory.name === currentTerritory.name;
+          
+          if (normalized && mapRef.current && isStillCurrentTerritory) {
+            console.log(`✅ [Territory Highlight] GeoJSON normalizado para ${territoryKey}, definindo no state`, {
               type: normalized.type,
               featuresCount: normalized.features?.length ?? 0,
             });
@@ -1777,6 +1853,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
           <>
             {console.log('🎯 [Map Render] Renderizando highlight para:', selectedTerritory.name, 'com GeoJSON:', !!territoryGeoJSON)}
             <TerritoryHighlightGeoJSON 
+              key={`highlight-${selectedTerritory.type}-${selectedTerritory.name}-${selectedTerritory.id}`}
               territory={selectedTerritory}
               geoJSON={territoryGeoJSON}
             />
@@ -1793,6 +1870,7 @@ export function PlatformMapMapLibre({ selectedDatasetId, onStatisticsChange }: P
         {/* Fallback: Highlight usando Vector Tiles se GeoJSON não estiver disponível */}
         {selectedTerritory && divisionCategoryId && !territoryGeoJSON && (
           <TerritoryHighlightVectorTiles 
+            key={`vectortiles-${selectedTerritory.type}-${selectedTerritory.name}-${selectedTerritory.id}`}
             territory={selectedTerritory}
             divisionCategoryId={divisionCategoryId}
             mapRef={mapRef}

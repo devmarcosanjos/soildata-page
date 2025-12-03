@@ -6,6 +6,7 @@ import type {
   GranulometryFiltersResponse,
   GranulometryFractionQuery,
   GranulometryFractionResponse,
+  GranulometryRecord,
 } from '@/types/granulometry';
 
 async function fetchGranulometry<T>(
@@ -162,23 +163,75 @@ export async function getAllGranulometryData(query?: Omit<GranulometryQuery, 'li
 
 /**
  * Busca dados de granulometria filtrados por bioma
+ * Implementa paginação automática para buscar todos os registros
  */
 export async function getGranulometryByBiome(
   biome: string,
   query?: Omit<GranulometryQuery, 'biome' | 'limit' | 'offset'>
 ): Promise<GranulometryResponse> {
-  const queryParams: GranulometryQuery = {
-    ...query,
-    biome,
+  const limit = 1000; // Max limit per request
+  let offset = 0;
+  let allData: GranulometryRecord[] = [];
+  let total = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const queryParams: GranulometryQuery = {
+      ...query,
+      biome,
+      limit,
+      offset,
+    };
+    const queryString = buildQueryString(queryParams);
+    const url = `${apiUrl('api/granulometry')}?${queryString}`;
+    
+    console.log(`🌐 [Granulometry API] Buscando bioma: "${biome}" (paginação): offset=${offset}, limit=${limit}`);
+    const response = await fetchGranulometry<GranulometryResponse>(url);
+    
+    if (response.success && Array.isArray(response.data)) {
+      allData = allData.concat(response.data);
+      total = response.total;
+      offset += response.returned;
+      hasMore = allData.length < total;
+      console.log(`📊 [Granulometry API] Paginação bioma: total=${total}, fetched=${allData.length}, nextOffset=${offset}, hasMore=${hasMore}`);
+    } else {
+      console.error('❌ [Granulometry API] Resposta inválida durante paginação:', response);
+      hasMore = false;
+    }
+  }
+
+  return {
+    success: true,
+    total: total,
+    returned: allData.length,
+    pagination: { limit: total, offset: 0 },
+    filters: {
+      ...query,
+      biome,
+      datasetId: null,
+      state: null,
+      region: null,
+      municipality: null,
+      layerId: null,
+      minDepth: null,
+      maxDepth: null,
+      minLatitude: null,
+      maxLatitude: null,
+      minLongitude: null,
+      maxLongitude: null,
+      minClayFraction: null,
+      maxClayFraction: null,
+      minSiltFraction: null,
+      maxSiltFraction: null,
+      minSandFraction: null,
+      maxSandFraction: null,
+    },
+    sorting: {
+      sortBy: null,
+      sortOrder: 'asc',
+    },
+    data: allData,
   };
-  const queryString = buildQueryString(queryParams);
-  const url = `${apiUrl('api/granulometry')}?${queryString}`;
-  
-  console.log(`🌐 [Granulometry API] Buscando bioma: "${biome}" -> URL: ${url}`);
-  const response = await fetchGranulometry<GranulometryResponse>(url);
-  console.log(`📊 [Granulometry API] Resposta: success=${response.success}, total=${response.total}, returned=${response.returned}`);
-  
-  return response;
 }
 
 /**
