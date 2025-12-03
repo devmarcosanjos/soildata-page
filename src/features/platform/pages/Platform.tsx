@@ -14,7 +14,6 @@ export function PlatformPage() {
     headerHeight,
     setHeaderHeight,
     selectedSoloDataset,
-    setSelectedSoloDataset,
     mapStatistics,
     setMapStatistics,
   } = usePlatformStore();
@@ -63,10 +62,7 @@ export function PlatformPage() {
                   <PlatformSubheader />
                 </Platform.Subheader>
                 <Platform.Leftbar>
-                  <PlatformLeftbar 
-                    selectedSoloDataset={selectedSoloDataset}
-                    onSoloDatasetChange={setSelectedSoloDataset}
-                  />
+                  <PlatformLeftbar />
                 </Platform.Leftbar>
                 <Platform.Content>
                   <PlatformMap 

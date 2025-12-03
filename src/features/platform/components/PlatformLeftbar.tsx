@@ -4,11 +4,10 @@ import { LeftMenu } from './LeftMenu';
 import { useUIStore } from '@/stores/uiStore';
 
 interface PlatformLeftbarProps {
-  selectedSoloDataset: string;
-  onSoloDatasetChange: (value: string) => void;
+  // Props removidas - não são mais necessárias após remoção da seção SOLO
 }
 
-export function PlatformLeftbar({ selectedSoloDataset, onSoloDatasetChange }: PlatformLeftbarProps) {
+export function PlatformLeftbar({}: PlatformLeftbarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isMinimized, setIsMinimized } = useUIStore();
 
@@ -57,8 +56,6 @@ export function PlatformLeftbar({ selectedSoloDataset, onSoloDatasetChange }: Pl
         }}
       >
         <LeftMenu 
-          selectedSoloDataset={selectedSoloDataset}
-          onSoloDatasetChange={onSoloDatasetChange}
           isMinimized={isMinimized}
         />
       </div>

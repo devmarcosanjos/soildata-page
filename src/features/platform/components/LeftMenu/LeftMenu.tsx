@@ -4,12 +4,10 @@ import { useUIStore } from '@/stores/uiStore';
 import { GranulometryFilters } from '../GranulometryFilters';
 
 interface LeftMenuProps {
-  selectedSoloDataset: string;
-  onSoloDatasetChange: (value: string) => void;
   isMinimized?: boolean;
 }
 
-export function LeftMenu({ selectedSoloDataset, onSoloDatasetChange, isMinimized = false }: LeftMenuProps) {
+export function LeftMenu({ isMinimized = false }: LeftMenuProps) {
   const { activeTab, setActiveTab } = useUIStore();
 
   const handleOpenPanel = () => {
